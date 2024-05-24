@@ -1,0 +1,1 @@
+Uruchomienie aplikacji desktopowej: npm start

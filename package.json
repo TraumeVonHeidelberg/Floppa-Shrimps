@@ -1,0 +1,22 @@
+{
+	"name": "projekt-dla-misia",
+	"version": "1.0.0",
+	"description": "",
+	"main": "script.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "electron ."
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"electron": "^29.1.5"
+	},
+	"dependencies": {
+		"express": "^4.19.2",
+		"mongoose": "^8.4.0",
+		"sequelize": "^6.37.3",
+		"sqlite3": "^5.1.7"
+	}
+}
