@@ -15,6 +15,11 @@ app.get('/', (req, res) => {
 	res.sendFile(path.join(__dirname, 'index.html'))
 })
 
+// Endpoint dla panelu administracyjnego
+app.get('/admin', (req, res) => {
+	res.sendFile(path.join(__dirname, 'public', 'admin.html'))
+})
+
 const PORT = process.env.PORT || 3000
 
 sequelize
