@@ -1,28 +1,28 @@
 document.addEventListener('DOMContentLoaded', function () {
-	const addElementsBtn = document.getElementById('add-elements-btn')
-	const listElementsBtn = document.getElementById('list-elements-btn')
-	const reservationsBtn = document.querySelector('button:nth-child(3)')
-	const mainContent = document.getElementById('main-content')
+	const addElementsBtn = document.getElementById('add-elements-btn');
+	const listElementsBtn = document.getElementById('list-elements-btn');
+	const reservationsBtn = document.querySelector('button:nth-child(3)');
+	const mainContent = document.getElementById('main-content');
 
 	function clearActiveClass() {
-		document.querySelectorAll('aside button').forEach(button => button.classList.remove('button-active'))
+		document.querySelectorAll('aside button').forEach(button => button.classList.remove('button-active'));
 	}
 
 	function formatPriceInput(input) {
 		input.addEventListener('blur', function () {
-			let value = parseFloat(input.value)
+			let value = parseFloat(input.value);
 			if (isNaN(value) || value < 0) {
-				value = 0
+				value = 0;
 			}
-			input.value = value.toFixed(2)
-		})
+			input.value = value.toFixed(2);
+		});
 	}
 
 	function submitMenuForm(event) {
-		event.preventDefault()
-		const name = document.getElementById('menu-name').value
-		const description = document.getElementById('menu-description').value
-		const price = document.getElementById('menu-price').value
+		event.preventDefault();
+		const name = document.getElementById('menu-name').value;
+		const description = document.getElementById('menu-description').value;
+		const price = document.getElementById('menu-price').value;
 
 		fetch('/api/menu', {
 			method: 'POST',
@@ -33,20 +33,20 @@ document.addEventListener('DOMContentLoaded', function () {
 		})
 			.then(response => response.json())
 			.then(data => {
-				alert('Pozycja dodana do menu!')
-				document.getElementById('menu-form').reset()
+				alert('Pozycja dodana do menu!');
+				document.getElementById('menu-form').reset();
 			})
 			.catch(error => {
-				console.error('Error:', error)
-				alert('Wystąpił błąd podczas dodawania pozycji do menu.')
-			})
+				console.error('Error:', error);
+				alert('Wystąpił błąd podczas dodawania pozycji do menu.');
+			});
 	}
 
 	function submitTestimonialForm(event) {
-		event.preventDefault()
-		const text = document.getElementById('testimonial-text').value
-		const author = document.getElementById('testimonial-author').value
-		const company = document.getElementById('testimonial-company').value
+		event.preventDefault();
+		const text = document.getElementById('testimonial-text').value;
+		const author = document.getElementById('testimonial-author').value;
+		const company = document.getElementById('testimonial-company').value;
 
 		fetch('/api/testimonials', {
 			method: 'POST',
@@ -57,18 +57,18 @@ document.addEventListener('DOMContentLoaded', function () {
 		})
 			.then(response => response.json())
 			.then(data => {
-				alert('Testimonial dodany!')
-				document.getElementById('testimonial-form').reset()
+				alert('Testimonial dodany!');
+				document.getElementById('testimonial-form').reset();
 			})
 			.catch(error => {
-				console.error('Error:', error)
-				alert('Wystąpił błąd podczas dodawania testimonialu.')
-			})
+				console.error('Error:', error);
+				alert('Wystąpił błąd podczas dodawania testimonialu.');
+			});
 	}
 
 	function loadAddElements() {
-		clearActiveClass()
-		addElementsBtn.classList.add('button-active')
+		clearActiveClass();
+		addElementsBtn.classList.add('button-active');
 		mainContent.innerHTML = `
 			<div class="dynamic-content">
 				<div class="select-element">
@@ -80,13 +80,13 @@ document.addEventListener('DOMContentLoaded', function () {
 				</div>
 				<div id="form-container"></div>
 			</div>
-		`
+		`;
 
-		const elementTypeSelect = document.getElementById('element-type')
-		const formContainer = document.getElementById('form-container')
+		const elementTypeSelect = document.getElementById('element-type');
+		const formContainer = document.getElementById('form-container');
 
 		elementTypeSelect.addEventListener('change', function () {
-			const selectedType = elementTypeSelect.value
+			const selectedType = elementTypeSelect.value;
 			if (selectedType === 'menu') {
 				formContainer.innerHTML = `
 					<form id="menu-form">
@@ -104,10 +104,10 @@ document.addEventListener('DOMContentLoaded', function () {
 						</div>
 						<button type="submit">Dodaj</button>
 					</form>
-				`
-				const priceInput = document.getElementById('menu-price')
-				formatPriceInput(priceInput)
-				document.getElementById('menu-form').addEventListener('submit', submitMenuForm)
+				`;
+				const priceInput = document.getElementById('menu-price');
+				formatPriceInput(priceInput);
+				document.getElementById('menu-form').addEventListener('submit', submitMenuForm);
 			} else if (selectedType === 'testimonial') {
 				formContainer.innerHTML = `
 					<form id="testimonial-form">
@@ -125,32 +125,90 @@ document.addEventListener('DOMContentLoaded', function () {
 						</div>
 						<button type="submit">Dodaj</button>
 					</form>
-				`
-				document.getElementById('testimonial-form').addEventListener('submit', submitTestimonialForm)
+				`;
+				document.getElementById('testimonial-form').addEventListener('submit', submitTestimonialForm);
 			}
-		})
+		});
 
 		// Trigger the change event to load the default form
-		elementTypeSelect.dispatchEvent(new Event('change'))
+		elementTypeSelect.dispatchEvent(new Event('change'));
 	}
 
 	function loadListElements() {
-		clearActiveClass()
-		listElementsBtn.classList.add('button-active')
+		clearActiveClass();
+		listElementsBtn.classList.add('button-active');
 		mainContent.innerHTML = `
-			<h2>Lista Elementów</h2>
-			<ul>
-				<li>Element 1</li>
-				<li>Element 2</li>
-				<li>Element 3</li>
-				<!-- Więcej elementów -->
-			</ul>
-		`
+			<div class="dynamic-content">
+				<div class="select-element">
+					<label for="element-list-type">Wybierz typ elementu:</label>
+					<select id="element-list-type" class="element-type">
+						<option value="menu">Menu</option>
+						<option value="testimonial">Testimonial</option>
+					</select>
+				</div>
+				<div id="list-container"></div>
+			</div>
+		`;
+
+		const elementListTypeSelect = document.getElementById('element-list-type');
+		const listContainer = document.getElementById('list-container');
+
+		elementListTypeSelect.addEventListener('change', function () {
+			const selectedType = elementListTypeSelect.value;
+			if (selectedType === 'menu') {
+				listContainer.innerHTML = `
+					<div class="elements-list">
+						<div class="element">
+							<div class="text-container">
+								<p class="element-text">Menu Item 1</p>
+								<p class="element-text">Description 1</p>
+								<p class="element-text">$10.00</p>
+							</div>
+							<i class="fa-regular fa-circle-xmark"></i>
+						</div>
+						<div class="element">
+							<div class="text-container">
+								<p class="element-text">Menu Item 2</p>
+								<p class="element-text">Description 2</p>
+								<p class="element-text">$15.00</p>
+							</div>
+							<i class="fa-regular fa-circle-xmark"></i>
+						</div>
+						<!-- Więcej elementów -->
+					</div>
+				`;
+			} else if (selectedType === 'testimonial') {
+				listContainer.innerHTML = `
+					<div class="elements-list">
+						<div class="element">
+							<div class="text-container">
+								<p class="element-text">Testimonial 1</p>
+								<p class="element-text">Author 1</p>
+								<p class="element-text">Company 1</p>
+							</div>
+							<i class="fa-regular fa-circle-xmark"></i>
+						</div>
+						<div class="element">
+							<div class="text-container">
+								<p class="element-text">Testimonial 2</p>
+								<p class="element-text">Author 2</p>
+								<p class="element-text">Company 2</p>
+							</div>
+							<i class="fa-regular fa-circle-xmark"></i>
+						</div>
+						<!-- Więcej elementów -->
+					</div>
+				`;
+			}
+		});
+
+		// Trigger the change event to load the default list
+		elementListTypeSelect.dispatchEvent(new Event('change'));
 	}
 
-	addElementsBtn.addEventListener('click', loadAddElements)
+	addElementsBtn.addEventListener('click', loadAddElements);
 	listElementsBtn.addEventListener('click', loadListElements);
 
 	// Domyślnie załaduj opcję "Dodaj Elementy" po załadowaniu strony
-	loadAddElements()
-})
+	loadAddElements();
+});

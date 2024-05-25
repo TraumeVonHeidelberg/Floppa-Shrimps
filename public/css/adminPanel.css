@@ -11,7 +11,7 @@ html {
 body {
 	background-color: white;
 	font-family: 'Raleway', 'sans-serif';
-    overflow: hidden;
+	overflow: hidden;
 }
 
 nav {
@@ -30,6 +30,11 @@ nav img {
 	grid-template-columns: 1.5fr 5fr;
 }
 
+article
+{
+	overflow: auto;
+}
+
 aside {
 	display: flex;
 	flex-direction: column;
@@ -40,6 +45,7 @@ aside {
 }
 
 button {
+	background-color: transparent;
 	cursor: pointer;
 }
 
@@ -47,7 +53,6 @@ aside button {
 	display: flex;
 	align-items: center;
 	gap: 1.2rem;
-	background-color: white;
 	border: 0.2rem solid #ced4da;
 	border-right: none;
 	padding: 1.2rem 2.4rem;
@@ -121,4 +126,28 @@ form button {
 	background-color: black;
 	color: white;
 	padding: 1.2rem 2.4rem;
+}
+
+/* List items section */
+
+.element {
+	display: grid;
+	grid-template-columns: 3fr 0.5fr;
+	align-items: center;
+	min-height: 15.4rem;
+	max-width: 40%;
+	font-size: 1.6rem;
+	line-height: 1.8;
+	color: white;
+	background-color: #0051e8;
+	border-radius: 1.2rem;
+	padding: 1.2rem;
+	margin-bottom: 2.4rem;
+}
+
+.element i {
+	display: flex;
+	justify-content: center;
+	font-size: 3.6rem;
+	cursor: pointer;
 }
