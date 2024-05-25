@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						<option value="testimonial">Testimonial</option>
 					</select>
 				</div>
-				<div id="list-container"></div>
+				<div id="list-container" class="list-container"></div>
 			</div>
 		`
 
