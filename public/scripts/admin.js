@@ -31,7 +31,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			},
 			body: JSON.stringify({ name, description, price }),
 		})
-			.then(response => response.json())
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok')
+				}
+				return response.json()
+			})
 			.then(data => {
 				alert('Pozycja dodana do menu!')
 				document.getElementById('menu-form').reset()
@@ -55,14 +60,40 @@ document.addEventListener('DOMContentLoaded', function () {
 			},
 			body: JSON.stringify({ text, author, company }),
 		})
-			.then(response => response.json())
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok')
+				}
+				return response.json()
+			})
 			.then(data => {
 				alert('Testimonial dodany!')
 				document.getElementById('testimonial-form').reset()
 			})
 			.catch(error => {
 				console.error('Error:', error)
-				alert('Wystąpił błąd podczas dodawania testimonialu.')
+				alert('Wystąpił błąd podczas dodawania opinii.')
+			})
+	}
+
+	function deleteItem(type, id) {
+		const url = type === 'menu' ? `/api/menu/${id}` : `/api/testimonials/${id}`
+		fetch(url, {
+			method: 'DELETE',
+		})
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok')
+				}
+				return response.json()
+			})
+			.then(data => {
+				alert(`${type === 'menu' ? 'Pozycja' : 'Testimonial'} usunięta!`)
+				loadListElements() // Reload list after deletion
+			})
+			.catch(error => {
+				console.error('Error:', error)
+				alert(`Wystąpił błąd podczas usuwania ${type === 'menu' ? 'pozycji' : 'opinii'}.`)
 			})
 	}
 
@@ -168,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function () {
 									<p class="element-text">${item.description}</p>
 									<p class="element-text">$${item.price.toFixed(2)}</p>
 								</div>
-								<i class="fa-regular fa-circle-xmark"></i>
+								<i class="fa-regular fa-circle-xmark" onclick="deleteItem('menu', ${item.id})"></i>
 							</div>
 						`
 							)
@@ -187,11 +218,11 @@ document.addEventListener('DOMContentLoaded', function () {
 								item => `
 							<div class="element">
 								<div class="text-container">
-									<p class="element-text">${item.text}</p>
+									<p class="element-text main-testimonial-text">${item.text}</p>
 									<p class="element-text">${item.author}</p>
 									<p class="element-text">${item.company}</p>
 								</div>
-								<i class="fa-regular fa-circle-xmark"></i>
+								<i class="fa-regular fa-circle-xmark" onclick="deleteItem('testimonial', ${item.id})"></i>
 							</div>
 						`
 							)
@@ -199,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					})
 					.catch(error => {
 						console.error('Error:', error)
-						alert('Wystąpił błąd podczas ładowania testimonials.')
+						alert('Wystąpił błąd podczas ładowania opinii.')
 					})
 			}
 		})
@@ -213,4 +244,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	// Domyślnie załaduj opcję "Dodaj Elementy" po załadowaniu strony
 	loadAddElements()
+
+	// Attach deleteItem function to the window object to make it accessible
+	window.deleteItem = deleteItem
 })

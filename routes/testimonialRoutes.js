@@ -23,4 +23,19 @@ router.post('/testimonials', async (req, res) => {
 	}
 })
 
+// Endpoint do usuwania testimonialu
+router.delete('/testimonials/:id', async (req, res) => {
+	try {
+		const id = req.params.id
+		const testimonial = await Testimonial.findByPk(id)
+		if (!testimonial) {
+			return res.status(404).json({ message: 'Testimonial nie znaleziony' })
+		}
+		await testimonial.destroy()
+		res.json({ message: 'Testimonial usunięty' })
+	} catch (err) {
+		res.status(500).json({ message: err.message })
+	}
+})
+
 module.exports = router
