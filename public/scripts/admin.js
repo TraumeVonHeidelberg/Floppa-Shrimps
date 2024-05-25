@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 			.catch(error => {
 				console.error('Error:', error)
-				alert('Wystąpił błąd podczas dodawania opinii.')
+				alert('Wystąpił błąd podczas dodawania testimonialu.')
 			})
 	}
 
@@ -88,13 +88,76 @@ document.addEventListener('DOMContentLoaded', function () {
 				return response.json()
 			})
 			.then(data => {
-				alert(`${type === 'menu' ? 'Pozycja' : 'Testimonial'} usunięta!`)
+				alert(`${type === 'menu' ? 'Pozycja' : 'Testimonial'} usunięty!`)
 				loadListElements() // Reload list after deletion
 			})
 			.catch(error => {
 				console.error('Error:', error)
-				alert(`Wystąpił błąd podczas usuwania ${type === 'menu' ? 'pozycji' : 'opinii'}.`)
+				alert(`Wystąpił błąd podczas usuwania ${type === 'menu' ? 'pozycji' : 'testimonialu'}.`)
 			})
+	}
+
+	function editItem(type, id, field, value) {
+		console.log(`Edit item: type=${type}, id=${id}, field=${field}, value=${value}`)
+		const url = type === 'menu' ? `/api/menu/${id}` : `/api/testimonials/${id}`
+
+		let data = {}
+		if (type === 'menu') {
+			const name = field === 'name' ? value : document.getElementById(`name-${id}`).textContent.trim()
+			const description =
+				field === 'description' ? value : document.getElementById(`description-${id}`).textContent.trim()
+			const price =
+				field === 'price'
+					? value
+					: parseFloat(document.getElementById(`price-${id}`).textContent.replace('$', '').trim())
+			data = { name, description, price }
+		} else if (type === 'testimonial') {
+			const text = field === 'text' ? value : document.getElementById(`text-${id}`).textContent.trim()
+			const author = field === 'author' ? value : document.getElementById(`author-${id}`).textContent.trim()
+			const company = field === 'company' ? value : document.getElementById(`company-${id}`).textContent.trim()
+			data = { text, author, company }
+		}
+
+		fetch(url, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(data),
+		})
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok')
+				}
+				return response.json()
+			})
+			.then(data => {
+				alert(`${type === 'menu' ? 'Pozycja' : 'Testimonial'} zaktualizowany!`)
+				loadListElements() // Reload list after update
+			})
+			.catch(error => {
+				console.error('Error:', error)
+				alert(`Wystąpił błąd podczas aktualizacji ${type === 'menu' ? 'pozycji' : 'testimonialu'}.`)
+			})
+	}
+
+	function makeEditable(element, type, id, field) {
+		element.addEventListener('click', function () {
+			const currentValue = element.textContent.trim()
+			const input = document.createElement('input')
+			input.type = 'text'
+			input.value = currentValue
+			input.addEventListener('blur', function () {
+				const newValue = input.value.trim()
+				if (newValue !== currentValue) {
+					editItem(type, id, field, newValue)
+				}
+				element.textContent = newValue || currentValue
+			})
+			element.textContent = ''
+			element.appendChild(input)
+			input.focus()
+		})
 	}
 
 	function loadAddElements() {
@@ -154,9 +217,9 @@ document.addEventListener('DOMContentLoaded', function () {
 							<label for="testimonial-company">Firma</label>
 							<input type="text" id="testimonial-company" name="company" required>
 						</div>
-						<button type="submit">Dodaj</button>
-					</form>
-				`
+							<button type="submit">Dodaj</button>
+						</form>
+					`
 				document.getElementById('testimonial-form').addEventListener('submit', submitTestimonialForm)
 			}
 		})
@@ -177,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						<option value="testimonial">Testimonial</option>
 					</select>
 				</div>
-				<div id="list-container" class="list-container"></div>
+				<div id="list-container"></div>
 			</div>
 		`
 
@@ -195,15 +258,20 @@ document.addEventListener('DOMContentLoaded', function () {
 								item => `
 							<div class="element">
 								<div class="text-container">
-									<p class="element-text">${item.name}</p>
-									<p class="element-text">${item.description}</p>
-									<p class="element-text">$${item.price.toFixed(2)}</p>
+									<p class="element-text" id="name-${item.id}">${item.name}</p>
+									<p class="element-text" id="description-${item.id}">${item.description}</p>
+									<p class="element-text" id="price-${item.id}">$${item.price.toFixed(2)}</p>
 								</div>
 								<i class="fa-regular fa-circle-xmark" onclick="deleteItem('menu', ${item.id})"></i>
 							</div>
 						`
 							)
 							.join('')
+						data.forEach(item => {
+							makeEditable(document.getElementById(`name-${item.id}`), 'menu', item.id, 'name')
+							makeEditable(document.getElementById(`description-${item.id}`), 'menu', item.id, 'description')
+							makeEditable(document.getElementById(`price-${item.id}`), 'menu', item.id, 'price')
+						})
 					})
 					.catch(error => {
 						console.error('Error:', error)
@@ -218,19 +286,24 @@ document.addEventListener('DOMContentLoaded', function () {
 								item => `
 							<div class="element">
 								<div class="text-container">
-									<p class="element-text main-testimonial-text">${item.text}</p>
-									<p class="element-text">${item.author}</p>
-									<p class="element-text">${item.company}</p>
+									<p class="element-text" id="text-${item.id}">${item.text}</p>
+									<p class="element-text" id="author-${item.id}">${item.author}</p>
+									<p class="element-text" id="company-${item.id}">${item.company}</p>
 								</div>
 								<i class="fa-regular fa-circle-xmark" onclick="deleteItem('testimonial', ${item.id})"></i>
 							</div>
 						`
 							)
 							.join('')
+						data.forEach(item => {
+							makeEditable(document.getElementById(`text-${item.id}`), 'testimonial', item.id, 'text')
+							makeEditable(document.getElementById(`author-${item.id}`), 'testimonial', item.id, 'author')
+							makeEditable(document.getElementById(`company-${item.id}`), 'testimonial', item.id, 'company')
+						})
 					})
 					.catch(error => {
 						console.error('Error:', error)
-						alert('Wystąpił błąd podczas ładowania opinii.')
+						alert('Wystąpił błąd podczas ładowania testimonials.')
 					})
 			}
 		})
@@ -245,6 +318,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	// Domyślnie załaduj opcję "Dodaj Elementy" po załadowaniu strony
 	loadAddElements()
 
-	// Attach deleteItem function to the window object to make it accessible
+	// Attach deleteItem and makeEditable functions to the window object to make them accessible
 	window.deleteItem = deleteItem
+	window.makeEditable = makeEditable
 })

@@ -38,4 +38,25 @@ router.delete('/menu/:id', async (req, res) => {
 	}
 })
 
+// Endpoint do aktualizacji pozycji menu
+router.put('/menu/:id', async (req, res) => {
+	const { name, description, price } = req.body
+	console.log(`Updating menu item: id=${req.params.id}, name=${name}, description=${description}, price=${price}`)
+	try {
+		const item = await MenuItem.findByPk(req.params.id)
+		if (!item) {
+			console.error('Item not found')
+			return res.status(404).json({ message: 'Pozycja nie znaleziona' })
+		}
+		item.name = name
+		item.description = description
+		item.price = price
+		await item.save()
+		res.json(item)
+	} catch (err) {
+		console.error('Error updating item:', err)
+		res.status(500).json({ message: err.message })
+	}
+})
+
 module.exports = router
