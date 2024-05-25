@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 	const addElementsBtn = document.getElementById('add-elements-btn')
-	const listElementsBtn = document.querySelector('button:nth-child(2)')
+	const listElementsBtn = document.getElementById('list-elements-btn')
 	const reservationsBtn = document.querySelector('button:nth-child(3)')
 	const mainContent = document.getElementById('main-content')
 
@@ -134,7 +134,22 @@ document.addEventListener('DOMContentLoaded', function () {
 		elementTypeSelect.dispatchEvent(new Event('change'))
 	}
 
+	function loadListElements() {
+		clearActiveClass()
+		listElementsBtn.classList.add('button-active')
+		mainContent.innerHTML = `
+			<h2>Lista Elementów</h2>
+			<ul>
+				<li>Element 1</li>
+				<li>Element 2</li>
+				<li>Element 3</li>
+				<!-- Więcej elementów -->
+			</ul>
+		`
+	}
+
 	addElementsBtn.addEventListener('click', loadAddElements)
+	listElementsBtn.addEventListener('click', loadListElements);
 
 	// Domyślnie załaduj opcję "Dodaj Elementy" po załadowaniu strony
 	loadAddElements()
