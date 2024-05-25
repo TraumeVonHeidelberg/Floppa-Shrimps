@@ -158,7 +158,12 @@ form button {
 	cursor: pointer;
 }
 
-.main-testimonial-text
-{
+.main-testimonial-text {
 	margin-bottom: 2.4rem;
+}
+
+@media (max-width: 992px) {
+	.list-container {
+		grid-template-columns: 1fr;
+	}
 }

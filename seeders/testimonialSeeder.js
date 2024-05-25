@@ -14,12 +14,12 @@ const testimonials = [
 		company: 'Grove Numer 9',
 	},
 	{
-		text: "Floppa's Seafood Haven wyznacza nowe standardy w serwowaniu owoców morza. Restauracja oferuje dania, które są nie tylko świeże, ale również przygotowane z niezwykłą dbałością o szczegóły.",
+		text: "Floppa Shrimps & Cement wyznacza nowe standardy w serwowaniu owoców morza. Restauracja oferuje dania, które są nie tylko świeże, ale również przygotowane z niezwykłą dbałością o szczegóły.",
 		author: 'Lance Wilson',
 		company: 'San Fierro',
 	},
 	{
-		text: "Restauracja Floppa's Seafood Haven to synonim doskonałości w kuchni morskiej. Dania są nie tylko wyśmienite, ale także pięknie podane, co podkreśla ich wyjątkowy charakter.",
+		text: "Floppa Shrimps & Cement to synonim doskonałości w kuchni morskiej. Dania są nie tylko wyśmienite, ale także pięknie podane, co podkreśla ich wyjątkowy charakter.",
 		author: 'Frank Tenpenny',
 		company: 'C.R.A.S.H',
 	},
