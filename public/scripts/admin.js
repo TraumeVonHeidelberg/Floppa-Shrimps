@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', function () {
 								item => `
 							<div class="element">
 								<div class="text-container">
-									<p class="element-text" id="text-${item.id}">${item.text}</p>
+									<p class="element-text main-testimonial-text" id="text-${item.id}">${item.text}</p>
 									<p class="element-text" id="author-${item.id}">${item.author}</p>
 									<p class="element-text" id="company-${item.id}">${item.company}</p>
 								</div>
