@@ -1,36 +1,22 @@
-const { DataTypes } = require('sequelize')
+const { Sequelize, DataTypes } = require('sequelize')
 const sequelize = require('../config/database')
 
-const createUsersTable = async () => {
-	await sequelize.getQueryInterface().createTable('Users', {
-		id: {
-			type: DataTypes.INTEGER,
-			primaryKey: true,
-			autoIncrement: true,
-		},
+const User = sequelize.define(
+	'User',
+	{
 		username: {
 			type: DataTypes.STRING,
-			unique: true,
 			allowNull: false,
+			unique: true,
 		},
 		email: {
 			type: DataTypes.STRING,
-			unique: true,
 			allowNull: false,
+			unique: true,
 		},
 		password: {
 			type: DataTypes.STRING,
 			allowNull: false,
-		},
-		createdAt: {
-			type: DataTypes.DATE,
-			allowNull: false,
-			defaultValue: DataTypes.NOW,
-		},
-		updatedAt: {
-			type: DataTypes.DATE,
-			allowNull: false,
-			defaultValue: DataTypes.NOW,
 		},
 		profilePicture: {
 			type: DataTypes.STRING,
@@ -41,7 +27,15 @@ const createUsersTable = async () => {
 			allowNull: false,
 			defaultValue: 'normal-user',
 		},
-	})
-}
+		isVerified: {
+			type: DataTypes.BOOLEAN,
+			allowNull: false,
+			defaultValue: false,
+		},
+	},
+	{
+		timestamps: true,
+	}
+)
 
-createUsersTable().catch(console.error)
+module.exports = User

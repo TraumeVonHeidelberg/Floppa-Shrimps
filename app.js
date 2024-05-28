@@ -1,9 +1,10 @@
 const express = require('express')
 const sequelize = require('./config/database')
-const path = require('path')
+const User = require('./models/user')
 const menuRoutes = require('./routes/menuRoutes')
 const testimonialRoutes = require('./routes/testimonialRoutes')
 const authRoutes = require('./routes/auth')
+const path = require('path')
 
 const app = express()
 
@@ -17,12 +18,14 @@ app.get('/', (req, res) => {
 	res.sendFile(path.join(__dirname, 'index.html'))
 })
 
+// Endpoint dla panelu administracyjnego
 app.get('/admin', (req, res) => {
 	res.sendFile(path.join(__dirname, 'public', 'admin.html'))
 })
 
 const PORT = process.env.PORT || 3000
 
+// Synchronizacja modeli z bazą danych i uruchomienie serwera
 sequelize
 	.sync()
 	.then(() => {
