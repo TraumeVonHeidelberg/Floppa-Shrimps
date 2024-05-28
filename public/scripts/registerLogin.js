@@ -6,9 +6,10 @@ document.addEventListener('DOMContentLoaded', function () {
 	const logoutBtn = document.getElementById('logout-btn')
 
 	// Funkcja do wyświetlania modalnego okna lub menu użytkownika
-	btn.onclick = function () {
+	btn.onclick = function (event) {
 		if (localStorage.getItem('token')) {
 			userOptions.classList.toggle('hidden')
+			event.stopPropagation() // Zatrzymaj propagację eventu kliknięcia
 		} else {
 			modal.style.display = 'flex'
 		}
@@ -147,8 +148,9 @@ document.addEventListener('DOMContentLoaded', function () {
 					localStorage.setItem('token', data.token)
 					document.getElementById('modal').style.display = 'none'
 					// Zmiana ikony na menu użytkownika
-					btn.onclick = function () {
+					btn.onclick = function (event) {
 						userOptions.classList.toggle('hidden')
+						event.stopPropagation() // Zatrzymaj propagację eventu kliknięcia
 					}
 				}
 			})
@@ -168,6 +170,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	// Dodanie event listenera do przycisku wylogowania
 	logoutBtn.addEventListener('click', handleLogout)
+
+	// Ukryj menu użytkownika po kliknięciu poza nim
+	document.addEventListener('click', function (event) {
+		if (!userOptions.contains(event.target) && event.target !== btn) {
+			userOptions.classList.add('hidden')
+		}
+	})
 
 	// Domyślnie załaduj formularz rejestracji po załadowaniu strony
 	loadRegisterForm()
