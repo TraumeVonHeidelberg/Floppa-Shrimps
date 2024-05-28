@@ -2,10 +2,16 @@ document.addEventListener('DOMContentLoaded', function () {
 	const modal = document.getElementById('modal')
 	const btn = document.getElementById('login-icon')
 	const modalContent = document.getElementById('modal-content')
+	const userOptions = document.getElementById('user-options')
+	const logoutBtn = document.getElementById('logout-btn')
 
-	// Funkcja do wyświetlania modalnego okna
+	// Funkcja do wyświetlania modalnego okna lub menu użytkownika
 	btn.onclick = function () {
-		modal.style.display = 'flex'
+		if (localStorage.getItem('token')) {
+			userOptions.classList.toggle('hidden')
+		} else {
+			modal.style.display = 'flex'
+		}
 	}
 
 	// Funkcja do zamykania modalnego okna
@@ -140,6 +146,10 @@ document.addEventListener('DOMContentLoaded', function () {
 					// Zapisz token w localStorage lub w ciasteczkach
 					localStorage.setItem('token', data.token)
 					document.getElementById('modal').style.display = 'none'
+					// Zmiana ikony na menu użytkownika
+					btn.onclick = function () {
+						userOptions.classList.toggle('hidden')
+					}
 				}
 			})
 			.catch(error => {
@@ -147,6 +157,17 @@ document.addEventListener('DOMContentLoaded', function () {
 				alert('Wystąpił błąd podczas logowania.')
 			})
 	}
+
+	// Funkcja obsługująca wylogowanie
+	function handleLogout() {
+		localStorage.removeItem('token')
+		alert('Wylogowano pomyślnie')
+		// Przeładuj stronę lub wykonaj inne działania po wylogowaniu
+		location.reload()
+	}
+
+	// Dodanie event listenera do przycisku wylogowania
+	logoutBtn.addEventListener('click', handleLogout)
 
 	// Domyślnie załaduj formularz rejestracji po załadowaniu strony
 	loadRegisterForm()
