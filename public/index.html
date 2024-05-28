@@ -32,11 +32,30 @@
                 <li><a href="#page-footer">Kontakt</a></li>
             </ul>
 
-            <a href="#reservation" class="section-link">
-                <button class="main-btn">
-                    Rezerwuj Teraz
-                </button>
-            </a>
+
+            <div class="nav-group">
+                <a href="#reservation" class="section-link">
+                    <button class="main-btn">
+                        Rezerwuj Teraz
+                    </button>
+                </a>
+                <i id="login-icon" class="fa-solid fa-user"></i>
+            </div>
+
+            <!-- Domyslnie ukryte modal window do logowania -->
+            <div id="modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-item">
+                        <h2 class="login-header">Zarejestruj Się</h2>
+                        <i id="close-login" class="fa-solid fa-x close-login"></i>
+                    </div>
+                    <input class="form-input" type="text" placeholder="Nazwa">
+                    <input class="form-input" type="email" placeholder="E-Mail">
+                    <input class="form-input" type="password" placeholder="Hasło">
+                    <button class="create-account-btn">Stwórz Konto</button>
+                    <p class="login-text">Posiadasz już konto? <span id="login-link">Zaloguj się</span></p>
+                </div>
+            </div>
 
         </nav>
 
@@ -228,27 +247,27 @@
                     +48 881 925
                     560 w godzinach otwarcia.</p>
 
-                <form class="reservation-inputs">
+                <form class="form-inputs">
                     <div class="reservations-grid">
                         <div class="reservation-field">
                             <label for="" class="input-label">Personalia*</label>
-                            <input type="text" class="reservation-input" required>
+                            <input type="text" class="form-input" required>
                         </div>
                         <div class="reservation-field">
                             <label for="" class="input-label">Email*</label>
-                            <input type="email" class="reservation-input" required>
+                            <input type="email" class="form-input" required>
                         </div>
                         <div class="reservation-field">
                             <label for="" class="input-label">Telefon*</label>
-                            <input type="tel" class="reservation-input" required>
+                            <input type="tel" class="form-input" required>
                         </div>
                         <div class="reservation-field">
                             <label for="" class="input-label">Data*</label>
-                            <input type="date" class="reservation-input" required>
+                            <input type="date" class="form-input" required>
                         </div>
                         <div class="reservation-field">
                             <label for="time" class="input-label">Godzina*</label>
-                            <select id="time" name="time" class="reservation-input" required>
+                            <select id="time" name="time" class="form-input" required>
                                 <option value="09:00">08:00</option>
                                 <option value="10:00">09:00</option>
                                 <option value="09:00">10:00</option>
@@ -270,7 +289,7 @@
                         </div>
                         <div class="reservation-field">
                             <label for="" class="input-label">Miejsca*</label>
-                            <input type="number" class="reservation-input" required>
+                            <input type="number" class="form-input" required>
                         </div>
                     </div>
                     <div class="reservation-field">
@@ -382,11 +401,12 @@
 
 
 
-    <script src="./scripts/script.js"></script>
+    <script src="../script.js"></script>
     <script src="./scripts/scroll.js"></script>
     <script src="./scripts/getCurrentYear.js"></script>
     <script src="./scripts/getMenuContent.js"></script>
     <script src="./scripts/getTestimonialContent.js"></script>
+    <script src="./scripts/showLoginWindow.js"></script>
     <script src="https://kit.fontawesome.com/3b7d7d2b37.js" crossorigin="anonymous"></script>
 </body>
 

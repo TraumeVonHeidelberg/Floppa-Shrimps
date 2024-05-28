@@ -37,6 +37,10 @@
 	line-height: 3.2rem;
 }
 
+button {
+	cursor: pointer;
+}
+
 .main-btn {
 	padding: 1.6rem 3.2rem;
 	font-weight: 700;
@@ -45,7 +49,6 @@
 	color: #eb2a3c;
 	background: none;
 	border: 0.3rem solid #eb2a3c;
-	cursor: pointer;
 	transition: background-color 0.3s, color 0.3s;
 }
 
@@ -62,6 +65,91 @@
 	display: none;
 }
 
+a {
+	text-decoration: none;
+	color: #1f3571;
+	cursor: pointer;
+}
+
+/* Modal Window */
+
+.modal {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 20;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+	display: flex;
+	flex-direction: column;
+	gap: 2.4rem;
+	padding: 2.4rem;
+	width: 44rem;
+	min-height: 45rem;
+	max-height: 50rem;
+	background-color: white;
+	border-radius: 1.2rem;
+}
+
+.modal-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1.6rem;
+}
+
+.modal-item i {
+	font-size: 2.4rem;
+	transition: 0.3s color;
+}
+
+.modal-item i:hover {
+	color: #356bff;
+}
+
+.login-header {
+	font-weight: 800;
+}
+
+input {
+	padding: 1.2rem;
+}
+
+.create-account-btn {
+	padding: 1.6rem 3.2rem;
+	background-color: #274eba;
+	color: white;
+	border: none;
+	border-radius: 1.2rem;
+	margin-bottom: 2.4rem;
+	transition: background-color 0.3s;
+}
+
+.create-account-btn:hover {
+	background-color: #356bff;
+}
+
+.login-text {
+	font-size: 1.4rem;
+}
+
+.login-text span {
+	font-weight: 800;
+	color: #274eba;
+	cursor: pointer;
+}
+
+.close-login {
+	cursor: pointer;
+}
 /* ------------------------------------------------------------------------------ */
 
 * {
@@ -121,13 +209,22 @@ section {
 }
 
 .main-nav-list li a {
-	text-decoration: none;
-	color: #1f3571;
-	cursor: pointer;
 	transition: color 0.3s;
 }
 .main-nav-list li a:hover {
 	color: #eb2a3c;
+}
+
+.nav-group {
+	display: flex;
+	align-items: center;
+	gap: 4.8rem;
+}
+
+.nav-group i {
+	font-size: 3.6rem;
+	color: #1f3571;
+	cursor: pointer;
 }
 
 .header-grid {
@@ -240,7 +337,7 @@ section {
 .special-offer-section {
 	position: relative;
 	height: 80vh;
-	background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('img/ryby-oferta.jpg');
+	background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../img/ryby-oferta.jpg');
 	background-size: cover;
 	background-position: center;
 	background-attachment: fixed;
@@ -392,7 +489,7 @@ section {
 	margin-bottom: 0.4rem;
 }
 
-.reservation-input {
+.form-input {
 	height: 4.8rem;
 }
 
@@ -402,7 +499,7 @@ section {
 	max-height: 20rem;
 }
 
-.reservation-input,
+.form-input,
 .reservation-textarea {
 	font-size: 1.6rem;
 	font-family: 'Raleway', 'sans-serif';

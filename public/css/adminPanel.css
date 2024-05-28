@@ -97,6 +97,7 @@ textarea {
 textarea,
 input {
 	font-family: 'Raleway', 'sans-serif';
+	line-height: 1.5;
 }
 
 .element-type {
