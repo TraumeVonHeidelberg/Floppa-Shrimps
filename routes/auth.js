@@ -22,7 +22,13 @@ router.post(
 	[
 		body('username').isLength({ min: 3 }).withMessage('Nazwa użytkownika musi mieć co najmniej 3 znaki'),
 		body('email').isEmail().withMessage('Podaj poprawny adres e-mail'),
-		body('password').isLength({ min: 6 }).withMessage('Hasło musi mieć co najmniej 6 znaków'),
+		body('password')
+			.isLength({ min: 6 })
+			.withMessage('Hasło musi mieć co najmniej 6 znaków')
+			.matches(/[A-Z]/)
+			.withMessage('Hasło musi zawierać co najmniej jedną wielką literę')
+			.matches(/\d/)
+			.withMessage('Hasło musi zawierać co najmniej jedną cyfrę'),
 	],
 	async (req, res) => {
 		const errors = validationResult(req)
