@@ -30,9 +30,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 <h2 class="login-header">Zaloguj Się</h2>
                 <i id="close-login" class="fa-solid fa-x close-login"></i>
             </div>
-            <input class="form-input" type="email" placeholder="E-Mail">
-            <input class="form-input" type="password" placeholder="Hasło">
-            <button class="create-account-btn">Zaloguj się</button>
+            <input class="form-input" type="email" id="login-email" placeholder="E-Mail">
+            <input class="form-input" type="password" id="login-password" placeholder="Hasło">
+            <button class="create-account-btn" id="login-btn">Zaloguj się</button>
             <p class="login-text">Nie masz konta? <span id="register-link">Zarejestruj się</span></p>
         `
 
@@ -41,6 +41,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		// Dodanie event listenera do linku rejestracji
 		document.getElementById('register-link').onclick = loadRegisterForm
+
+		// Dodanie event listenera do przycisku logowania
+		document.getElementById('login-btn').addEventListener('click', handleLogin)
 	}
 
 	// Funkcja do ładowania formularza rejestracji
@@ -64,8 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		document.getElementById('login-link').onclick = loadLoginForm
 
 		// Dodanie event listenera do przycisku rejestracji
-		const registerButton = document.getElementById('register-btn')
-		registerButton.addEventListener('click', handleRegistration)
+		document.getElementById('register-btn').addEventListener('click', handleRegistration)
 	}
 
 	// Funkcja obsługująca rejestrację
@@ -107,6 +109,46 @@ document.addEventListener('DOMContentLoaded', function () {
 			.catch(error => {
 				console.error('Error:', error)
 				alert('Wystąpił błąd podczas rejestracji.')
+			})
+	}
+
+	// Funkcja obsługująca logowanie
+	function handleLogin(event) {
+		event.preventDefault()
+		console.log('Login button clicked')
+
+		const email = document.getElementById('login-email').value
+		const password = document.getElementById('login-password').value
+
+		console.log('Email:', email)
+		console.log('Password:', password)
+
+		if (!email || !password) {
+			alert('Proszę wypełnić wszystkie pola')
+			return
+		}
+
+		fetch('/api/login', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ email, password }),
+		})
+			.then(response => response.json())
+			.then(data => {
+				if (data.errors) {
+					alert(data.errors.map(error => error.msg).join('\n'))
+				} else {
+					alert('Zalogowano pomyślnie')
+					// Zapisz token w localStorage lub w ciasteczkach
+					localStorage.setItem('token', data.token)
+					document.getElementById('modal').style.display = 'none'
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error)
+				alert('Wystąpił błąd podczas logowania.')
 			})
 	}
 

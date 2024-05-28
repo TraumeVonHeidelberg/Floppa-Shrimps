@@ -1,14 +1,29 @@
+require('dotenv').config()
+
 const express = require('express')
 const sequelize = require('./config/database')
-const User = require('./models/user')
+const path = require('path')
 const menuRoutes = require('./routes/menuRoutes')
 const testimonialRoutes = require('./routes/testimonialRoutes')
 const authRoutes = require('./routes/auth')
-const path = require('path')
+const session = require('express-session')
 
 const app = express()
 
+// Middleware do parsowania JSON
 app.use(express.json())
+
+// Konfiguracja sesji
+app.use(
+	session({
+		secret: process.env.SESSION_SECRET,
+		resave: false,
+		saveUninitialized: true,
+		cookie: { secure: false }, // Ustaw na true, jeśli używasz HTTPS
+	})
+)
+
+// Routing
 app.use('/api', menuRoutes)
 app.use('/api', testimonialRoutes)
 app.use('/api', authRoutes)
@@ -25,7 +40,6 @@ app.get('/admin', (req, res) => {
 
 const PORT = process.env.PORT || 3000
 
-// Synchronizacja modeli z bazą danych i uruchomienie serwera
 sequelize
 	.sync()
 	.then(() => {
