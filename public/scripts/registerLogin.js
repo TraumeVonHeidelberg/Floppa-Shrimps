@@ -13,13 +13,11 @@ document.addEventListener('DOMContentLoaded', function () {
 		modal.style.display = 'none'
 	}
 
-	// Dodanie event listenera do przycisku zamykania
-	document.getElementById('close-login').onclick = closeModal
-
-	// Zamknij modalne okno po kliknięciu poza nim
-	window.onclick = function (event) {
-		if (event.target == modal) {
-			closeModal()
+	// Funkcja do przypisania event listenerów po dynamicznym załadowaniu zawartości modala
+	function assignCloseModalListener() {
+		const closeBtn = document.getElementById('close-login')
+		if (closeBtn) {
+			closeBtn.onclick = closeModal
 		}
 	}
 
@@ -36,8 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <p class="login-text">Nie masz konta? <span id="register-link">Zarejestruj się</span></p>
         `
 
-		// Ponowne przypisanie event listenera do przycisku zamykania
-		document.getElementById('close-login').onclick = closeModal
+		assignCloseModalListener()
 
 		// Dodanie event listenera do linku rejestracji
 		document.getElementById('register-link').onclick = loadRegisterForm
@@ -60,8 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <p class="login-text">Posiadasz już konto? <span id="login-link">Zaloguj się</span></p>
         `
 
-		// Ponowne przypisanie event listenera do przycisku zamykania
-		document.getElementById('close-login').onclick = closeModal
+		assignCloseModalListener()
 
 		// Dodanie event listenera do linku logowania
 		document.getElementById('login-link').onclick = loadLoginForm
@@ -151,9 +147,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				alert('Wystąpił błąd podczas logowania.')
 			})
 	}
-
-	// Dodanie event listenera do linku logowania
-	document.getElementById('login-link').onclick = loadLoginForm
 
 	// Domyślnie załaduj formularz rejestracji po załadowaniu strony
 	loadRegisterForm()
