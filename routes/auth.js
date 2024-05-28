@@ -34,11 +34,17 @@ router.post(
 		console.log('Received registration data:', { username, email, password })
 
 		try {
+			// Logowanie przed wyszukiwaniem użytkownika
+			console.log(`Checking if user with email ${email} exists`)
+
 			const existingUser = await User.findOne({ where: { email } })
 			if (existingUser) {
-				console.log('User already exists with email:', email)
+				console.log(`User already exists with email: ${email}`)
 				return res.status(400).json({ errors: [{ msg: 'Użytkownik o takim e-mailu już istnieje' }] })
 			}
+
+			// Logowanie po sprawdzeniu, czy użytkownik istnieje
+			console.log(`No user found with email ${email}, proceeding with registration`)
 
 			const hashedPassword = await bcrypt.hash(password, 10)
 			const newUser = await User.create({
@@ -48,6 +54,9 @@ router.post(
 				profilePicture: null,
 				role: 'normal-user',
 			})
+
+			// Logowanie po utworzeniu nowego użytkownika
+			console.log(`User ${username} created with email ${email}`)
 
 			const mailOptions = {
 				from: process.env.EMAIL_USER,
@@ -59,10 +68,9 @@ router.post(
 
 			transporter.sendMail(mailOptions, (error, info) => {
 				if (error) {
-					console.error(error)
-				} else {
-					console.log('Email sent: ' + info.response)
+					return console.error('Error sending confirmation email:', error)
 				}
+				console.log('Email sent: ' + info.response)
 			})
 
 			res.status(201).json({ msg: 'Użytkownik zarejestrowany. Sprawdź swoją skrzynkę e-mail.' })
