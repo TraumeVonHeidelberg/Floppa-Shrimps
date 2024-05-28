@@ -178,6 +178,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	})
 
-	// Domyślnie załaduj formularz rejestracji po załadowaniu strony
-	loadRegisterForm()
+	// Domyślnie załaduj formularz logowania po załadowaniu strony
+	loadLoginForm()
 })
