@@ -89,6 +89,7 @@ a {
 .modal-content {
 	display: flex;
 	flex-direction: column;
+	z-index: 50;
 	gap: 2.4rem;
 	padding: 2.4rem;
 	width: 44rem;
