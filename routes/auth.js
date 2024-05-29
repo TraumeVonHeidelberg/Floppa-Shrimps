@@ -16,19 +16,20 @@ const transporter = nodemailer.createTransport({
 	},
 })
 
-// Trasa rejestracji użytkownika
+// Rejestracja użytkownika
 router.post(
 	'/register',
 	[
-		body('username').isLength({ min: 3 }).withMessage('Nazwa użytkownika musi mieć co najmniej 3 znaki'),
+		body('firstName').isLength({ min: 1 }).withMessage('Imię jest wymagane'),
+		body('lastName').isLength({ min: 1 }).withMessage('Nazwisko jest wymagane'),
 		body('email').isEmail().withMessage('Podaj poprawny adres e-mail'),
 		body('password')
 			.isLength({ min: 6 })
 			.withMessage('Hasło musi mieć co najmniej 6 znaków')
-			.matches(/[A-Z]/)
-			.withMessage('Hasło musi zawierać co najmniej jedną wielką literę')
 			.matches(/\d/)
-			.withMessage('Hasło musi zawierać co najmniej jedną cyfrę'),
+			.withMessage('Hasło musi zawierać co najmniej jedną cyfrę')
+			.matches(/[A-Z]/)
+			.withMessage('Hasło musi zawierać co najmniej jedną wielką literę'),
 	],
 	async (req, res) => {
 		const errors = validationResult(req)
@@ -37,11 +38,10 @@ router.post(
 			return res.status(400).json({ errors: errors.array() })
 		}
 
-		const { username, email, password } = req.body
-		console.log('Received registration data:', { username, email, password })
+		const { firstName, lastName, email, password } = req.body
+		console.log('Received registration data:', { firstName, lastName, email, password })
 
 		try {
-			// Logowanie przed wyszukiwaniem użytkownika
 			console.log(`Checking if user with email ${email} exists`)
 
 			const existingUser = await User.findOne({ where: { email } })
@@ -50,12 +50,12 @@ router.post(
 				return res.status(400).json({ errors: [{ msg: 'Użytkownik o takim e-mailu już istnieje' }] })
 			}
 
-			// Logowanie po sprawdzeniu, czy użytkownik istnieje
 			console.log(`No user found with email ${email}, proceeding with registration`)
 
 			const hashedPassword = await bcrypt.hash(password, 10)
 			const newUser = await User.create({
-				username,
+				firstName,
+				lastName,
 				email,
 				password: hashedPassword,
 				profilePicture: null,
@@ -63,8 +63,7 @@ router.post(
 				isVerified: false,
 			})
 
-			// Logowanie po utworzeniu nowego użytkownika
-			console.log(`User ${username} created with email ${email}`)
+			console.log(`User ${firstName} ${lastName} created with email ${email}`)
 
 			const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET, { expiresIn: '1h' })
 
@@ -91,28 +90,7 @@ router.post(
 	}
 )
 
-// Trasa potwierdzenia e-maila
-router.get('/confirm-email', async (req, res) => {
-	const { token } = req.query
-	try {
-		const decoded = jwt.verify(token, process.env.JWT_SECRET)
-		const user = await User.findByPk(decoded.userId)
-
-		if (!user) {
-			return res.status(400).json({ errors: [{ msg: 'Nieprawidłowy token' }] })
-		}
-
-		user.isVerified = true
-		await user.save()
-
-		res.status(200).json({ msg: 'Konto zostało potwierdzone' })
-	} catch (error) {
-		console.error('Error during email confirmation:', error)
-		res.status(500).json({ errors: [{ msg: 'Błąd serwera' }] })
-	}
-})
-
-// Trasa logowania użytkownika
+// Logowanie użytkownika
 router.post(
 	'/login',
 	[
@@ -130,34 +108,53 @@ router.post(
 		try {
 			const user = await User.findOne({ where: { email } })
 			if (!user) {
-				return res.status(400).json({ errors: [{ msg: 'Nieprawidłowy email lub hasło' }] })
+				return res.status(400).json({ errors: [{ msg: 'Nieprawidłowy adres e-mail lub hasło' }] })
 			}
 
 			const isMatch = await bcrypt.compare(password, user.password)
 			if (!isMatch) {
-				return res.status(400).json({ errors: [{ msg: 'Nieprawidłowy email lub hasło' }] })
+				return res.status(400).json({ errors: [{ msg: 'Nieprawidłowy adres e-mail lub hasło' }] })
 			}
 
 			if (!user.isVerified) {
-				return res.status(400).json({ errors: [{ msg: 'Konto nie zostało zweryfikowane' }] })
+				return res.status(400).json({ errors: [{ msg: 'Musisz potwierdzić swoje konto przed zalogowaniem' }] })
 			}
 
-			const payload = {
-				user: {
-					id: user.id,
-					role: user.role,
-				},
-			}
+			const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' })
 
-			jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
-				if (err) throw err
-				res.json({ token })
-			})
+			res.json({ token })
 		} catch (error) {
-			console.error(error)
+			console.error('Error during login:', error)
 			res.status(500).json({ errors: [{ msg: 'Błąd serwera' }] })
 		}
 	}
 )
+
+// Potwierdzenie rejestracji
+router.get('/confirm-email', async (req, res) => {
+	const { token } = req.query
+
+	if (!token) {
+		return res.status(400).json({ msg: 'Brak tokena' })
+	}
+
+	try {
+		const decoded = jwt.verify(token, process.env.JWT_SECRET)
+		const userId = decoded.userId
+
+		const user = await User.findByPk(userId)
+		if (!user) {
+			return res.status(400).json({ msg: 'Nieprawidłowy token' })
+		}
+
+		user.isVerified = true
+		await user.save()
+
+		res.status(200).send('Twoje konto zostało potwierdzone!')
+	} catch (error) {
+		console.error('Error during email confirmation:', error)
+		res.status(500).json({ msg: 'Błąd serwera' })
+	}
+})
 
 module.exports = router

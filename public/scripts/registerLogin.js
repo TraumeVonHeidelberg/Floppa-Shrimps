@@ -57,7 +57,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 <h2 class="login-header">Zarejestruj Się</h2>
                 <i id="close-login" class="fa-solid fa-x close-login"></i>
             </div>
-            <input class="form-input" type="text" id="username" placeholder="Nazwa">
+            <input class="form-input" type="text" id="firstName" placeholder="Imię">
+            <input class="form-input" type="text" id="lastName" placeholder="Nazwisko">
             <input class="form-input" type="email" id="email" placeholder="E-Mail">
             <input class="form-input" type="password" id="password" placeholder="Hasło">
             <button class="create-account-btn" id="register-btn">Stwórz Konto</button>
@@ -78,15 +79,17 @@ document.addEventListener('DOMContentLoaded', function () {
 		event.preventDefault()
 		console.log('Register button clicked')
 
-		const username = document.getElementById('username').value
+		const firstName = document.getElementById('firstName').value
+		const lastName = document.getElementById('lastName').value
 		const email = document.getElementById('email').value
 		const password = document.getElementById('password').value
 
-		console.log('Username:', username)
+		console.log('First Name:', firstName)
+		console.log('Last Name:', lastName)
 		console.log('Email:', email)
 		console.log('Password:', password)
 
-		if (!username || !email || !password) {
+		if (!firstName || !lastName || !email || !password) {
 			alert('Proszę wypełnić wszystkie pola')
 			return
 		}
@@ -96,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ username, email, password }),
+			body: JSON.stringify({ firstName, lastName, email, password }),
 		})
 			.then(response => response.json())
 			.then(data => {
