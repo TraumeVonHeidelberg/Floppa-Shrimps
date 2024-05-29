@@ -10,7 +10,7 @@
 .main-news-header {
 	position: relative;
 	height: 70vh;
-	background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('./img/news/new dish full.jpg');
+	background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../img/news/new dish full.jpg');
 	background-size: cover;
 	background-position: center;
 	margin-bottom: 8rem;
@@ -58,6 +58,8 @@
 	font-weight: bold;
 }
 
+/* ------------------------------------------ */
+
 .news-main {
 	width: 130rem;
 	margin: 0 auto;
@@ -69,9 +71,14 @@
 	gap: 4.8rem;
 }
 
-.article-header {
-	margin-top: 2.4rem;
-	margin-bottom: 2.4rem;
+article {
+	display: flex;
+	flex-direction: column;
+	gap: 2.4rem;
+}
+
+.section-header {
+	margin: 0;
 }
 
 .change-post {
@@ -79,7 +86,92 @@
 	justify-content: space-between;
 }
 
+.comment-content {
+	position: relative;
+}
+
+textarea,
+input {
+	font-family: 'Raleway';
+}
+
+textarea {
+	margin-bottom: 2.4rem;
+	padding: 2.4rem;
+	width: 100%;
+	min-height: 20rem;
+	max-height: 25rem;
+	font-size: 2rem;
+}
+
+.comment-content i {
+	position: absolute;
+	bottom: 3.2rem;
+	right: 20px;
+	font-size: 3.6rem;
+	transition: 0.3s color;
+	cursor: pointer;
+}
+.last-article-text {
+	margin-bottom: 3.2rem;
+}
+
+.change-post {
+	line-height: 1.5;
+}
+
+.call-to-action-sign {
+	font-size: 2rem;
+	font-weight: 700;
+	color: #274eba;
+}
+
+.change-post-title {
+	font-size: 1.8rem;
+	font-weight: 600;
+	transition: 0.3s color;
+	cursor: pointer;
+}
+
+.change-post-title:hover,
+.comment-content i:hover {
+	color: #eb2a3c;
+}
+
+aside {
+	display: flex;
+	flex-direction: column;
+	gap: 2.4rem;
+}
+
 .aside-item {
 	display: flex;
 	flex-direction: column;
+	gap: 1.2rem;
+}
+
+.search-bar {
+	margin-bottom: 2.4rem;
+}
+
+.search-bar-sign {
+	margin-bottom: 0.8rem;
+	font-size: 1.8rem;
+	font-weight: 800;
+}
+
+.main-search-bar {
+	display: flex;
+	gap: 1.2rem;
+}
+
+.search-btn {
+	padding: 1.2rem 2.4rem;
+	font-weight: 600;
+}
+
+.aside-item a {
+	font-size: 1.6rem;
+	font-weight: 500;
+	color: #274eba;
 }

@@ -150,6 +150,8 @@ document.addEventListener('DOMContentLoaded', function () {
 					// Zapisz token w localStorage lub w ciasteczkach
 					localStorage.setItem('token', data.token)
 					document.getElementById('modal').style.display = 'none'
+					// Aktualizuj ikonę profilową użytkownika
+					loadUserProfilePicture()
 					// Zmiana ikony na menu użytkownika
 					btn.onclick = function (event) {
 						userOptions.classList.toggle('hidden')
@@ -171,6 +173,37 @@ document.addEventListener('DOMContentLoaded', function () {
 		location.reload()
 	}
 
+	// Funkcja ładująca zdjęcie profilowe użytkownika
+	function loadUserProfilePicture() {
+		const token = localStorage.getItem('token')
+		if (token) {
+			fetch('/api/profile', {
+				method: 'GET',
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+				.then(response => {
+					if (!response.ok) {
+						if (response.status === 401 || response.status === 403) {
+							localStorage.removeItem('token')
+							window.location.href = '/login.html'
+						}
+						throw new Error('Network response was not ok')
+					}
+					return response.json()
+				})
+				.then(user => {
+					const profilePicture = user.profilePicture ? `img/uploads/${user.profilePicture}` : './img/avatar-big.jpg'
+					btn.src = profilePicture
+				})
+				.catch(error => {
+					console.error('Error loading user profile:', error)
+					alert('Błąd podczas ładowania profilu użytkownika.')
+				})
+		}
+	}
+
 	// Dodanie event listenera do przycisku wylogowania
 	logoutBtn.addEventListener('click', handleLogout)
 
@@ -187,6 +220,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	if (token) {
 		localStorage.setItem('token', token)
 		alert('Zalogowano pomyślnie po weryfikacji emaila')
+		// Aktualizuj ikonę profilową użytkownika
+		loadUserProfilePicture()
 		// Zmiana ikony na menu użytkownika
 		btn.onclick = function (event) {
 			userOptions.classList.toggle('hidden')
@@ -196,4 +231,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	// Domyślnie załaduj formularz logowania po załadowaniu strony
 	loadLoginForm()
+	// Aktualizuj ikonę profilową użytkownika po załadowaniu strony
+	loadUserProfilePicture()
 })
