@@ -23,7 +23,9 @@ document.addEventListener('DOMContentLoaded', function () {
 				return response.json()
 			})
 			.then(user => {
-				document.querySelector('.user-name').textContent = `${user.firstName} ${user.lastName} (${user.username || ''})`
+				document.querySelector('.user-name').textContent = `${user.firstName} ${user.lastName}${
+					user.username ? ` (${user.username})` : ''
+				}`
 				document.querySelector('.user-data[data-field="firstName"]').textContent = user.firstName
 				document.querySelector('.user-data[data-field="lastName"]').textContent = user.lastName
 				document.querySelector('.user-data[data-field="email"]').textContent = user.email
