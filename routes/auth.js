@@ -16,6 +16,18 @@ const transporter = nodemailer.createTransport({
 	},
 })
 
+// Funkcja middleware do uwierzytelniania tokenu
+const authenticateToken = (req, res, next) => {
+	const token = req.header('Authorization') && req.header('Authorization').split(' ')[1]
+	if (!token) return res.sendStatus(401)
+
+	jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+		if (err) return res.sendStatus(403)
+		req.user = user
+		next()
+	})
+}
+
 router.post(
 	'/register',
 	[
@@ -100,7 +112,8 @@ router.get('/confirm-email', async (req, res) => {
 
 		const authToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' })
 
-		res.redirect(`/?token=${authToken}`)
+		// Przekierowanie na stronę główną z tokenem w query params
+		res.redirect(`/profile.html?token=${authToken}`)
 	} catch (error) {
 		console.error('Error verifying email:', error)
 		res.status(400).json({ errors: [{ msg: 'Błąd podczas weryfikacji' }] })
@@ -129,6 +142,21 @@ router.post('/login', async (req, res) => {
 	} catch (error) {
 		console.error('Error during login:', error)
 		res.status(500).json({ errors: [{ msg: 'Błąd serwera' }] })
+	}
+})
+
+router.get('/profile', authenticateToken, async (req, res) => {
+	try {
+		const user = await User.findByPk(req.user.userId, {
+			attributes: ['firstName', 'lastName', 'email', 'profilePicture', 'role', 'isVerified', 'phoneNumber', 'username'],
+		})
+		if (!user) {
+			return res.status(404).json({ message: 'User not found' })
+		}
+		res.json(user)
+	} catch (error) {
+		console.error('Error fetching user profile:', error)
+		res.status(500).json({ message: 'Server error' })
 	}
 })
 
