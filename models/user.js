@@ -40,6 +40,10 @@ const User = sequelize.define(
 			allowNull: false,
 			defaultValue: false,
 		},
+		phoneNumber: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
 	},
 	{
 		timestamps: true,
