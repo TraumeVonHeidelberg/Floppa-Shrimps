@@ -181,6 +181,19 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	})
 
+	// Sprawdź, czy użytkownik został przekierowany z tokenem
+	const urlParams = new URLSearchParams(window.location.search)
+	const token = urlParams.get('token')
+	if (token) {
+		localStorage.setItem('token', token)
+		alert('Zalogowano pomyślnie po weryfikacji emaila')
+		// Zmiana ikony na menu użytkownika
+		btn.onclick = function (event) {
+			userOptions.classList.toggle('hidden')
+			event.stopPropagation() // Zatrzymaj propagację eventu kliknięcia
+		}
+	}
+
 	// Domyślnie załaduj formularz logowania po załadowaniu strony
 	loadLoginForm()
 })
