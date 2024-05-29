@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="./css/adminPanel.css">
+</head>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html"><img src="./img/logo-full.svg" alt="Logo Floppa Shrimps & Cement"></a>
+    </nav>
+
+    <div class="main-panel">
+        <aside>
+            <button id="add-elements-btn"><i class="fa-solid fa-circle-plus"></i>Dodaj elementy</button>
+            <button id="list-elements-btn"><i class="fa-solid fa-list"></i>Wylistuj Elementy</button>
+            <button><i class="fa-solid fa-address-book"></i>Rezerwacje</button>
+        </aside>
+        <article id="main-content">
+            <!-- Dynamiczna zawartosc zgodna z wybraną opcja -->
+            <div class="dynamic-content">
+                <h2 class="user-profile-header">Mój Profil</h2>
+                <div class="user-item">
+                    <img src="./img/avatar-big.jpg" alt="User profile picture" class="user-profile-picture">
+                    <p class="user-name">Mateusz Dyląg (Cygan)</p>
+                </div>
+                <div class="user-item user-grid">
+                    <p class="common-user-text">Imię* Mateusz</p>
+                    <p class="common-user-text">Nazwisko* Dyląg</p>
+                    <p class="common-user-text">Pseudonim Cygan</p>
+                    <p class="common-user-text">Email* cygan@gmail.com</p>
+                    <p class="common-user-text">Telefon 881-925-560</p>
+                    <p class="common-user-text">Typ Konta* normal-user</p>
+                    <p class="common-user-text">Hasło* Zmień hasło</p>
+                </div>
+
+            </div>
+
+
+        </article>
+    </div>
+
+    <script src="https://kit.fontawesome.com/3b7d7d2b37.js" crossorigin="anonymous"></script>
+</body>
+
+</html>
