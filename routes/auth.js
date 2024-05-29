@@ -4,6 +4,8 @@ const { body, validationResult } = require('express-validator')
 const User = require('../models/user')
 const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
+const multer = require('multer')
+const path = require('path')
 const router = express.Router()
 require('dotenv').config()
 
@@ -16,19 +18,54 @@ const transporter = nodemailer.createTransport({
 	},
 })
 
-// Funkcja middleware do uwierzytelniania tokenu
-const authenticateToken = async (req, res, next) => {
-	const token = req.header('Authorization') && req.header('Authorization').split(' ')[1]
-	if (!token) return res.sendStatus(401)
+// Konfiguracja multer
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/img/uploads/')
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        cb(null, uniqueSuffix + path.extname(file.originalname))
+    }
+})
 
-	jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
-		if (err) return res.sendStatus(403)
-		const dbUser = await User.findByPk(user.userId)
-		if (!dbUser) return res.sendStatus(401) // Użytkownik nie istnieje w bazie danych
-		req.user = user
+const upload = multer({ storage: storage })
+
+// Middleware do weryfikacji tokena
+const authenticateToken = (req, res, next) => {
+	const token = req.header('Authorization').replace('Bearer ', '')
+
+	if (!token) {
+		return res.status(401).json({ errors: [{ msg: 'Brak tokenu uwierzytelniającego' }] })
+	}
+
+	try {
+		const decoded = jwt.verify(token, process.env.JWT_SECRET)
+		req.user = decoded
 		next()
-	})
+	} catch (error) {
+		res.status(401).json({ errors: [{ msg: 'Nieprawidłowy token' }] })
+	}
 }
+
+// Endpoint do zmiany zdjęcia profilowego
+router.post('/profile-picture', authenticateToken, upload.single('profilePicture'), async (req, res) => {
+	try {
+		const user = await User.findByPk(req.user.userId)
+
+		if (!user) {
+			return res.status(404).json({ errors: [{ msg: 'Użytkownik nie znaleziony' }] })
+		}
+
+		user.profilePicture = req.file.filename
+		await user.save()
+
+		res.json({ msg: 'Zdjęcie profilowe zaktualizowane pomyślnie' })
+	} catch (error) {
+		console.error('Error uploading profile picture:', error)
+		res.status(500).json({ errors: [{ msg: 'Błąd serwera' }] })
+	}
+})
 
 router.post(
 	'/register',
@@ -114,7 +151,6 @@ router.get('/confirm-email', async (req, res) => {
 
 		const authToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' })
 
-		// Przekierowanie na stronę główną z tokenem w query params
 		res.redirect(`/?token=${authToken}`)
 	} catch (error) {
 		console.error('Error verifying email:', error)
@@ -149,16 +185,16 @@ router.post('/login', async (req, res) => {
 
 router.get('/profile', authenticateToken, async (req, res) => {
 	try {
-		const user = await User.findByPk(req.user.userId, {
-			attributes: ['firstName', 'lastName', 'email', 'profilePicture', 'role', 'isVerified', 'phoneNumber', 'username'],
-		})
+		const user = await User.findByPk(req.user.userId)
+
 		if (!user) {
-			return res.status(404).json({ message: 'User not found' })
+			return res.status(404).json({ errors: [{ msg: 'Użytkownik nie znaleziony' }] })
 		}
+
 		res.json(user)
 	} catch (error) {
-		console.error('Error fetching user profile:', error)
-		res.status(500).json({ message: 'Server error' })
+		console.error('Error fetching profile:', error)
+		res.status(500).json({ errors: [{ msg: 'Błąd serwera' }] })
 	}
 })
 

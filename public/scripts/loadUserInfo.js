@@ -1,19 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
-	const urlParams = new URLSearchParams(window.location.search)
-	const token = urlParams.get('token')
-
-	if (token) {
-		localStorage.setItem('token', token)
-		history.replaceState({}, document.title, window.location.pathname) // Usunięcie tokena z URL
+	const token = localStorage.getItem('token')
+	if (!token) {
+		window.location.href = '/login.html'
+		return
 	}
 
 	const loadUserProfile = () => {
-		const token = localStorage.getItem('token')
-		if (!token) {
-			window.location.href = '/login.html'
-			return
-		}
-
 		fetch('/api/profile', {
 			method: 'GET',
 			headers: {
@@ -38,12 +30,49 @@ document.addEventListener('DOMContentLoaded', function () {
 				document.querySelector('.user-data[data-field="phoneNumber"]').textContent = user.phoneNumber || ''
 				document.querySelector('.user-data[data-field="role"]').textContent = user.role
 				document.querySelector('.user-data[data-field="username"]').textContent = user.username || ''
+				const profilePicture = user.profilePicture ? `/img/uploads/${user.profilePicture}` : './img/default-profile.png'
+				document.getElementById('user-profile-picture').style.backgroundImage = `url(${profilePicture})`
 			})
 			.catch(error => {
 				console.error('Error loading user profile:', error)
-				alert('Wystąpił błąd podczas ładowania profilu użytkownika.')
+				alert('Błąd podczas ładowania profilu użytkownika.')
 			})
 	}
+
+	const handleProfilePictureChange = event => {
+		const file = event.target.files[0]
+		if (file) {
+			const formData = new FormData()
+			formData.append('profilePicture', file)
+
+			fetch('/api/profile-picture', {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+				body: formData,
+			})
+				.then(response => response.json())
+				.then(data => {
+					if (data.errors) {
+						alert(data.errors.map(error => error.msg).join('\n'))
+					} else {
+						alert('Zdjęcie profilowe zaktualizowane pomyślnie')
+						loadUserProfile()
+					}
+				})
+				.catch(error => {
+					console.error('Error uploading profile picture:', error)
+					alert('Błąd podczas zmiany zdjęcia profilowego.')
+				})
+		}
+	}
+
+	document.getElementById('user-profile-picture').addEventListener('click', () => {
+		document.getElementById('profile-picture-input').click()
+	})
+
+	document.getElementById('profile-picture-input').addEventListener('change', handleProfilePictureChange)
 
 	loadUserProfile()
 })
