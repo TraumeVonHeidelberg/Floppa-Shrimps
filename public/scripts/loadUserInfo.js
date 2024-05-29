@@ -20,7 +20,16 @@ document.addEventListener('DOMContentLoaded', function () {
 				Authorization: `Bearer ${token}`,
 			},
 		})
-			.then(response => response.json())
+			.then(response => {
+				if (!response.ok) {
+					if (response.status === 401 || response.status === 403) {
+						localStorage.removeItem('token')
+						window.location.href = '/login.html'
+					}
+					throw new Error('Network response was not ok')
+				}
+				return response.json()
+			})
 			.then(user => {
 				document.querySelector('.user-name').textContent = `${user.firstName} ${user.lastName} (${user.username || ''})`
 				document.querySelector('.user-data[data-field="firstName"]').textContent = user.firstName

@@ -17,12 +17,14 @@ const transporter = nodemailer.createTransport({
 })
 
 // Funkcja middleware do uwierzytelniania tokenu
-const authenticateToken = (req, res, next) => {
+const authenticateToken = async (req, res, next) => {
 	const token = req.header('Authorization') && req.header('Authorization').split(' ')[1]
 	if (!token) return res.sendStatus(401)
 
-	jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+	jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
 		if (err) return res.sendStatus(403)
+		const dbUser = await User.findByPk(user.userId)
+		if (!dbUser) return res.sendStatus(401) // Użytkownik nie istnieje w bazie danych
 		req.user = user
 		next()
 	})
@@ -113,7 +115,7 @@ router.get('/confirm-email', async (req, res) => {
 		const authToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' })
 
 		// Przekierowanie na stronę główną z tokenem w query params
-		res.redirect(`/profile.html?token=${authToken}`)
+		res.redirect(`/?token=${authToken}`)
 	} catch (error) {
 		console.error('Error verifying email:', error)
 		res.status(400).json({ errors: [{ msg: 'Błąd podczas weryfikacji' }] })
