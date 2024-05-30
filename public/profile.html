@@ -51,7 +51,21 @@
                     <p class="common-user-text">Typ Konta* <span class="user-data" data-field="role"></span></p>
                     <p class="common-user-text">Hasło* <span class="change-password">Zmień hasło</span></p>
                 </div>
-
+                <form action="" class="change-password-form hidden">
+                    <div class="configuration-item">
+                        <label for="menu-name">Stare hasło</label>
+                        <input type="password" id="current-password" required>
+                    </div>
+                    <div class="configuration-item">
+                        <label for="menu-name">Nowe hasło</label>
+                        <input type="password" id="new-password" required>
+                    </div>
+                    <div class="configuration-item">
+                        <label for="menu-name">Potwierdź hasło</label>
+                        <input type="password" id="confirm-password" required>
+                    </div>
+                    <button id="update-password-btn">Zaktualizuj hasło</button>
+                </form>
             </div>
 
 

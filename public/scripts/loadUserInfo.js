@@ -1,128 +1,150 @@
 document.addEventListener('DOMContentLoaded', function () {
-	const token = localStorage.getItem('token')
-	if (!token) {
-		window.location.href = '/login.html'
-		return
-	}
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login.html';
+        return;
+    }
 
-	let userProfile = {}
+    const loadUserProfile = () => {
+        fetch('/api/profile', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.removeItem('token');
+                    window.location.href = '/login.html';
+                }
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(user => {
+            document.querySelector('.user-name').textContent = `${user.firstName} ${user.lastName} ${user.username ? `(${user.username})` : ''}`;
+            document.querySelector('.user-data[data-field="firstName"]').textContent = user.firstName;
+            document.querySelector('.user-data[data-field="lastName"]').textContent = user.lastName;
+            document.querySelector('.user-data[data-field="email"]').textContent = user.email;
+            document.querySelector('.user-data[data-field="phoneNumber"]').textContent = user.phoneNumber || '';
+            document.querySelector('.user-data[data-field="role"]').textContent = user.role;
+            document.querySelector('.user-data[data-field="username"]').textContent = user.username || '';
+            const profilePicture = user.profilePicture ? `img/uploads/${user.profilePicture}` : './img/avatar-big.jpg';
+            document.getElementById('user-profile-picture').style.backgroundImage = `url(${profilePicture})`;
+        })
+        .catch(error => {
+            console.error('Error loading user profile:', error);
+            alert('Błąd podczas ładowania profilu użytkownika.');
+        });
+    }
 
-	const loadUserProfile = () => {
-		fetch('/api/profile', {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		})
-			.then(response => {
-				if (!response.ok) {
-					if (response.status === 401 || response.status === 403) {
-						localStorage.removeItem('token')
-						window.location.href = '/login.html'
-					}
-					throw new Error('Network response was not ok')
-				}
-				return response.json()
-			})
-			.then(user => {
-				userProfile = user
+    const handleProfilePictureChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append('profilePicture', file);
 
-				document.querySelector('.user-name').textContent = `${user.firstName} ${user.lastName} (${user.username || ''})`
-				document.querySelector('.user-data[data-field="firstName"]').textContent = user.firstName
-				document.querySelector('.user-data[data-field="lastName"]').textContent = user.lastName
-				document.querySelector('.user-data[data-field="email"]').textContent = user.email
-				document.querySelector('.user-data[data-field="phoneNumber"]').textContent = user.phoneNumber || ''
-				document.querySelector('.user-data[data-field="role"]').textContent = user.role
-				document.querySelector('.user-data[data-field="username"]').textContent = user.username || ''
-				const profilePicture = user.profilePicture ? `img/uploads/${user.profilePicture}` : './img/avatar-big.jpg'
-				document.getElementById('user-profile-picture').style.backgroundImage = `url(${profilePicture})`
-			})
-			.catch(error => {
-				console.error('Error loading user profile:', error)
-				alert('Błąd podczas ładowania profilu użytkownika.')
-			})
-	}
+            fetch('/api/profile-picture', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.errors) {
+                    alert(data.errors.map(error => error.msg).join('\n'));
+                } else {
+                    alert('Zdjęcie profilowe zaktualizowane pomyślnie');
+                    loadUserProfile();
+                }
+            })
+            .catch(error => {
+                console.error('Error uploading profile picture:', error);
+                alert('Błąd podczas zmiany zdjęcia profilowego.');
+            });
+        }
+    }
 
-	const handleProfileUpdate = event => {
-		const span = event.target
-		const field = span.getAttribute('data-field')
-		const value = span.textContent
+    document.getElementById('user-profile-picture').addEventListener('click', () => {
+        document.getElementById('profile-picture-input').click();
+    });
 
-		if (value === userProfile[field]) {
-			// Jeśli wartość nie została zmieniona, zakończ funkcję
-			return
-		}
+    document.getElementById('profile-picture-input').addEventListener('change', handleProfilePictureChange);
 
-		// Ignoruj zmiany w polu role
-		if (field === 'role') {
-			loadUserProfile()
-			return
-		}
+    // Dodanie obsługi edycji pól profilu
+    document.querySelectorAll('.user-data[contenteditable="true"]').forEach(field => {
+        field.addEventListener('blur', handleProfileUpdate);
+    });
 
-		const data = {}
-		data[field] = value
+    function handleProfileUpdate(event) {
+        const field = event.target;
+        const fieldName = field.getAttribute('data-field');
+        const fieldValue = field.textContent;
 
-		fetch('/api/profile', {
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-			body: JSON.stringify(data),
-		})
-			.then(response => response.json())
-			.then(data => {
-				if (data.errors) {
-					alert(data.errors.map(error => error.msg).join('\n'))
-				} else {
-					alert('Profil zaktualizowany pomyślnie')
-					userProfile[field] = value // Aktualizuj lokalne dane użytkownika
-				}
-			})
-			.catch(error => {
-				console.error('Error updating profile:', error)
-				alert('Błąd podczas aktualizacji profilu.')
-			})
-	}
+        fetch('/api/profile', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ [fieldName]: fieldValue })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.errors) {
+                alert(data.errors.map(error => error.msg).join('\n'));
+            } else {
+                alert('Profil zaktualizowany pomyślnie');
+                loadUserProfile();
+            }
+        })
+        .catch(error => {
+            console.error('Error updating profile:', error);
+            alert('Błąd podczas aktualizacji profilu.');
+        });
+    }
 
-	const handleProfilePictureChange = event => {
-		const file = event.target.files[0]
-		if (file) {
-			const formData = new FormData()
-			formData.append('profilePicture', file)
+    // Dodanie obsługi zmiany hasła
+    document.querySelector('.change-password').addEventListener('click', () => {
+        document.querySelector('.change-password-form').classList.toggle('hidden');
+    });
 
-			fetch('/api/profile-picture', {
-				method: 'POST',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-				body: formData,
-			})
-				.then(response => response.json())
-				.then(data => {
-					if (data.errors) {
-						alert(data.errors.map(error => error.msg).join('\n'))
-					} else {
-						alert('Zdjęcie profilowe zaktualizowane pomyślnie')
-						loadUserProfile()
-					}
-				})
-				.catch(error => {
-					console.error('Error uploading profile picture:', error)
-					alert('Błąd podczas zmiany zdjęcia profilowego.')
-				})
-		}
-	}
+    document.getElementById('update-password-btn').addEventListener('click', (event) => {
+        event.preventDefault();
+        const currentPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
 
-	document.getElementById('user-profile-picture').addEventListener('click', () => {
-		document.getElementById('profile-picture-input').click()
-	})
+        if (newPassword !== confirmPassword) {
+            alert('Nowe hasło i potwierdzenie hasła nie są zgodne.');
+            return;
+        }
 
-	document.getElementById('profile-picture-input').addEventListener('change', handleProfilePictureChange)
+        fetch('/api/change-password', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ currentPassword, newPassword })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.errors) {
+                alert(data.errors.map(error => error.msg).join('\n'));
+            } else {
+                alert('Hasło zostało zaktualizowane pomyślnie.');
+                document.querySelector('.change-password-form').classList.add('hidden');
+            }
+        })
+        .catch(error => {
+            console.error('Error changing password:', error);
+            alert('Błąd podczas zmiany hasła.');
+        });
+    });
 
-	document.querySelectorAll('.user-data[contenteditable="true"]').forEach(span => {
-		span.addEventListener('blur', handleProfileUpdate)
-	})
-
-	loadUserProfile()
-})
+    loadUserProfile();
+});

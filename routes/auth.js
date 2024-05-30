@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
 	},
 	filename: function (req, file, cb) {
 		cb(null, Date.now() + '-' + file.originalname)
-	}
+	},
 })
 const upload = multer({ storage: storage })
 
@@ -149,7 +149,7 @@ router.post('/login', async (req, res) => {
 router.get('/profile', authenticateToken, async (req, res) => {
 	try {
 		const user = await User.findByPk(req.user.userId, {
-			attributes: ['firstName', 'lastName', 'username', 'email', 'phoneNumber', 'profilePicture', 'role']
+			attributes: ['firstName', 'lastName', 'username', 'email', 'phoneNumber', 'profilePicture', 'role'],
 		})
 		if (!user) {
 			return res.status(404).json({ errors: [{ msg: 'Użytkownik nie znaleziony' }] })
@@ -197,6 +197,33 @@ router.post('/profile-picture', authenticateToken, upload.single('profilePicture
 		res.json({ msg: 'Zdjęcie profilowe zaktualizowane pomyślnie', profilePicture: user.profilePicture })
 	} catch (error) {
 		console.error('Error uploading profile picture:', error)
+		res.status(500).json({ errors: [{ msg: 'Błąd serwera' }] })
+	}
+})
+
+router.put('/change-password', authenticateToken, async (req, res) => {
+	const { currentPassword, newPassword } = req.body
+
+	try {
+		const user = await User.findByPk(req.user.userId)
+
+		if (!user) {
+			return res.status(400).json({ errors: [{ msg: 'Użytkownik nie znaleziony' }] })
+		}
+
+		const isMatch = await bcrypt.compare(currentPassword, user.password)
+
+		if (!isMatch) {
+			return res.status(400).json({ errors: [{ msg: 'Stare hasło jest nieprawidłowe' }] })
+		}
+
+		const hashedNewPassword = await bcrypt.hash(newPassword, 10)
+		user.password = hashedNewPassword
+		await user.save()
+
+		res.json({ msg: 'Hasło zostało zaktualizowane pomyślnie' })
+	} catch (error) {
+		console.error('Error changing password:', error)
 		res.status(500).json({ errors: [{ msg: 'Błąd serwera' }] })
 	}
 })
