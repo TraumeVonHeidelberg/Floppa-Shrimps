@@ -536,6 +536,11 @@ section {
 	padding: 1.2rem;
 }
 
+.seats-field {
+	grid-column-start: 2;
+	grid-row-start: 3;
+}
+
 /* ------------------------------------------------------ */
 /* Nowości */
 
