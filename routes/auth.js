@@ -4,11 +4,22 @@ const { body, validationResult } = require('express-validator')
 const User = require('../models/user')
 const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
-const authenticateToken = require('../middleware/authenticateToken')
 const multer = require('multer')
 const path = require('path')
+const authenticateToken = require('../middleware/authenticateToken')
 const router = express.Router()
 require('dotenv').config()
+
+// Konfiguracja multer dla przesyłania plików
+const storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null, path.join(__dirname, '../public/img/uploads'))
+	},
+	filename: function (req, file, cb) {
+		cb(null, Date.now() + '-' + file.originalname)
+	}
+})
+const upload = multer({ storage: storage })
 
 // Konfiguracja nodemailer
 const transporter = nodemailer.createTransport({
@@ -18,18 +29,6 @@ const transporter = nodemailer.createTransport({
 		pass: process.env.EMAIL_PASS,
 	},
 })
-
-// Konfiguracja multer
-const storage = multer.diskStorage({
-	destination: (req, file, cb) => {
-		cb(null, path.join(__dirname, '..', 'public', 'img', 'uploads'))
-	},
-	filename: (req, file, cb) => {
-		cb(null, Date.now() + '-' + file.originalname)
-	},
-})
-
-const upload = multer({ storage: storage })
 
 router.post(
 	'/register',
@@ -149,38 +148,36 @@ router.post('/login', async (req, res) => {
 
 router.get('/profile', authenticateToken, async (req, res) => {
 	try {
-		const user = await User.findByPk(req.user.userId)
-
+		const user = await User.findByPk(req.user.userId, {
+			attributes: ['firstName', 'lastName', 'username', 'email', 'phoneNumber', 'profilePicture', 'role']
+		})
 		if (!user) {
 			return res.status(404).json({ errors: [{ msg: 'Użytkownik nie znaleziony' }] })
 		}
-
 		res.json(user)
 	} catch (error) {
-		console.error('Error fetching user profile:', error)
+		console.error('Error fetching profile:', error)
 		res.status(500).json({ errors: [{ msg: 'Błąd serwera' }] })
 	}
 })
 
 router.put('/profile', authenticateToken, async (req, res) => {
-	const { firstName, lastName, username, email, phoneNumber } = req.body
-
 	try {
 		const user = await User.findByPk(req.user.userId)
-
 		if (!user) {
 			return res.status(404).json({ errors: [{ msg: 'Użytkownik nie znaleziony' }] })
 		}
 
-		user.firstName = firstName || user.firstName
-		user.lastName = lastName || user.lastName
-		user.username = username || user.username
-		user.email = email || user.email
-		user.phoneNumber = phoneNumber || user.phoneNumber
+		// Zaktualizuj tylko dozwolone pola
+		const { firstName, lastName, username, email, phoneNumber } = req.body
+		if (firstName) user.firstName = firstName
+		if (lastName) user.lastName = lastName
+		if (username) user.username = username
+		if (email) user.email = email
+		if (phoneNumber) user.phoneNumber = phoneNumber
 
 		await user.save()
-
-		res.json({ msg: 'Profil zaktualizowany pomyślnie', user })
+		res.json(user)
 	} catch (error) {
 		console.error('Error updating profile:', error)
 		res.status(500).json({ errors: [{ msg: 'Błąd serwera' }] })
@@ -190,7 +187,6 @@ router.put('/profile', authenticateToken, async (req, res) => {
 router.post('/profile-picture', authenticateToken, upload.single('profilePicture'), async (req, res) => {
 	try {
 		const user = await User.findByPk(req.user.userId)
-
 		if (!user) {
 			return res.status(404).json({ errors: [{ msg: 'Użytkownik nie znaleziony' }] })
 		}
