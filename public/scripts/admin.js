@@ -9,6 +9,11 @@ document.addEventListener('DOMContentLoaded', function () {
 		document.querySelectorAll('aside button').forEach(button => button.classList.remove('button-active'))
 	}
 
+	function validateEmail(email) {
+		const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+		return re.test(String(email).toLowerCase())
+	}
+
 	function formatPriceInput(input) {
 		input.addEventListener('blur', function () {
 			let value = parseFloat(input.value)
@@ -621,6 +626,13 @@ document.addEventListener('DOMContentLoaded', function () {
 				return // Jeśli wartość się nie zmieniła, nie wysyłaj żądania
 			}
 
+			// Walidacja e-maila
+			if (fieldName === 'email' && !validateEmail(fieldValue)) {
+				alert('Proszę podać poprawny adres e-mail.')
+				field.textContent = originalValue // Przywróć oryginalną wartość
+				return
+			}
+
 			fetch('/api/profile', {
 				method: 'PUT',
 				headers: {
@@ -633,17 +645,26 @@ document.addEventListener('DOMContentLoaded', function () {
 				.then(data => {
 					if (data.errors) {
 						alert(data.errors.map(error => error.msg).join('\n'))
+						field.textContent = originalValue // Przywróć oryginalną wartość w przypadku błędu
 					} else {
-						alert('Profil zaktualizowany pomyślnie')
+						if (fieldName === 'email') {
+							alert(
+								'Link weryfikacyjny został wysłany na nowy adres e-mail. Zmiana zostanie zatwierdzona po weryfikacji.'
+							)
+						} else {
+							alert('Profil zaktualizowany pomyślnie')
+						}
 						field.setAttribute('data-original-value', fieldValue) // Zaktualizuj oryginalną wartość
 					}
 				})
 				.catch(error => {
 					console.error('Error updating profile:', error)
 					alert('Błąd podczas aktualizacji profilu.')
+					field.textContent = originalValue // Przywróć oryginalną wartość w przypadku błędu
 				})
 		}
 
+		// Dodanie obsługi edycji pól profilu
 		document.querySelectorAll('.user-data[contenteditable="true"]').forEach(field => {
 			field.setAttribute('data-original-value', field.textContent.trim()) // Ustawienie oryginalnej wartości przy załadowaniu strony
 			field.addEventListener('blur', handleProfileUpdate)

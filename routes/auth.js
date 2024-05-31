@@ -161,6 +161,7 @@ router.get('/profile', authenticateToken, async (req, res) => {
 	}
 })
 
+// Endpoint do aktualizacji profilu użytkownika
 router.put('/profile', authenticateToken, async (req, res) => {
 	try {
 		const user = await User.findByPk(req.user.userId)
@@ -168,19 +169,68 @@ router.put('/profile', authenticateToken, async (req, res) => {
 			return res.status(404).json({ errors: [{ msg: 'Użytkownik nie znaleziony' }] })
 		}
 
-		// Zaktualizuj tylko dozwolone pola
 		const { firstName, lastName, username, email, phoneNumber } = req.body
 		if (firstName) user.firstName = firstName
 		if (lastName) user.lastName = lastName
 		if (username) user.username = username
-		if (email) user.email = email
 		if (phoneNumber) user.phoneNumber = phoneNumber
+
+		// Obsługa zmiany e-maila
+		if (email && email !== user.email) {
+			const token = jwt.sign({ userId: user.id, email }, process.env.JWT_SECRET, { expiresIn: '1h' })
+			const mailOptions = {
+				from: process.env.EMAIL_USER,
+				to: email,
+				subject: 'Potwierdzenie zmiany e-maila',
+				text: `Kliknij poniższy link, aby potwierdzić zmianę adresu e-mail: http://localhost:3000/api/verify-email-change?token=${token}`,
+				html: `<p>Kliknij poniższy link, aby potwierdzić zmianę adresu e-mail:</p><a href="http://localhost:3000/api/verify-email-change?token=${token}">Potwierdź zmianę e-maila</a>`,
+			}
+
+			transporter.sendMail(mailOptions, (error, info) => {
+				if (error) {
+					return console.error('Error sending verification email:', error)
+				}
+				console.log('Email sent: ' + info.response)
+			})
+
+			// Nie zmieniaj e-maila bez weryfikacji
+			// user.email = email;
+			return res.json({
+				msg: 'Link weryfikacyjny został wysłany na nowy adres e-mail. Zmiana zostanie zatwierdzona po weryfikacji.',
+			})
+		}
 
 		await user.save()
 		res.json(user)
 	} catch (error) {
 		console.error('Error updating profile:', error)
 		res.status(500).json({ errors: [{ msg: 'Błąd serwera' }] })
+	}
+})
+
+// Endpoint do weryfikacji zmiany e-maila
+router.get('/verify-email-change', async (req, res) => {
+	const { token } = req.query
+
+	if (!token) {
+		return res.status(400).json({ errors: [{ msg: 'Brak tokenu weryfikacyjnego' }] })
+	}
+
+	try {
+		const decoded = jwt.verify(token, process.env.JWT_SECRET)
+		const user = await User.findByPk(decoded.userId)
+
+		if (!user) {
+			return res.status(400).json({ errors: [{ msg: 'Nieprawidłowy token' }] })
+		}
+
+		user.email = decoded.email
+		await user.save()
+
+		res.redirect('/?emailVerified=true')
+	} catch (error) {
+		console.error('Error verifying email change:', error)
+		res.status(400).json({ errors: [{ msg: 'Błąd podczas weryfikacji' }] })
 	}
 })
 
