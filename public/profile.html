@@ -29,47 +29,6 @@
         </aside>
         <article id="main-content">
             <!-- Dynamiczna zawartosc zgodna z wybraną opcja -->
-            <div class="dynamic-content user-content">
-                <h2 class="user-profile-header">Mój Profil</h2>
-                <div class="user-item">
-                    <div class="user-profile-picture" id="user-profile-picture">
-                        <i class="fa-solid fa-pen"></i>
-                        <input type="file" id="profile-picture-input" class="hidden">
-                    </div>
-                    <p class="user-name">Mateusz Dyląg (Cygan)</p>
-                </div>
-                <div class="user-item user-grid">
-                    <p class="common-user-text">Imię* <span class="user-data" contenteditable="true"
-                            data-field="firstName"></span></p>
-                    <p class="common-user-text">Nazwisko* <span class="user-data" contenteditable="true"
-                            data-field="lastName"></span></p>
-                    <p class="common-user-text">Pseudonim <span class="user-data" contenteditable="true"
-                            data-field="username"></span></p>
-                    <p class="common-user-text">Email* <span class="user-data" contenteditable="true"
-                            data-field="email"></span></p>
-                    <p class="common-user-text">Telefon <span class="user-data" contenteditable="true"
-                            data-field="phoneNumber"></span></p>
-                    <p class="common-user-text">Typ Konta* <span class="user-data" data-field="role"></span></p>
-                    <p class="common-user-text">Hasło* <span class="change-password">Zmień hasło</span></p>
-                </div>
-                <form action="" class="change-password-form hidden">
-                    <div class="configuration-item">
-                        <label for="menu-name">Stare hasło</label>
-                        <input type="password" id="current-password" required>
-                    </div>
-                    <div class="configuration-item">
-                        <label for="menu-name">Nowe hasło</label>
-                        <input type="password" id="new-password" required>
-                    </div>
-                    <div class="configuration-item">
-                        <label for="menu-name">Potwierdź hasło</label>
-                        <input type="password" id="confirm-password" required>
-                    </div>
-                    <button id="update-password-btn">Zaktualizuj hasło</button>
-                </form>
-            </div>
-
-
         </article>
     </div>
 
