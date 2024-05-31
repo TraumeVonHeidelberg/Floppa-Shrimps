@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	const addElementsBtn = document.getElementById('add-elements-btn')
 	const listElementsBtn = document.getElementById('list-elements-btn')
 	const reservationsBtn = document.querySelector('button:nth-child(3)')
+	const userProfileBtn = document.getElementById('user-profile-btn')
 	const mainContent = document.getElementById('main-content')
 
 	function clearActiveClass() {
@@ -480,11 +481,210 @@ document.addEventListener('DOMContentLoaded', function () {
 		elementListTypeSelect.dispatchEvent(new Event('change'))
 	}
 
+	function loadUserProfile() {
+		clearActiveClass()
+		userProfileBtn.classList.add('button-active')
+		mainContent.innerHTML = `
+			<div class="dynamic-content user-content">
+				<h2 class="user-profile-header">Mój Profil</h2>
+				<div class="user-item">
+					<div class="user-profile-picture" id="user-profile-picture">
+						<i class="fa-solid fa-pen"></i>
+						<input type="file" id="profile-picture-input" class="hidden">
+					</div>
+					<p class="user-name"></p>
+				</div>
+				<div class="user-item user-grid">
+					<p class="common-user-text">Imię* <span class="user-data" contenteditable="true"
+							data-field="firstName"></span></p>
+					<p class="common-user-text">Nazwisko* <span class="user-data" contenteditable="true"
+							data-field="lastName"></span></p>
+					<p class="common-user-text">Pseudonim <span class="user-data" contenteditable="true"
+							data-field="username"></span></p>
+					<p class="common-user-text">Email* <span class="user-data" contenteditable="true"
+							data-field="email"></span></p>
+					<p class="common-user-text">Telefon <span class="user-data" contenteditable="true"
+							data-field="phoneNumber"></span></p>
+					<p class="common-user-text">Typ Konta* <span class="user-data" data-field="role"></span></p>
+					<p class="common-user-text">Hasło* <span class="change-password">Zmień hasło</span></p>
+				</div>
+				<form action="" class="change-password-form hidden">
+					<div class="configuration-item">
+						<label for="menu-name">Stare hasło</label>
+						<input type="password" id="current-password" required>
+					</div>
+					<div class="configuration-item">
+						<label for="menu-name">Nowe hasło</label>
+						<input type="password" id="new-password" required>
+					</div>
+					<div class="configuration-item">
+						<label for="menu-name">Potwierdź hasło</label>
+						<input type="password" id="confirm-password" required>
+					</div>
+					<button id="update-password-btn">Zaktualizuj hasło</button>
+				</form>
+			</div>
+		`
+		loadUserInfo()
+	}
+
+	function loadUserInfo() {
+		const token = localStorage.getItem('token');
+		if (!token) {
+			window.location.href = '/login.html';
+			return;
+		}
+
+		const loadUserProfile = () => {
+			fetch('/api/profile', {
+				method: 'GET',
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+			.then(response => {
+				if (!response.ok) {
+					if (response.status === 401 || response.status === 403) {
+						localStorage.removeItem('token');
+						window.location.href = '/login.html';
+					}
+					throw new Error('Network response was not ok');
+				}
+				return response.json();
+			})
+			.then(user => {
+				document.querySelector('.user-name').textContent = `${user.firstName} ${user.lastName} ${user.username ? `(${user.username})` : ''}`;
+				document.querySelector('.user-data[data-field="firstName"]').textContent = user.firstName;
+				document.querySelector('.user-data[data-field="lastName"]').textContent = user.lastName;
+				document.querySelector('.user-data[data-field="email"]').textContent = user.email;
+				document.querySelector('.user-data[data-field="phoneNumber"]').textContent = user.phoneNumber || '';
+				document.querySelector('.user-data[data-field="role"]').textContent = user.role;
+				document.querySelector('.user-data[data-field="username"]').textContent = user.username || '';
+				const profilePicture = user.profilePicture ? `img/uploads/${user.profilePicture}` : './img/avatar-big.jpg';
+				document.getElementById('user-profile-picture').style.backgroundImage = `url(${profilePicture})`;
+			})
+			.catch(error => {
+				console.error('Error loading user profile:', error);
+				alert('Błąd podczas ładowania profilu użytkownika.');
+			});
+		}
+
+		const handleProfilePictureChange = (event) => {
+			const file = event.target.files[0];
+			if (file) {
+				const formData = new FormData();
+				formData.append('profilePicture', file);
+
+				fetch('/api/profile-picture', {
+					method: 'POST',
+					headers: {
+						'Authorization': `Bearer ${token}`
+					},
+					body: formData
+				})
+				.then(response => response.json())
+				.then(data => {
+					if (data.errors) {
+						alert(data.errors.map(error => error.msg).join('\n'));
+					} else {
+						alert('Zdjęcie profilowe zaktualizowane pomyślnie');
+						loadUserProfile();
+					}
+				})
+				.catch(error => {
+					console.error('Error uploading profile picture:', error);
+					alert('Błąd podczas zmiany zdjęcia profilowego.');
+				});
+			}
+		}
+
+		document.getElementById('user-profile-picture').addEventListener('click', () => {
+			document.getElementById('profile-picture-input').click();
+		});
+
+		document.getElementById('profile-picture-input').addEventListener('change', handleProfilePictureChange);
+
+		// Dodanie obsługi edycji pól profilu
+		document.querySelectorAll('.user-data[contenteditable="true"]').forEach(field => {
+			field.addEventListener('blur', handleProfileUpdate);
+		});
+
+		function handleProfileUpdate(event) {
+			const field = event.target;
+			const fieldName = field.getAttribute('data-field');
+			const fieldValue = field.textContent;
+
+			fetch('/api/profile', {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				},
+				body: JSON.stringify({ [fieldName]: fieldValue })
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.errors) {
+					alert(data.errors.map(error => error.msg).join('\n'));
+				} else {
+					alert('Profil zaktualizowany pomyślnie');
+					loadUserProfile();
+				}
+			})
+			.catch(error => {
+				console.error('Error updating profile:', error);
+				alert('Błąd podczas aktualizacji profilu.');
+			});
+		}
+
+		// Dodanie obsługi zmiany hasła
+		document.querySelector('.change-password').addEventListener('click', () => {
+			document.querySelector('.change-password-form').classList.toggle('hidden');
+		});
+
+		document.getElementById('update-password-btn').addEventListener('click', (event) => {
+			event.preventDefault();
+			const currentPassword = document.getElementById('current-password').value;
+			const newPassword = document.getElementById('new-password').value;
+			const confirmPassword = document.getElementById('confirm-password').value;
+
+			if (newPassword !== confirmPassword) {
+				alert('Nowe hasło i potwierdzenie hasła nie są zgodne.');
+				return;
+			}
+
+			fetch('/api/change-password', {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				},
+				body: JSON.stringify({ currentPassword, newPassword })
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.errors) {
+					alert(data.errors.map(error => error.msg).join('\n'));
+				} else {
+					alert('Hasło zostało zaktualizowane pomyślnie.');
+					document.querySelector('.change-password-form').classList.add('hidden');
+				}
+			})
+			.catch(error => {
+				console.error('Error changing password:', error);
+				alert('Błąd podczas zmiany hasła.');
+			});
+		});
+
+		loadUserProfile();
+	}
+
 	addElementsBtn.addEventListener('click', loadAddElements)
 	listElementsBtn.addEventListener('click', loadListElements)
+	userProfileBtn.addEventListener('click', loadUserProfile)
 
-	// Domyślnie załaduj opcję "Dodaj Elementy" po załadowaniu strony
-	loadAddElements()
+	// Domyślnie załaduj profil użytkownika po załadowaniu strony
+	loadUserProfile()
 
 	// Attach deleteItem and makeEditable functions to the window object to make them accessible
 	window.deleteItem = deleteItem
