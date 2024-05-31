@@ -525,7 +525,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function loadUserInfo() {
         const token = localStorage.getItem('token');
         if (!token) {
-            window.location.href = '/login.html';
+            window.location.href = '/index.html';
             return;
         }
 
@@ -540,7 +540,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!response.ok) {
                     if (response.status === 401 || response.status === 403) {
                         localStorage.removeItem('token');
-                        window.location.href = '/login.html';
+                        window.location.href = '/index.html';
                     }
                     throw new Error('Network response was not ok');
                 }
