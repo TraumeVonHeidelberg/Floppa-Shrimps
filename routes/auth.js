@@ -30,6 +30,27 @@ const transporter = nodemailer.createTransport({
 	},
 })
 
+// Konfiguracja Vonage
+const { Vonage } = require('@vonage/server-sdk')
+const vonage = new Vonage({
+	apiKey: process.env.VONAGE_API_KEY,
+	apiSecret: process.env.VONAGE_API_SECRET,
+})
+
+// Funkcja do wysyłania SMS
+async function sendSMS(to, from, text) {
+	return vonage.sms
+		.send({ to, from, text })
+		.then(resp => {
+			console.log('Message sent successfully')
+			console.log(resp)
+		})
+		.catch(err => {
+			console.log('There was an error sending the messages.')
+			console.error(err)
+		})
+}
+
 router.post(
 	'/register',
 	[
@@ -163,50 +184,58 @@ router.get('/profile', authenticateToken, async (req, res) => {
 
 // Endpoint do aktualizacji profilu użytkownika
 router.put('/profile', authenticateToken, async (req, res) => {
-	try {
-		const user = await User.findByPk(req.user.userId)
-		if (!user) {
-			return res.status(404).json({ errors: [{ msg: 'Użytkownik nie znaleziony' }] })
-		}
+    try {
+        const user = await User.findByPk(req.user.userId);
+        if (!user) {
+            return res.status(404).json({ errors: [{ msg: 'Użytkownik nie znaleziony' }] });
+        }
 
-		const { firstName, lastName, username, email, phoneNumber } = req.body
-		if (firstName) user.firstName = firstName
-		if (lastName) user.lastName = lastName
-		if (username) user.username = username
-		if (phoneNumber) user.phoneNumber = phoneNumber
+        const { firstName, lastName, username, email, phoneNumber } = req.body;
+        if (firstName) user.firstName = firstName;
+        if (lastName) user.lastName = lastName;
+        if (username) user.username = username;
 
-		// Obsługa zmiany e-maila
-		if (email && email !== user.email) {
-			const token = jwt.sign({ userId: user.id, email }, process.env.JWT_SECRET, { expiresIn: '1h' })
-			const mailOptions = {
-				from: process.env.EMAIL_USER,
-				to: email,
-				subject: 'Potwierdzenie zmiany e-maila',
-				text: `Kliknij poniższy link, aby potwierdzić zmianę adresu e-mail: http://localhost:3000/api/verify-email-change?token=${token}`,
-				html: `<p>Kliknij poniższy link, aby potwierdzić zmianę adresu e-mail:</p><a href="http://localhost:3000/api/verify-email-change?token=${token}">Potwierdź zmianę e-maila</a>`,
-			}
+        // Obsługa zmiany e-maila
+        if (email && email !== user.email) {
+            const emailToken = jwt.sign({ userId: user.id, email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: 'Potwierdzenie zmiany e-maila',
+                text: `Kliknij poniższy link, aby potwierdzić zmianę adresu e-mail: http://localhost:3000/api/verify-email-change?token=${emailToken}`,
+                html: `<p>Kliknij poniższy link, aby potwierdzić zmianę adresu e-mail:</p><a href="http://localhost:3000/api/verify-email-change?token=${emailToken}">Potwierdź zmianę e-maila</a>`,
+            };
 
-			transporter.sendMail(mailOptions, (error, info) => {
-				if (error) {
-					return console.error('Error sending verification email:', error)
-				}
-				console.log('Email sent: ' + info.response)
-			})
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    return console.error('Error sending verification email:', error);
+                }
+                console.log('Email sent: ' + info.response);
+            });
 
-			// Nie zmieniaj e-maila bez weryfikacji
-			// user.email = email;
-			return res.json({
-				msg: 'Link weryfikacyjny został wysłany na nowy adres e-mail. Zmiana zostanie zatwierdzona po weryfikacji.',
-			})
-		}
+            return res.json({ msg: 'Link weryfikacyjny został wysłany na nowy adres e-mail. Zmiana zostanie zatwierdzona po weryfikacji.' });
+        }
 
-		await user.save()
-		res.json(user)
-	} catch (error) {
-		console.error('Error updating profile:', error)
-		res.status(500).json({ errors: [{ msg: 'Błąd serwera' }] })
-	}
-})
+        // Obsługa zmiany numeru telefonu
+        if (phoneNumber && phoneNumber !== user.phoneNumber) {
+            const phoneToken = jwt.sign({ userId: user.id, phoneNumber }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+            const from = 'Vonage APIs';
+            const to = phoneNumber.startsWith('+') ? phoneNumber.slice(1) : phoneNumber;
+            const text = `Twój kod weryfikacyjny to: ${phoneToken}`;
+
+            await sendSMS(to, from, text);
+
+            return res.json({ msg: 'Kod weryfikacyjny został wysłany na nowy numer telefonu. Zmiana zostanie zatwierdzona po weryfikacji.' });
+        }
+
+        await user.save();
+        res.json(user);
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        res.status(500).json({ errors: [{ msg: 'Błąd serwera' }] });
+    }
+});
 
 // Endpoint do weryfikacji zmiany e-maila
 router.get('/verify-email-change', async (req, res) => {
@@ -233,6 +262,32 @@ router.get('/verify-email-change', async (req, res) => {
 		res.status(400).json({ errors: [{ msg: 'Błąd podczas weryfikacji' }] })
 	}
 })
+
+// Endpoint do weryfikacji zmiany numeru telefonu
+router.get('/verify-phone-change', async (req, res) => {
+    const { token } = req.query;
+
+    if (!token) {
+        return res.status(400).json({ errors: [{ msg: 'Brak tokenu weryfikacyjnego' }] });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findByPk(decoded.userId);
+
+        if (!user) {
+            return res.status(400).json({ errors: [{ msg: 'Nieprawidłowy token' }] });
+        }
+
+        user.phoneNumber = decoded.phoneNumber;
+        await user.save();
+
+        res.redirect('/?phoneVerified=true');
+    } catch (error) {
+        console.error('Error verifying phone change:', error);
+        res.status(400).json({ errors: [{ msg: 'Błąd podczas weryfikacji' }] });
+    }
+});
 
 router.post('/profile-picture', authenticateToken, upload.single('profilePicture'), async (req, res) => {
 	try {
