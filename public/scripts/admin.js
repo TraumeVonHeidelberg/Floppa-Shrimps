@@ -454,19 +454,19 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <p class="element-text" id="introText-${item.id}">${item.introText}</p>
                                 <div id="headers-${item.id}">
                                     ${item.headers
-										.map((header, index) => `<p class="element-text news-header">${header}</p>`)
-										.join('')}
+																			.map((header, index) => `<p class="element-text news-header">${header}</p>`)
+																			.join('')}
                                 </div>
                                 <div id="texts-${item.id}">
                                     ${item.texts
-										.map((text, index) => `<p class="element-text news-text">${text}</p>`)
-										.join('')}
+																			.map((text, index) => `<p class="element-text news-text">${text}</p>`)
+																			.join('')}
                                 </div>
                                 ${
-									item.image
-										? `<img src="/uploads/${item.image}" alt="News Image" class="news-image">`
-										: ''
-								}
+																	item.image
+																		? `<img src="/uploads/${item.image}" alt="News Image" class="news-image">`
+																		: ''
+																}
                             </div>
                             <i class="fa-regular fa-circle-xmark" onclick="deleteItem('news', ${item.id})"></i>
                         </div>
@@ -497,9 +497,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	function loadUserProfile() {
-        clearActiveClass();
-        userProfileBtn.classList.add('button-active');
-        mainContent.innerHTML = `
+		clearActiveClass()
+		userProfileBtn.classList.add('button-active')
+		mainContent.innerHTML = `
             <div class="dynamic-content user-content">
                 <h2 class="user-profile-header">Mój Profil</h2>
                 <div class="user-item">
@@ -533,9 +533,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     <button id="update-password-btn">Zaktualizuj hasło</button>
                 </form>
             </div>
-        `;
-        loadUserInfo();
-    }
+        `
+		loadUserInfo()
+	}
 
 	function loadUserInfo() {
 		const token = localStorage.getItem('token')
@@ -544,167 +544,171 @@ document.addEventListener('DOMContentLoaded', function () {
 			return
 		}
 
-		const loadUserProfile = () => {
-			fetch('/api/profile', {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-				.then(response => {
-					if (!response.ok) {
-						if (response.status === 401 || response.status === 403) {
-							localStorage.removeItem('token')
-							window.location.href = '/index.html'
-						}
-						throw new Error('Network response was not ok')
+		fetch('/api/profile', {
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		})
+			.then(response => {
+				if (!response.ok) {
+					if (response.status === 401 || response.status === 403) {
+						localStorage.removeItem('token')
+						window.location.href = '/index.html'
 					}
-					return response.json()
-				})
-				.then(user => {
-					document.querySelector('.user-name').textContent = `${user.firstName} ${user.lastName} ${
-						user.username ? `(${user.username})` : ''
-					}`
-					document.querySelector('.user-data[data-field="firstName"]').textContent = user.firstName
-					document.querySelector('.user-data[data-field="lastName"]').textContent = user.lastName
-					document.querySelector('.user-data[data-field="email"]').textContent = user.email
-					document.querySelector('.user-data[data-field="role"]').textContent = user.role
-					document.querySelector('.user-data[data-field="username"]').textContent = user.username || ''
-					const profilePicture = user.profilePicture ? `img/uploads/${user.profilePicture}` : './img/avatar-big.jpg'
-					document.getElementById('user-profile-picture').style.backgroundImage = `url(${profilePicture})`
-
-					// Dodanie obsługi edycji pól profilu
-					document.querySelectorAll('.user-data[contenteditable="true"]').forEach(field => {
-						field.setAttribute('data-original-value', field.textContent.trim()) // Ustawienie oryginalnej wartości przy załadowaniu strony
-						field.addEventListener('focus', event => {
-							originalValue = event.target.textContent.trim() // Zapisz oryginalną wartość przed edycją
-						})
-						field.addEventListener('blur', handleProfileUpdate)
-					})
-
-					document.getElementById('user-profile-picture').addEventListener('click', () => {
-						document.getElementById('profile-picture-input').click()
-					})
-
-					document.getElementById('profile-picture-input').addEventListener('change', handleProfilePictureChange)
-
-					document.querySelector('.change-password').addEventListener('click', () => {
-						document.querySelector('.change-password-form').classList.toggle('hidden')
-					})
-
-					document.getElementById('update-password-btn').addEventListener('click', event => {
-						event.preventDefault()
-						const currentPassword = document.getElementById('current-password').value
-						const newPassword = document.getElementById('new-password').value
-						const confirmPassword = document.getElementById('confirm-password').value
-
-						if (newPassword !== confirmPassword) {
-							alert('Nowe hasło i potwierdzenie hasła nie są zgodne.')
-							return
-						}
-
-						fetch('/api/change-password', {
-							method: 'PUT',
-							headers: {
-								'Content-Type': 'application/json',
-								Authorization: `Bearer ${localStorage.getItem('token')}`,
-							},
-							body: JSON.stringify({ currentPassword, newPassword }),
-						})
-							.then(response => response.json())
-							.then(data => {
-								if (data.errors) {
-									alert(data.errors.map(error => error.msg).join('\n'))
-								} else {
-									alert('Hasło zostało zaktualizowane pomyślnie.')
-									document.querySelector('.change-password-form').classList.add('hidden')
-								}
-							})
-							.catch(error => {
-								console.error('Error changing password:', error)
-								alert('Błąd podczas zmiany hasła.')
-							})
-					})
-				})
-				.catch(error => {
-					console.error('Error loading user profile:', error)
-					alert('Błąd podczas ładowania profilu użytkownika.')
-				})
-		}
-
-		const handleProfilePictureChange = event => {
-			const file = event.target.files[0]
-			if (file) {
-				const formData = new FormData()
-				formData.append('profilePicture', file)
-
-				fetch('/api/profile-picture', {
-					method: 'POST',
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-					body: formData,
-				})
-					.then(response => response.json())
-					.then(data => {
-						if (data.errors) {
-							alert(data.errors.map(error => error.msg).join('\n'))
-							loadUserProfile()
-						} else {
-							alert('Zdjęcie profilowe zaktualizowane pomyślnie')
-							loadUserProfile()
-						}
-					})
-					.catch(error => {
-						console.error('Error uploading profile picture:', error)
-						alert('Błąd podczas zmiany zdjęcia profilowego.')
-					})
-			}
-		}
-
-		function handleProfileUpdate(event) {
-			const field = event.target;
-			const fieldName = field.getAttribute('data-field');
-			const fieldValue = field.textContent.trim();
-			const originalValue = field.getAttribute('data-original-value') || '';
-	
-			if (originalValue === fieldValue) {
-				return; // Jeśli wartość się nie zmieniła, nie wysyłaj żądania
-			}
-	
-			// Walidacja e-maila
-			if (fieldName === 'email' && !validateEmail(fieldValue)) {
-				alert('Proszę podać poprawny adres e-mail.');
-				field.textContent = originalValue; // Przywróć oryginalną wartość
-				return;
-			}
-	
-			fetch('/api/profile', {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${localStorage.getItem('token')}`
-				},
-				body: JSON.stringify({ [fieldName]: fieldValue })
+					throw new Error('Network response was not ok')
+				}
+				return response.json()
 			})
-			.then(response => response.json())
-			.then(data => {
-				if (data.errors) {
-					alert(data.errors.map(error => error.msg).join('\n'));
-					field.textContent = originalValue; // Przywróć oryginalną wartość w przypadku błędu
+			.then(user => {
+				document.querySelector('.user-name').textContent = `${user.firstName} ${user.lastName} ${
+					user.username ? `(${user.username})` : ''
+				}`
+				document.querySelector('.user-data[data-field="firstName"]').textContent = user.firstName
+				document.querySelector('.user-data[data-field="lastName"]').textContent = user.lastName
+				document.querySelector('.user-data[data-field="email"]').textContent = user.email
+				document.querySelector('.user-data[data-field="role"]').textContent = user.role
+				document.querySelector('.user-data[data-field="username"]').textContent = user.username || ''
+				const profilePicture = user.profilePicture ? `img/uploads/${user.profilePicture}` : './img/avatar-big.jpg'
+				document.getElementById('user-profile-picture').style.backgroundImage = `url(${profilePicture})`
+
+				// Dodanie obsługi edycji pól profilu
+				document.querySelectorAll('.user-data[contenteditable="true"]').forEach(field => {
+					field.setAttribute('data-original-value', field.textContent.trim()) // Ustawienie oryginalnej wartości przy załadowaniu strony
+					field.addEventListener('focus', event => {
+						originalValue = event.target.textContent.trim() // Zapisz oryginalną wartość przed edycją
+					})
+					field.addEventListener('blur', handleProfileUpdate)
+				})
+
+				document.getElementById('user-profile-picture').addEventListener('click', () => {
+					document.getElementById('profile-picture-input').click()
+				})
+
+				document.getElementById('profile-picture-input').addEventListener('change', handleProfilePictureChange)
+
+				document.querySelector('.change-password').addEventListener('click', () => {
+					document.querySelector('.change-password-form').classList.toggle('hidden')
+				})
+
+				document.getElementById('update-password-btn').addEventListener('click', event => {
+					event.preventDefault()
+					const currentPassword = document.getElementById('current-password').value
+					const newPassword = document.getElementById('new-password').value
+					const confirmPassword = document.getElementById('confirm-password').value
+
+					if (newPassword !== confirmPassword) {
+						alert('Nowe hasło i potwierdzenie hasła nie są zgodne.')
+						return
+					}
+
+					fetch('/api/change-password', {
+						method: 'PUT',
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: `Bearer ${localStorage.getItem('token')}`,
+						},
+						body: JSON.stringify({ currentPassword, newPassword }),
+					})
+						.then(response => response.json())
+						.then(data => {
+							if (data.errors) {
+								alert(data.errors.map(error => error.msg).join('\n'))
+							} else {
+								alert('Hasło zostało zaktualizowane pomyślnie.')
+								document.querySelector('.change-password-form').classList.add('hidden')
+							}
+						})
+						.catch(error => {
+							console.error('Error changing password:', error)
+							alert('Błąd podczas zmiany hasła.')
+						})
+				})
+
+				// Show admin options if user is an admin
+				if (user.role === 'admin') {
+					document.getElementById('add-elements-btn').style.display = 'flex'
+					document.getElementById('list-elements-btn').style.display = 'flex'
 				} else {
-					alert('Profil zaktualizowany pomyślnie');
-					field.setAttribute('data-original-value', fieldValue); // Zaktualizuj oryginalną wartość
+					document.getElementById('add-elements-btn').style.display = 'none'
+					document.getElementById('list-elements-btn').style.display = 'none'
 				}
 			})
 			.catch(error => {
-				console.error('Error updating profile:', error);
-				alert('Błąd podczas aktualizacji profilu.');
-				field.textContent = originalValue; // Przywróć oryginalną wartość w przypadku błędu
-			});
+				console.error('Error loading user profile:', error)
+				alert('Błąd podczas ładowania profilu użytkownika.')
+			})
+	}
+
+	const handleProfilePictureChange = event => {
+		const file = event.target.files[0]
+		if (file) {
+			const formData = new FormData()
+			formData.append('profilePicture', file)
+
+			fetch('/api/profile-picture', {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+				body: formData,
+			})
+				.then(response => response.json())
+				.then(data => {
+					if (data.errors) {
+						alert(data.errors.map(error => error.msg).join('\n'))
+					} else {
+						alert('Zdjęcie profilowe zaktualizowane pomyślnie')
+						loadUserProfile()
+					}
+				})
+				.catch(error => {
+					console.error('Error uploading profile picture:', error)
+					alert('Błąd podczas zmiany zdjęcia profilowego.')
+				})
+		}
+	}
+
+	function handleProfileUpdate(event) {
+		const field = event.target
+		const fieldName = field.getAttribute('data-field')
+		const fieldValue = field.textContent.trim()
+		const originalValue = field.getAttribute('data-original-value') || ''
+
+		if (originalValue === fieldValue) {
+			return // Jeśli wartość się nie zmieniła, nie wysyłaj żądania
 		}
 
-		loadUserProfile()
+		// Walidacja e-maila
+		if (fieldName === 'email' && !validateEmail(fieldValue)) {
+			alert('Proszę podać poprawny adres e-mail.')
+			field.textContent = originalValue // Przywróć oryginalną wartość
+			return
+		}
+
+		fetch('/api/profile', {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${localStorage.getItem('token')}`,
+			},
+			body: JSON.stringify({ [fieldName]: fieldValue }),
+		})
+			.then(response => response.json())
+			.then(data => {
+				if (data.errors) {
+					alert(data.errors.map(error => error.msg).join('\n'))
+					field.textContent = originalValue // Przywróć oryginalną wartość w przypadku błędu
+				} else {
+					alert('Profil zaktualizowany pomyślnie')
+					field.setAttribute('data-original-value', fieldValue) // Zaktualizuj oryginalną wartość
+				}
+			})
+			.catch(error => {
+				console.error('Error updating profile:', error)
+				alert('Błąd podczas aktualizacji profilu.')
+				field.textContent = originalValue // Przywróć oryginalną wartość w przypadku błędu
+			})
 	}
 
 	function cancelReservation(reservationId) {
@@ -784,18 +788,18 @@ document.addEventListener('DOMContentLoaded', function () {
 					reservationsList.innerHTML = reservations
 						.map(
 							reservation => `
-					<div class="element">
-						<div class="text-container">
-						<p>Data: ${reservation.date}</p>
-						<p>Godzina: ${reservation.time}</p>
-						<p>Miejsca: ${reservation.seats}</p>
-						${reservation.firstName ? `<p>Imię: ${reservation.firstName}</p>` : ''}
-						${reservation.lastName ? `<p>Nazwisko: ${reservation.lastName}</p>` : ''}
-						${reservation.email ? `<p>Email: ${reservation.email}</p>` : ''}
-						</div>
-						<i class="fa-regular fa-circle-xmark" aria-hidden="true" onclick="cancelReservation(${reservation.id})"></i>
-					</div>
-				`
+                    <div class="element">
+                        <div class="text-container">
+                        <p>Data: ${reservation.date}</p>
+                        <p>Godzina: ${reservation.time}</p>
+                        <p>Miejsca: ${reservation.seats}</p>
+                        ${reservation.firstName ? `<p>Imię: ${reservation.firstName}</p>` : ''}
+                        ${reservation.lastName ? `<p>Nazwisko: ${reservation.lastName}</p>` : ''}
+                        ${reservation.email ? `<p>Email: ${reservation.email}</p>` : ''}
+                        </div>
+                        <i class="fa-regular fa-circle-xmark" aria-hidden="true" onclick="cancelReservation(${reservation.id})"></i>
+                    </div>
+                `
 						)
 						.join('')
 				}
