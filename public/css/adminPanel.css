@@ -246,6 +246,13 @@ form button {
 	cursor: pointer;
 }
 
+/* Reservations */
+
+.reservations-content h2
+{
+	margin-bottom: 2.4rem;
+}
+
 /* ------------------------------------------------------- */
 
 @media (max-width: 992px) {

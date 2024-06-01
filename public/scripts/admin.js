@@ -735,8 +735,8 @@ document.addEventListener('DOMContentLoaded', function () {
         reservationsBtn.classList.add('button-active');
         mainContent.innerHTML = `
             <div class="dynamic-content reservations-content">
-                <h2 class="reservations-header">Moje Rezerwacje</h2>
-                <div class="reservations-list" id="reservations-list"></div>
+                <h2 class="user-profile-header">Moje Rezerwacje</h2>
+                <div class="reservations-list list-container" id="reservations-list"></div>
             </div>
         `;
         loadUserReservations();
@@ -772,13 +772,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 reservationsList.innerHTML = '<p>Brak rezerwacji</p>';
             } else {
                 reservationsList.innerHTML = reservations.map(reservation => `
-                    <div class="reservation-item">
+                    <div class="element">
+                        <div class="text-container">
                         <p>Data: ${reservation.date}</p>
                         <p>Godzina: ${reservation.time}</p>
                         <p>Miejsca: ${reservation.seats}</p>
                         ${reservation.firstName ? `<p>Imię: ${reservation.firstName}</p>` : ''}
                         ${reservation.lastName ? `<p>Nazwisko: ${reservation.lastName}</p>` : ''}
                         ${reservation.email ? `<p>Email: ${reservation.email}</p>` : ''}
+                        </div>
+                        <i class="fa-regular fa-circle-xmark" aria-hidden="true"></i>
                     </div>
                 `).join('');
             }
