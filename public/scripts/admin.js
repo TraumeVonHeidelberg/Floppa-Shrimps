@@ -730,48 +730,83 @@ document.addEventListener('DOMContentLoaded', function () {
 		loadUserProfile()
 	}
 
-    function loadReservations() {
-        clearActiveClass();
-        reservationsBtn.classList.add('button-active');
-        mainContent.innerHTML = `
+	function cancelReservation(reservationId) {
+		const token = localStorage.getItem('token')
+		if (!token) {
+			window.location.href = '/index.html'
+			return
+		}
+
+		fetch(`/api/reservations/${reservationId}`, {
+			method: 'DELETE',
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		})
+			.then(response => {
+				if (!response.ok) {
+					return response.json().then(err => {
+						// Read the response body to get error details
+						console.error('Error details:', err)
+						throw new Error('Network response was not ok')
+					})
+				}
+				return response.json()
+			})
+			.then(data => {
+				alert('Rezerwacja anulowana!')
+				loadUserReservations() // Ponowne załadowanie listy rezerwacji
+			})
+			.catch(error => {
+				console.error('Error:', error)
+				alert('Wystąpił błąd podczas anulowania rezerwacji.')
+			})
+	}
+
+	function loadReservations() {
+		clearActiveClass()
+		reservationsBtn.classList.add('button-active')
+		mainContent.innerHTML = `
             <div class="dynamic-content reservations-content">
                 <h2 class="user-profile-header">Moje Rezerwacje</h2>
                 <div class="reservations-list list-container" id="reservations-list"></div>
             </div>
-        `;
-        loadUserReservations();
-    }
+        `
+		loadUserReservations()
+	}
 
-    function loadUserReservations() {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            window.location.href = '/index.html';
-            return;
-        }
+	function loadUserReservations() {
+		const token = localStorage.getItem('token')
+		if (!token) {
+			window.location.href = '/index.html'
+			return
+		}
 
-        fetch('/api/reservations', {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        })
-        .then(response => {
-            if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
-                    localStorage.removeItem('token');
-                    window.location.href = '/index.html';
-                }
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(reservations => {
-            console.log('Reservations:', reservations); // Logowanie otrzymanych rezerwacji
-            const reservationsList = document.getElementById('reservations-list');
-            if (reservations.length === 0) {
-                reservationsList.innerHTML = '<p>Brak rezerwacji</p>';
-            } else {
-                reservationsList.innerHTML = reservations.map(reservation => `
+		fetch('/api/reservations', {
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		})
+			.then(response => {
+				if (!response.ok) {
+					if (response.status === 401 || response.status === 403) {
+						localStorage.removeItem('token')
+						window.location.href = '/index.html'
+					}
+					throw new Error('Network response was not ok')
+				}
+				return response.json()
+			})
+			.then(reservations => {
+				console.log('Reservations:', reservations) // Logowanie otrzymanych rezerwacji
+				const reservationsList = document.getElementById('reservations-list')
+				if (reservations.length === 0) {
+					reservationsList.innerHTML = '<p>Brak rezerwacji</p>'
+				} else {
+					reservationsList.innerHTML = reservations
+						.map(
+							reservation => `
                     <div class="element">
                         <div class="text-container">
                         <p>Data: ${reservation.date}</p>
@@ -781,16 +816,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         ${reservation.lastName ? `<p>Nazwisko: ${reservation.lastName}</p>` : ''}
                         ${reservation.email ? `<p>Email: ${reservation.email}</p>` : ''}
                         </div>
-                        <i class="fa-regular fa-circle-xmark" aria-hidden="true"></i>
+                        <i class="fa-regular fa-circle-xmark" aria-hidden="true" onclick="cancelReservation(${
+													reservation.id
+												})"></i>
                     </div>
-                `).join('');
-            }
-        })
-        .catch(error => {
-            console.error('Error loading reservations:', error);
-            alert('Błąd podczas ładowania rezerwacji.');
-        });
-    }
+                `
+						)
+						.join('')
+				}
+			})
+			.catch(error => {
+				console.error('Error loading reservations:', error)
+				alert('Błąd podczas ładowania rezerwacji.')
+			})
+	}
 
 	addElementsBtn.addEventListener('click', loadAddElements)
 	listElementsBtn.addEventListener('click', loadListElements)
@@ -800,7 +839,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	// Domyślnie załaduj profil użytkownika po załadowaniu strony
 	loadUserProfile()
 
-	// Attach deleteItem and makeEditable functions to the window object to make them accessible
+	// Attach deleteItem, makeEditable, and cancelReservation functions to the window object to make them accessible
 	window.deleteItem = deleteItem
 	window.makeEditable = makeEditable
+	window.cancelReservation = cancelReservation
 })
