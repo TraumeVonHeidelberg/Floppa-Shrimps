@@ -241,16 +241,16 @@
             <div class="container">
                 <p class="information-header text-center">Zarezerwuj Stolik</p>
                 <h2 class="section-header">Dokonaj Rezerwacji</h2>
-                <p class="common-text text-center reservation-text">Rezerwacji można dokonać online w każdym momencie
-                    bądź dzwoniąc na nr
-                    +48 881 925
-                    560 w godzinach otwarcia.</p>
+                <p class="common-text text-center reservation-text">
+                    Rezerwacji można dokonać online w każdym momencie bądź dzwoniąc na nr +48 881 925 560 w godzinach
+                    otwarcia.
+                </p>
 
-                <form class="form-inputs">
+                <form class="form-inputs" id="reservation-form">
                     <div class="reservations-grid">
                         <div class="reservation-field">
-                            <label for="" class="input-label">Data*</label>
-                            <input type="date" class="form-input" required>
+                            <label for="reservation-date" class="input-label">Data*</label>
+                            <input type="date" class="form-input" id="reservation-date" required>
                         </div>
                         <div class="reservation-field">
                             <label for="time" class="input-label">Godzina*</label>
@@ -275,30 +275,29 @@
                             </select>
                         </div>
                         <div class="reservation-field">
-                            <label for="" class="input-label">Miejsca*</label>
-                            <input type="number" class="form-input" required>
+                            <label for="seats" class="input-label">Miejsca*</label>
+                            <input type="number" class="form-input" id="seats" required>
                         </div>
-                        <div class="reservation-field hidden">
-                            <label for="" class="input-label">Imie*</label>
-                            <input type="text" class="form-input" required>
+                        <div class="reservation-field hidden" id="firstNameField">
+                            <label for="firstName" class="input-label">Imie*</label>
+                            <input type="text" class="form-input" id="firstName">
                         </div>
-                        <div class="reservation-field hidden">
-                            <label for="" class="input-label">Nazwisko*</label>
-                            <input type="text" class="form-input" required>
+                        <div class="reservation-field hidden" id="lastNameField">
+                            <label for="lastName" class="input-label">Nazwisko*</label>
+                            <input type="text" class="form-input" id="lastName">
                         </div>
-                        <div class="reservation-field hidden">
-                            <label for="" class="input-label">Email*</label>
-                            <input type="email" class="form-input" required>
+                        <div class="reservation-field hidden" id="emailField">
+                            <label for="email" class="input-label">Email*</label>
+                            <input type="email" class="form-input" id="email">
                         </div>
                     </div>
                     <div class="reservation-field">
-                        <label for="" class="input-label">Dodatkowe Informacje</label>
-                        <textarea name="" id="" class="reservation-textarea"></textarea>
+                        <label for="additionalInfo" class="input-label">Dodatkowe Informacje</label>
+                        <textarea id="additionalInfo" class="reservation-textarea"></textarea>
                     </div>
-
+                    <button type="submit" class="reservation-button">Zarezerwuj</button>
                 </form>
             </div>
-
         </section>
 
         <section class="news-section" id="news">
@@ -406,6 +405,7 @@
     <script src="./scripts/getMenuContent.js"></script>
     <script src="./scripts/getTestimonialContent.js"></script>
     <script src="./scripts/registerLogin.js"></script>
+    <script src="./scripts/reservation.js"></script>
     <!-- <script src="./scripts/login.js"></script> -->
     <script src="https://kit.fontawesome.com/3b7d7d2b37.js" crossorigin="anonymous"></script>
 </body>

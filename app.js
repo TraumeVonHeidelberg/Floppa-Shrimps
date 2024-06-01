@@ -5,6 +5,7 @@ const sequelize = require('./config/database')
 const path = require('path')
 const menuRoutes = require('./routes/menuRoutes')
 const testimonialRoutes = require('./routes/testimonialRoutes')
+const reservationRoutes = require('./routes/reservationRoutes');
 const authRoutes = require('./routes/auth')
 const session = require('express-session')
 
@@ -27,6 +28,7 @@ app.use(
 app.use('/api', menuRoutes)
 app.use('/api', testimonialRoutes)
 app.use('/api', authRoutes)
+app.use('/api', reservationRoutes);
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.get('/', (req, res) => {

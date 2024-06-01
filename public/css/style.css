@@ -502,7 +502,6 @@ section {
 .reservations-grid {
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
-	grid-template-rows: 1fr 1fr;
 	gap: 2.4rem;
 	margin-bottom: 2.4rem;
 }
@@ -525,6 +524,7 @@ section {
 	max-width: 100%;
 	min-height: 15rem;
 	max-height: 20rem;
+	margin-bottom: 2.4rem;
 }
 
 .form-input,
@@ -536,6 +536,12 @@ section {
 	padding: 1.2rem;
 }
 
+.reservation-button {
+	padding: 1.2rem 2.4rem;
+	width: 100%;
+	color: white;
+	background-color: black;
+}
 
 /* ------------------------------------------------------ */
 /* Nowości */
