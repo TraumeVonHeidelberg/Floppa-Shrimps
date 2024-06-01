@@ -802,25 +802,23 @@ document.addEventListener('DOMContentLoaded', function () {
 				console.log('Reservations:', reservations) // Logowanie otrzymanych rezerwacji
 				const reservationsList = document.getElementById('reservations-list')
 				if (reservations.length === 0) {
-					reservationsList.innerHTML = '<p>Brak rezerwacji</p>'
+					reservationsList.innerHTML = '' // Clear the innerHTML
 				} else {
 					reservationsList.innerHTML = reservations
 						.map(
 							reservation => `
-                    <div class="element">
-                        <div class="text-container">
-                        <p>Data: ${reservation.date}</p>
-                        <p>Godzina: ${reservation.time}</p>
-                        <p>Miejsca: ${reservation.seats}</p>
-                        ${reservation.firstName ? `<p>Imię: ${reservation.firstName}</p>` : ''}
-                        ${reservation.lastName ? `<p>Nazwisko: ${reservation.lastName}</p>` : ''}
-                        ${reservation.email ? `<p>Email: ${reservation.email}</p>` : ''}
-                        </div>
-                        <i class="fa-regular fa-circle-xmark" aria-hidden="true" onclick="cancelReservation(${
-													reservation.id
-												})"></i>
-                    </div>
-                `
+					<div class="element">
+						<div class="text-container">
+						<p>Data: ${reservation.date}</p>
+						<p>Godzina: ${reservation.time}</p>
+						<p>Miejsca: ${reservation.seats}</p>
+						${reservation.firstName ? `<p>Imię: ${reservation.firstName}</p>` : ''}
+						${reservation.lastName ? `<p>Nazwisko: ${reservation.lastName}</p>` : ''}
+						${reservation.email ? `<p>Email: ${reservation.email}</p>` : ''}
+						</div>
+						<i class="fa-regular fa-circle-xmark" aria-hidden="true" onclick="cancelReservation(${reservation.id})"></i>
+					</div>
+				`
 						)
 						.join('')
 				}
