@@ -6,7 +6,7 @@ const path = require('path');
 const session = require('express-session');
 const menuRoutes = require('./routes/menuRoutes');
 const testimonialRoutes = require('./routes/testimonialRoutes');
-const authRoutes = require('./routes/auth').router;  // Make sure to import the router correctly from auth.js
+const { router: authRoutes } = require('./routes/auth');  // Użyj destructuring do importu routera
 const reservationRoutes = require('./routes/reservationRoutes');
 
 const app = express();

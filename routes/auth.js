@@ -30,27 +30,6 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-// Konfiguracja Vonage
-const { Vonage } = require('@vonage/server-sdk');
-const vonage = new Vonage({
-    apiKey: process.env.VONAGE_API_KEY,
-    apiSecret: process.env.VONAGE_API_SECRET,
-});
-
-// Funkcja do wysyłania SMS
-async function sendSMS(to, from, text) {
-    return vonage.sms
-        .send({ to, from, text })
-        .then(resp => {
-            console.log('Message sent successfully');
-            console.log(resp);
-        })
-        .catch(err => {
-            console.log('There was an error sending the messages.');
-            console.error(err);
-        });
-}
-
 router.post(
     '/register',
     [
@@ -170,7 +149,7 @@ router.post('/login', async (req, res) => {
 router.get('/profile', authenticateToken, async (req, res) => {
     try {
         const user = await User.findByPk(req.user.userId, {
-            attributes: ['firstName', 'lastName', 'username', 'email', 'phoneNumber', 'profilePicture', 'role'],
+            attributes: ['firstName', 'lastName', 'username', 'email', 'profilePicture', 'role'],
         });
         if (!user) {
             return res.status(404).json({ errors: [{ msg: 'Użytkownik nie znaleziony' }] });
@@ -182,7 +161,6 @@ router.get('/profile', authenticateToken, async (req, res) => {
     }
 });
 
-// Endpoint do aktualizacji profilu użytkownika
 router.put('/profile', authenticateToken, async (req, res) => {
     try {
         const user = await User.findByPk(req.user.userId);
@@ -190,7 +168,7 @@ router.put('/profile', authenticateToken, async (req, res) => {
             return res.status(404).json({ errors: [{ msg: 'Użytkownik nie znaleziony' }] });
         }
 
-        const { firstName, lastName, username, email, phoneNumber } = req.body;
+        const { firstName, lastName, username, email } = req.body;
         if (firstName) user.firstName = firstName;
         if (lastName) user.lastName = lastName;
         if (username) user.username = username;
@@ -216,19 +194,6 @@ router.put('/profile', authenticateToken, async (req, res) => {
             return res.json({ msg: 'Link weryfikacyjny został wysłany na nowy adres e-mail. Zmiana zostanie zatwierdzona po weryfikacji.' });
         }
 
-        // Obsługa zmiany numeru telefonu
-        if (phoneNumber && phoneNumber !== user.phoneNumber) {
-            const phoneToken = jwt.sign({ userId: user.id, phoneNumber }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-            const from = 'Vonage APIs';
-            const to = phoneNumber.startsWith('+') ? phoneNumber.slice(1) : phoneNumber;
-            const text = `Twój kod weryfikacyjny to: ${phoneToken}`;
-
-            await sendSMS(to, from, text);
-
-            return res.json({ msg: 'Kod weryfikacyjny został wysłany na nowy numer telefonu. Zmiana zostanie zatwierdzona po weryfikacji.' });
-        }
-
         await user.save();
         res.json(user);
     } catch (error) {
@@ -237,7 +202,6 @@ router.put('/profile', authenticateToken, async (req, res) => {
     }
 });
 
-// Endpoint do weryfikacji zmiany e-maila
 router.get('/verify-email-change', async (req, res) => {
     const { token } = req.query;
 
@@ -259,32 +223,6 @@ router.get('/verify-email-change', async (req, res) => {
         res.redirect('/?emailVerified=true');
     } catch (error) {
         console.error('Error verifying email change:', error);
-        res.status(400).json({ errors: [{ msg: 'Błąd podczas weryfikacji' }] });
-    }
-});
-
-// Endpoint do weryfikacji zmiany numeru telefonu
-router.get('/verify-phone-change', async (req, res) => {
-    const { token } = req.query;
-
-    if (!token) {
-        return res.status(400).json({ errors: [{ msg: 'Brak tokenu weryfikacyjnego' }] });
-    }
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findByPk(decoded.userId);
-
-        if (!user) {
-            return res.status(400).json({ errors: [{ msg: 'Nieprawidłowy token' }] });
-        }
-
-        user.phoneNumber = decoded.phoneNumber;
-        await user.save();
-
-        res.redirect('/?phoneVerified=true');
-    } catch (error) {
-        console.error('Error verifying phone change:', error);
         res.status(400).json({ errors: [{ msg: 'Błąd podczas weryfikacji' }] });
     }
 });
@@ -333,7 +271,4 @@ router.put('/change-password', authenticateToken, async (req, res) => {
     }
 });
 
-module.exports = {
-    router,
-    transporter
-};
+module.exports = { router, transporter };

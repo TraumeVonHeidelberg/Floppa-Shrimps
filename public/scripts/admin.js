@@ -16,11 +16,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		return re.test(String(email).toLowerCase())
 	}
 
-	function validatePhoneNumber(phoneNumber) {
-		const re = /^\+?[1-9]\d{1,14}$/ // E.164 format
-		return re.test(String(phoneNumber))
-	}
-
 	function formatPriceInput(input) {
 		input.addEventListener('blur', function () {
 			let value = parseFloat(input.value)
@@ -459,19 +454,19 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <p class="element-text" id="introText-${item.id}">${item.introText}</p>
                                 <div id="headers-${item.id}">
                                     ${item.headers
-																			.map((header, index) => `<p class="element-text news-header">${header}</p>`)
-																			.join('')}
+										.map((header, index) => `<p class="element-text news-header">${header}</p>`)
+										.join('')}
                                 </div>
                                 <div id="texts-${item.id}">
                                     ${item.texts
-																			.map((text, index) => `<p class="element-text news-text">${text}</p>`)
-																			.join('')}
+										.map((text, index) => `<p class="element-text news-text">${text}</p>`)
+										.join('')}
                                 </div>
                                 ${
-																	item.image
-																		? `<img src="/uploads/${item.image}" alt="News Image" class="news-image">`
-																		: ''
-																}
+									item.image
+										? `<img src="/uploads/${item.image}" alt="News Image" class="news-image">`
+										: ''
+								}
                             </div>
                             <i class="fa-regular fa-circle-xmark" onclick="deleteItem('news', ${item.id})"></i>
                         </div>
@@ -502,9 +497,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	function loadUserProfile() {
-		clearActiveClass()
-		userProfileBtn.classList.add('button-active')
-		mainContent.innerHTML = `
+        clearActiveClass();
+        userProfileBtn.classList.add('button-active');
+        mainContent.innerHTML = `
             <div class="dynamic-content user-content">
                 <h2 class="user-profile-header">Mój Profil</h2>
                 <div class="user-item">
@@ -519,7 +514,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     <p class="common-user-text">Nazwisko* <span class="user-data" contenteditable="true" data-field="lastName"></span></p>
                     <p class="common-user-text">Pseudonim <span class="user-data" contenteditable="true" data-field="username"></span></p>
                     <p class="common-user-text">Email* <span class="user-data" contenteditable="true" data-field="email"></span></p>
-                    <p class="common-user-text">Telefon <span class="user-data" contenteditable="true" data-field="phoneNumber"></span></p>
                     <p class="common-user-text">Typ Konta* <span class="user-data" data-field="role"></span></p>
                     <p class="common-user-text">Hasło* <span class="change-password">Zmień hasło</span></p>
                 </div>
@@ -539,9 +533,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     <button id="update-password-btn">Zaktualizuj hasło</button>
                 </form>
             </div>
-        `
-		loadUserInfo()
-	}
+        `;
+        loadUserInfo();
+    }
 
 	function loadUserInfo() {
 		const token = localStorage.getItem('token')
@@ -574,7 +568,6 @@ document.addEventListener('DOMContentLoaded', function () {
 					document.querySelector('.user-data[data-field="firstName"]').textContent = user.firstName
 					document.querySelector('.user-data[data-field="lastName"]').textContent = user.lastName
 					document.querySelector('.user-data[data-field="email"]').textContent = user.email
-					document.querySelector('.user-data[data-field="phoneNumber"]').textContent = user.phoneNumber || ''
 					document.querySelector('.user-data[data-field="role"]').textContent = user.role
 					document.querySelector('.user-data[data-field="username"]').textContent = user.username || ''
 					const profilePicture = user.profilePicture ? `img/uploads/${user.profilePicture}` : './img/avatar-big.jpg'
@@ -656,6 +649,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					.then(data => {
 						if (data.errors) {
 							alert(data.errors.map(error => error.msg).join('\n'))
+							loadUserProfile()
 						} else {
 							alert('Zdjęcie profilowe zaktualizowane pomyślnie')
 							loadUserProfile()
@@ -669,62 +663,45 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function handleProfileUpdate(event) {
-			const field = event.target
-			const fieldName = field.getAttribute('data-field')
-			const fieldValue = field.textContent.trim()
-			const originalValue = field.getAttribute('data-original-value') || ''
-
+			const field = event.target;
+			const fieldName = field.getAttribute('data-field');
+			const fieldValue = field.textContent.trim();
+			const originalValue = field.getAttribute('data-original-value') || '';
+	
 			if (originalValue === fieldValue) {
-				return // Jeśli wartość się nie zmieniła, nie wysyłaj żądania
+				return; // Jeśli wartość się nie zmieniła, nie wysyłaj żądania
 			}
-
+	
 			// Walidacja e-maila
 			if (fieldName === 'email' && !validateEmail(fieldValue)) {
-				alert('Proszę podać poprawny adres e-mail.')
-				field.textContent = originalValue // Przywróć oryginalną wartość
-				return
+				alert('Proszę podać poprawny adres e-mail.');
+				field.textContent = originalValue; // Przywróć oryginalną wartość
+				return;
 			}
-
-			// Walidacja numeru telefonu
-			if (fieldName === 'phoneNumber' && !validatePhoneNumber(fieldValue)) {
-				alert('Proszę podać poprawny numer telefonu.')
-				field.textContent = originalValue // Przywróć oryginalną wartość
-				return
-			}
-
+	
 			fetch('/api/profile', {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${localStorage.getItem('token')}`,
+					Authorization: `Bearer ${localStorage.getItem('token')}`
 				},
-				body: JSON.stringify({ [fieldName]: fieldValue }),
+				body: JSON.stringify({ [fieldName]: fieldValue })
 			})
-				.then(response => response.json())
-				.then(data => {
-					if (data.errors) {
-						alert(data.errors.map(error => error.msg).join('\n'))
-						field.textContent = originalValue // Przywróć oryginalną wartość w przypadku błędu
-					} else {
-						if (fieldName === 'email') {
-							alert(
-								'Link weryfikacyjny został wysłany na nowy adres e-mail. Zmiana zostanie zatwierdzona po weryfikacji.'
-							)
-						} else if (fieldName === 'phoneNumber') {
-							alert(
-								'Kod weryfikacyjny został wysłany na nowy numer telefonu. Zmiana zostanie zatwierdzona po weryfikacji.'
-							)
-						} else {
-							alert('Profil zaktualizowany pomyślnie')
-						}
-						field.setAttribute('data-original-value', fieldValue) // Zaktualizuj oryginalną wartość
-					}
-				})
-				.catch(error => {
-					console.error('Error updating profile:', error)
-					alert('Błąd podczas aktualizacji profilu.')
-					field.textContent = originalValue // Przywróć oryginalną wartość w przypadku błędu
-				})
+			.then(response => response.json())
+			.then(data => {
+				if (data.errors) {
+					alert(data.errors.map(error => error.msg).join('\n'));
+					field.textContent = originalValue; // Przywróć oryginalną wartość w przypadku błędu
+				} else {
+					alert('Profil zaktualizowany pomyślnie');
+					field.setAttribute('data-original-value', fieldValue); // Zaktualizuj oryginalną wartość
+				}
+			})
+			.catch(error => {
+				console.error('Error updating profile:', error);
+				alert('Błąd podczas aktualizacji profilu.');
+				field.textContent = originalValue; // Przywróć oryginalną wartość w przypadku błędu
+			});
 		}
 
 		loadUserProfile()
