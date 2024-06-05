@@ -20,13 +20,21 @@ const Reservation = sequelize.define('Reservation', {
         type: DataTypes.STRING,
         allowNull: true,
     },
-    endTime: {
-        type: DataTypes.TIME,
-        allowNull: false,
+    firstName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    lastName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: true,
     },
     userId: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: User,
             key: 'id'
@@ -39,11 +47,15 @@ const Reservation = sequelize.define('Reservation', {
             model: Table,
             key: 'id'
         }
+    },
+    endTime: {
+        type: DataTypes.TIME,
+        allowNull: false,
     }
 });
 
-User.hasMany(Reservation, { foreignKey: 'userId' });
-Reservation.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(Reservation, { foreignKey: 'userId', as: 'reservations' });
+Reservation.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 Table.hasMany(Reservation, { foreignKey: 'tableId', as: 'reservations' });
 Reservation.belongsTo(Table, { foreignKey: 'tableId', as: 'table' });

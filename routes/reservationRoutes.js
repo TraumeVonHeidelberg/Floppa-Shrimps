@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Reservation = require('../models/reservation');  // Import modelu Reservation
-const Table = require('../models/table');  // Import modelu Table
+const Reservation = require('../models/reservation');
+const Table = require('../models/table');
 const authenticateToken = require('../middleware/authenticateToken');
 const { Op } = require('sequelize');
 
@@ -52,8 +52,17 @@ router.post('/check-availability', async (req, res) => {
 
 // Endpoint do tworzenia rezerwacji
 router.post('/reservations', authenticateToken, async (req, res) => {
-    const { date, time, seats, additionalInfo } = req.body;
-    const userId = req.user.userId;
+    const { date, time, seats, additionalInfo, firstName, lastName, email } = req.body;
+    let userId = null;
+
+    if (req.user) {
+        userId = req.user.userId;
+        console.log('Logged in user ID:', userId); // Dodaj ten log
+    } else {
+        console.log('No user logged in'); // Dodaj ten log
+    }
+
+    console.log('Reservation data:', { date, time, seats, additionalInfo, userId, firstName, lastName, email });
 
     try {
         const tables = await Table.findAll({
@@ -71,6 +80,9 @@ router.post('/reservations', authenticateToken, async (req, res) => {
                     seats,
                     additionalInfo,
                     userId,
+                    firstName,
+                    lastName,
+                    email,
                     tableId: table.id,
                     endTime: new Date(new Date(`${date}T${time}`).setHours(new Date(`${date}T${time}`).getHours() + 2)).toTimeString().split(' ')[0]
                 });
@@ -110,9 +122,14 @@ router.get('/reservations', authenticateToken, async (req, res) => {
     try {
         const reservations = await Reservation.findAll({
             where: { userId },
-            include: [{ model: Table, as: 'table' }]  // Użyj aliasu 'table'
+            include: [
+                {
+                    model: Table,
+                    as: 'reservationTable'
+                }
+            ]
         });
-        console.log('Fetched reservations:', reservations); // Dodaj logowanie pobranych rezerwacji
+
         res.status(200).json(reservations);
     } catch (error) {
         console.error('Error fetching reservations:', error);

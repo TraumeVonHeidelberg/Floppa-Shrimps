@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const lastName = document.getElementById('lastName').value;
         const email = document.getElementById('email').value;
 
-        // Sprawdzanie, czy użytkownik jest zalogowany
         const token = localStorage.getItem('token');
         let reservationData = { date, time, seats, additionalInfo };
 
@@ -27,6 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
             reservationData = { ...reservationData, firstName, lastName, email };
         }
 
+        console.log('Reservation data before fetch:', reservationData);
+
         fetch('/api/reservations', {
             method: 'POST',
             headers: {
@@ -35,8 +36,12 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify(reservationData)
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        })
         .then(data => {
+            console.log('Response data:', data);
             if (data.error) {
                 alert(data.error);
             } else {
@@ -52,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => console.error('Error:', error));
     });
 
-    // Pokazywanie dodatkowych pól dla niezalogowanych użytkowników
     const toggleAdditionalFields = () => {
         const token = localStorage.getItem('token');
         if (!token) {
