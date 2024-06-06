@@ -1,32 +1,31 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow } = require('electron');
 
 function createWindow() {
-	// Tworzenie okna przeglądarki.
-	let win = new BrowserWindow({
-		width: 800,
-		height: 600,
-		webPreferences: {
-			nodeIntegration: true,
-		},
-	})
+    const win = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false, // Umożliwia integrację Node.js w renderer process
+            enableRemoteModule: true, // Umożliwia użycie modułu remote
+        },
+    });
 
-	// Maksymalizacja okna po utworzeniu
-	win.maximize()
-
-	// i załaduj index.html aplikacji.
-	win.loadFile('./public/index.html')
+    win.maximize();
+    win.loadFile('public/index.html'); // Upewnij się, że ścieżka do pliku HTML jest poprawna
+    win.webContents.openDevTools(); // Otwórz narzędzia deweloperskie
 }
 
-app.whenReady().then(createWindow)
+app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
-	if (process.platform !== 'darwin') {
-		app.quit()
-	}
-})
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
+});
 
 app.on('activate', () => {
-	if (BrowserWindow.getAllWindows().length === 0) {
-		createWindow()
-	}
-})
+    if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+    }
+});
