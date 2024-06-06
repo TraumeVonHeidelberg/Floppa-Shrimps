@@ -51,18 +51,13 @@ router.post('/check-availability', async (req, res) => {
 });
 
 // Endpoint do tworzenia rezerwacji
-router.post('/reservations', authenticateToken, async (req, res) => {
+router.post('/reservations', async (req, res) => {
     const { date, time, seats, additionalInfo, firstName, lastName, email } = req.body;
     let userId = null;
 
     if (req.user) {
         userId = req.user.userId;
-        console.log('Logged in user ID:', userId); // Dodaj ten log
-    } else {
-        console.log('No user logged in'); // Dodaj ten log
     }
-
-    console.log('Reservation data:', { date, time, seats, additionalInfo, userId, firstName, lastName, email });
 
     try {
         const tables = await Table.findAll({
@@ -125,7 +120,7 @@ router.get('/reservations', authenticateToken, async (req, res) => {
             include: [
                 {
                     model: Table,
-                    as: 'reservationTable'
+                    as: 'table' // Ensure this alias matches the one defined in the association
                 }
             ]
         });
