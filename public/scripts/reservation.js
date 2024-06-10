@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
         weekend: { start: 12, end: 24 }
     };
 
-    function populateTimeOptions(dayOfWeek) {
+    function populateTimeOptions(dayOfWeek, selectedDate) {
         timeSelect.innerHTML = '';
 
         let startHour, endHour;
@@ -25,25 +25,49 @@ document.addEventListener('DOMContentLoaded', function () {
             endHour = openingHours.weekend.end;
         }
 
+        const currentDateTime = new Date();
+        const isToday = selectedDate.toDateString() === currentDateTime.toDateString();
+
         for (let hour = startHour; hour < endHour; hour++) {
             const hourFormatted = hour.toString().padStart(2, '0');
+
+            if (isToday && hour < currentDateTime.getHours()) continue;
+
             timeSelect.appendChild(new Option(`${hourFormatted}:00`, `${hourFormatted}:00`));
             timeSelect.appendChild(new Option(`${hourFormatted}:30`, `${hourFormatted}:30`));
         }
+
+        if (isToday) {
+            const remainingMinutes = currentDateTime.getMinutes();
+            const nextHalfHour = Math.ceil(remainingMinutes / 30) * 30;
+
+            if (nextHalfHour < 60) {
+                const nextHourFormatted = currentDateTime.getHours().toString().padStart(2, '0');
+                const nextMinutesFormatted = nextHalfHour.toString().padStart(2, '0');
+
+                // Usunięcie opcji z przeszłości
+                for (const option of timeSelect.options) {
+                    if (parseInt(option.value.split(':')[0]) === currentDateTime.getHours() &&
+                        parseInt(option.value.split(':')[1]) < nextHalfHour) {
+                        option.remove();
+                    }
+                }
+            }
+        }
     }
+
+    // Ustaw minimalną datę na dzisiaj
+    const today = new Date();
+    reservationDate.min = today.toISOString().split('T')[0];
 
     reservationDate.addEventListener('change', function () {
         const selectedDate = new Date(this.value);
         const dayOfWeek = selectedDate.getUTCDay(); // 0 (Sunday) to 6 (Saturday)
-        populateTimeOptions(dayOfWeek);
+        populateTimeOptions(dayOfWeek, selectedDate);
     });
 
-    // Ustawienie minimalnej daty na dzisiejszą datę
-    const today = new Date().toISOString().split('T')[0];
-    reservationDate.setAttribute('min', today);
-
     // Initial population based on today's date
-    populateTimeOptions(new Date().getUTCDay());
+    populateTimeOptions(today.getUTCDay(), today);
 
     reservationForm.addEventListener('submit', function (event) {
         event.preventDefault();
