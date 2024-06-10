@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const emailField = document.getElementById('emailField');
     const reservationDate = document.getElementById('reservation-date');
     const timeSelect = document.getElementById('time');
+    const seatsSelect = document.getElementById('seats');
 
     const openingHours = {
         weekday: { start: 8, end: 22 },
@@ -16,11 +17,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let startHour, endHour;
         if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-            // Poniedziałek - Piątek
             startHour = openingHours.weekday.start;
             endHour = openingHours.weekday.end;
         } else {
-            // Sobota - Niedziela
             startHour = openingHours.weekend.start;
             endHour = openingHours.weekend.end;
         }
@@ -45,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const nextHourFormatted = currentDateTime.getHours().toString().padStart(2, '0');
                 const nextMinutesFormatted = nextHalfHour.toString().padStart(2, '0');
 
-                // Usunięcie opcji z przeszłości
                 for (const option of timeSelect.options) {
                     if (parseInt(option.value.split(':')[0]) === currentDateTime.getHours() &&
                         parseInt(option.value.split(':')[1]) < nextHalfHour) {
@@ -56,31 +54,53 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Ustaw minimalną datę na dzisiaj
+    async function fetchMaxSeats() {
+        try {
+            const response = await fetch('/api/tables/max-seats');
+            if (response.ok) {
+                const data = await response.json();
+                return data.maxSeats;
+            } else {
+                throw new Error('Error fetching max seats');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            return 10; // default to 10 if there's an error
+        }
+    }
+
+    async function populateSeatsOptions() {
+        const maxSeats = await fetchMaxSeats();
+        seatsSelect.innerHTML = '';
+
+        for (let i = 1; i <= maxSeats; i++) {
+            seatsSelect.appendChild(new Option(i, i));
+        }
+    }
+
     const today = new Date();
     reservationDate.min = today.toISOString().split('T')[0];
 
     reservationDate.addEventListener('change', function () {
         const selectedDate = new Date(this.value);
-        const dayOfWeek = selectedDate.getUTCDay(); // 0 (Sunday) to 6 (Saturday)
+        const dayOfWeek = selectedDate.getUTCDay();
         populateTimeOptions(dayOfWeek, selectedDate);
     });
 
-    // Initial population based on today's date
     populateTimeOptions(today.getUTCDay(), today);
+    populateSeatsOptions();
 
     reservationForm.addEventListener('submit', function (event) {
         event.preventDefault();
 
-        const date = document.getElementById('reservation-date').value;
-        const time = document.getElementById('time').value;
-        const seats = document.getElementById('seats').value;
+        const date = reservationDate.value;
+        const time = timeSelect.value;
+        const seats = seatsSelect.value;
         const additionalInfo = document.getElementById('additionalInfo').value;
         const firstName = document.getElementById('firstName').value;
         const lastName = document.getElementById('lastName').value;
         const email = document.getElementById('email').value;
 
-        // Sprawdzanie, czy użytkownik jest zalogowany
         const token = localStorage.getItem('token');
         let reservationData = { date, time, seats, additionalInfo };
 
@@ -123,7 +143,6 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(error => console.error('Error:', error));
     });
 
-    // Pokazywanie dodatkowych pól dla niezalogowanych użytkowników
     const toggleAdditionalFields = () => {
         const token = localStorage.getItem('token');
         if (!token) {

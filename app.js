@@ -8,6 +8,7 @@ const menuRoutes = require('./routes/menuRoutes')
 const testimonialRoutes = require('./routes/testimonialRoutes')
 const { router: authRoutes } = require('./routes/auth') // Użyj destructuring do importu routera
 const reservationRoutes = require('./routes/reservationRoutes')
+const tableRoutes = require('./routes/tableRoutes');
 
 const app = express()
 
@@ -32,6 +33,7 @@ app.use('/api', menuRoutes)
 app.use('/api', testimonialRoutes)
 app.use('/api', authRoutes)
 app.use('/api', reservationRoutes)
+app.use('/api', tableRoutes);
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.get('/', (req, res) => {
