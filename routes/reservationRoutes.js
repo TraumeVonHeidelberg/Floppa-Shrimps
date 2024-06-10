@@ -94,6 +94,11 @@ router.post('/reservations', optionalAuthenticateToken, async (req, res) => {
         for (const table of tables) {
             const available = await isTableAvailable(table.id, date, time);
             if (available) {
+                const startTime = new Date(`${date}T${time}`);
+                const endTime = new Date(startTime);
+                endTime.setHours(startTime.getHours() + 2);
+                const formattedEndTime = endTime.toTimeString().split(' ')[0].slice(0, 5); // Zmiana tutaj
+
                 const reservation = await Reservation.create({
                     date,
                     time,
@@ -104,9 +109,7 @@ router.post('/reservations', optionalAuthenticateToken, async (req, res) => {
                     lastName,
                     email,
                     tableId: table.id,
-                    endTime: new Date(new Date(`${date}T${time}`).setHours(new Date(`${date}T${time}`).getHours() + 2))
-                        .toTimeString()
-                        .split(' ')[0],
+                    endTime: formattedEndTime
                 });
                 return res.status(201).json(reservation);
             }
