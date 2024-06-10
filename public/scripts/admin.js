@@ -513,9 +513,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     <p class="common-user-text">Imię* <span class="user-data" contenteditable="true" data-field="firstName"></span></p>
                     <p class="common-user-text">Nazwisko* <span class="user-data" contenteditable="true" data-field="lastName"></span></p>
                     <p class="common-user-text">Pseudonim <span class="user-data" contenteditable="true" data-field="username"></span></p>
-                    <p class="common-user-text">Email* <span class="user-data" contenteditable="true" data-field="email"></span></p>
-                    <p class="common-user-text">Typ Konta* <span class="user-data" data-field="role"></span></p>
                     <p class="common-user-text">Hasło* <span class="change-password">Zmień hasło</span></p>
+                    <p class="common-user-text">Email* <span class="user-data" contenteditable="true" data-field="email"></span></p>
+                    <p class="common-user-text">Typ Konta* <span class="user-data" data-field="role"></span></p>  
                 </div>
                 <form action="" class="change-password-form hidden">
                     <div class="configuration-item">

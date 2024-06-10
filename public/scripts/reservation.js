@@ -3,6 +3,44 @@ document.addEventListener('DOMContentLoaded', function () {
     const firstNameField = document.getElementById('firstNameField');
     const lastNameField = document.getElementById('lastNameField');
     const emailField = document.getElementById('emailField');
+    const reservationDate = document.getElementById('reservation-date');
+    const timeSelect = document.getElementById('time');
+
+    const openingHours = {
+        weekday: { start: 8, end: 22 },
+        weekend: { start: 12, end: 24 }
+    };
+
+    function populateTimeOptions(dayOfWeek) {
+        timeSelect.innerHTML = '';
+
+        let startHour, endHour;
+        if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+            // Poniedziałek - Piątek
+            startHour = openingHours.weekday.start;
+            endHour = openingHours.weekday.end;
+        } else {
+            // Sobota - Niedziela
+            startHour = openingHours.weekend.start;
+            endHour = openingHours.weekend.end;
+        }
+
+        for (let hour = startHour; hour < endHour; hour++) {
+            const hourFormatted = hour.toString().padStart(2, '0');
+            timeSelect.appendChild(new Option(`${hourFormatted}:00`, `${hourFormatted}:00`));
+            timeSelect.appendChild(new Option(`${hourFormatted}:30`, `${hourFormatted}:30`));
+        }
+    }
+
+    reservationDate.addEventListener('change', function () {
+        const selectedDate = new Date(this.value);
+        const dayOfWeek = selectedDate.getUTCDay(); // 0 (Sunday) to 6 (Saturday)
+        populateTimeOptions(dayOfWeek);
+    });
+
+    // Initial population based on today's date
+    const today = new Date();
+    populateTimeOptions(today.getUTCDay());
 
     reservationForm.addEventListener('submit', function (event) {
         event.preventDefault();
