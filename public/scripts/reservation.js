@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } catch (error) {
             console.error('Error:', error);
-            return 10; // default to 10 if there's an error
+            return 10;
         }
     }
 
@@ -74,7 +74,11 @@ document.addEventListener('DOMContentLoaded', function () {
         seatsSelect.innerHTML = '';
 
         for (let i = 1; i <= maxSeats; i++) {
-            seatsSelect.appendChild(new Option(i, i));
+            const option = new Option(i, i);
+            if (i === 2) {
+                option.selected = true;
+            }
+            seatsSelect.appendChild(option);
         }
     }
 
@@ -133,11 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 alert('Rezerwacja została złożona pomyślnie!');
                 reservationForm.reset();
-                if (!token) {
-                    firstNameField.classList.add('hidden');
-                    lastNameField.classList.add('hidden');
-                    emailField.classList.add('hidden');
-                }
+                seatsSelect.value = '2';
             }
         })
         .catch(error => console.error('Error:', error));
@@ -156,5 +156,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
+    toggleAdditionalFields();
+
+    // Nasłuchiwanie na zdarzenia logowania i wylogowania
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'token') {
+            toggleAdditionalFields();
+        }
+    });
+
+    // Nasłuchiwanie na zdarzenia logowania przy użyciu niestandardowego zdarzenia
+    document.addEventListener('userLoggedIn', toggleAdditionalFields);
+
+    // Sprawdzenie, czy użytkownik jest zalogowany na początku
     toggleAdditionalFields();
 });
