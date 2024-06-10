@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 const Reservation = require('../models/reservation');
 const Table = require('../models/table');
 const authenticateToken = require('../middleware/authenticateToken');
@@ -50,14 +51,38 @@ router.post('/check-availability', async (req, res) => {
     }
 });
 
+// Middleware to authenticate and set req.user for authenticated users
+const optionalAuthenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) {
+        return next(); // Skip authentication for non-authenticated users
+    }
+
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token == null) return next();
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) return next();
+        req.user = {
+            userId: user.userId,
+        };
+        next();
+    });
+};
+
 // Endpoint do tworzenia rezerwacji
-router.post('/reservations', async (req, res) => {
+router.post('/reservations', optionalAuthenticateToken, async (req, res) => {
     const { date, time, seats, additionalInfo, firstName, lastName, email } = req.body;
     let userId = null;
 
     if (req.user) {
         userId = req.user.userId;
+        console.log('Logged in user ID:', userId);
+    } else {
+        console.log('No user logged in');
     }
+
+    console.log('Reservation data:', { date, time, seats, additionalInfo, userId, firstName, lastName, email });
 
     try {
         const tables = await Table.findAll({
@@ -79,7 +104,9 @@ router.post('/reservations', async (req, res) => {
                     lastName,
                     email,
                     tableId: table.id,
-                    endTime: new Date(new Date(`${date}T${time}`).setHours(new Date(`${date}T${time}`).getHours() + 2)).toTimeString().split(' ')[0]
+                    endTime: new Date(new Date(`${date}T${time}`).setHours(new Date(`${date}T${time}`).getHours() + 2))
+                        .toTimeString()
+                        .split(' ')[0],
                 });
                 return res.status(201).json(reservation);
             }
@@ -120,9 +147,9 @@ router.get('/reservations', authenticateToken, async (req, res) => {
             include: [
                 {
                     model: Table,
-                    as: 'table' // Ensure this alias matches the one defined in the association
-                }
-            ]
+                    as: 'reservationTable',
+                },
+            ],
         });
 
         res.status(200).json(reservations);

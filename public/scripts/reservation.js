@@ -1,10 +1,10 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const reservationForm = document.getElementById('reservation-form');
     const firstNameField = document.getElementById('firstNameField');
     const lastNameField = document.getElementById('lastNameField');
     const emailField = document.getElementById('emailField');
 
-    reservationForm.addEventListener('submit', function(event) {
+    reservationForm.addEventListener('submit', function (event) {
         event.preventDefault();
 
         const date = document.getElementById('reservation-date').value;
@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const lastName = document.getElementById('lastName').value;
         const email = document.getElementById('email').value;
 
+        // Sprawdzanie, czy użytkownik jest zalogowany
         const token = localStorage.getItem('token');
         let reservationData = { date, time, seats, additionalInfo };
 
@@ -26,7 +27,8 @@ document.addEventListener('DOMContentLoaded', function() {
             reservationData = { ...reservationData, firstName, lastName, email };
         }
 
-        console.log('Reservation data before fetch:', reservationData);
+        console.log('Token:', token);
+        console.log('Reservation data before sending:', reservationData);
 
         fetch('/api/reservations', {
             method: 'POST',
@@ -41,7 +43,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
-            console.log('Response data:', data);
             if (data.error) {
                 alert(data.error);
             } else {
@@ -57,6 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => console.error('Error:', error));
     });
 
+    // Pokazywanie dodatkowych pól dla niezalogowanych użytkowników
     const toggleAdditionalFields = () => {
         const token = localStorage.getItem('token');
         if (!token) {
