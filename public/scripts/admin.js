@@ -755,6 +755,15 @@ document.addEventListener('DOMContentLoaded', function () {
 				} else {
 					alert('Profil zaktualizowany pomyślnie')
 					field.setAttribute('data-original-value', fieldValue) // Zaktualizuj oryginalną wartość
+
+					// Aktualizacja pseudonimu w górnej części profilu użytkownika
+					if (fieldName === 'username') {
+						const userNameDisplay = document.querySelector('.user-name')
+						const firstName = document.querySelector('.user-data[data-field="firstName"]').textContent.trim()
+						const lastName = document.querySelector('.user-data[data-field="lastName"]').textContent.trim()
+						const username = fieldValue ? `(${fieldValue})` : ''
+						userNameDisplay.textContent = `${firstName} ${lastName} ${username}`
+					}
 				}
 			})
 			.catch(error => {
