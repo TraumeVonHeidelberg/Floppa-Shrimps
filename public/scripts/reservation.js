@@ -38,9 +38,12 @@ document.addEventListener('DOMContentLoaded', function () {
         populateTimeOptions(dayOfWeek);
     });
 
+    // Ustawienie minimalnej daty na dzisiejszą datę
+    const today = new Date().toISOString().split('T')[0];
+    reservationDate.setAttribute('min', today);
+
     // Initial population based on today's date
-    const today = new Date();
-    populateTimeOptions(today.getUTCDay());
+    populateTimeOptions(new Date().getUTCDay());
 
     reservationForm.addEventListener('submit', function (event) {
         event.preventDefault();
