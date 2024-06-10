@@ -1,10 +1,42 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 const Reservation = require('../models/reservation');
 const Table = require('../models/table');
+const User = require('../models/user'); // Import modelu użytkownika
 const authenticateToken = require('../middleware/authenticateToken');
 const { Op } = require('sequelize');
+require('dotenv').config();
+
+// Konfiguracja nodemailer
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
+
+// Funkcja wysyłająca e-mail potwierdzający
+const sendConfirmationEmail = async (reservation, email) => {
+    const { date, time, seats, additionalInfo } = reservation;
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Potwierdzenie rezerwacji',
+        text: `Twoja rezerwacja została pomyślnie złożona!\n\nSzczegóły rezerwacji:\nData: ${date}\nGodzina: ${time}\nMiejsca: ${seats}\nDodatkowe informacje: ${additionalInfo || 'Brak'}\n\nDziękujemy!`
+    };
+
+    try {
+        console.log('Wysyłanie e-maila do:', email); // Dodaj logowanie adresu e-mail
+        await transporter.sendMail(mailOptions);
+        console.log('E-mail z potwierdzeniem został wysłany do:', email);
+    } catch (error) {
+        console.error('Błąd podczas wysyłania e-maila:', error);
+    }
+};
 
 // Funkcja sprawdzająca dostępność stolika
 const isTableAvailable = async (tableId, date, time, duration = 2) => {
@@ -74,15 +106,28 @@ const optionalAuthenticateToken = (req, res, next) => {
 router.post('/reservations', optionalAuthenticateToken, async (req, res) => {
     const { date, time, seats, additionalInfo, firstName, lastName, email } = req.body;
     let userId = null;
+    let userEmail = email;
 
     if (req.user) {
         userId = req.user.userId;
         console.log('Logged in user ID:', userId);
+        
+        // Pobierz e-mail z profilu użytkownika
+        const user = await User.findByPk(userId);
+        if (user) {
+            userEmail = user.email;
+            console.log('Logged in user email:', userEmail); // Dodaj logowanie e-maila
+        }
     } else {
         console.log('No user logged in');
     }
 
-    console.log('Reservation data:', { date, time, seats, additionalInfo, userId, firstName, lastName, email });
+    console.log('Reservation data:', { date, time, seats, additionalInfo, userId, firstName, lastName, userEmail });
+
+    if (!userEmail) {
+        console.error('Brak adresu e-mail do wysłania potwierdzenia.');
+        return res.status(400).json({ error: 'Brak adresu e-mail do wysłania potwierdzenia.' });
+    }
 
     try {
         const tables = await Table.findAll({
@@ -107,10 +152,14 @@ router.post('/reservations', optionalAuthenticateToken, async (req, res) => {
                     userId,
                     firstName,
                     lastName,
-                    email,
+                    email: userEmail,
                     tableId: table.id,
                     endTime: formattedEndTime
                 });
+
+                // Wysyłanie e-maila potwierdzającego
+                await sendConfirmationEmail(reservation, userEmail);
+
                 return res.status(201).json(reservation);
             }
         }
