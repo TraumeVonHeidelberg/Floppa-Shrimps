@@ -116,10 +116,18 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	function deleteItem(type, id) {
-		const url = type === 'menu' ? `/api/menu/${id}` : `/api/testimonials/${id}`
+		const url =
+			type === 'menu'
+				? `/api/menu/${id}`
+				: type === 'testimonial'
+				? `/api/testimonials/${id}`
+				: `/api/reservations/${id}`
 		const element = document.querySelector(`#element-${id}`)
 		fetch(url, {
 			method: 'DELETE',
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem('token')}`,
+			},
 		})
 			.then(response => {
 				if (!response.ok) {
@@ -128,12 +136,16 @@ document.addEventListener('DOMContentLoaded', function () {
 				return response.json()
 			})
 			.then(data => {
-				alert(`${type === 'menu' ? 'Pozycja' : 'Testimonial'} usunięty!`)
+				alert(`${type === 'menu' ? 'Pozycja' : type === 'testimonial' ? 'Testimonial' : 'Rezerwacja'} usunięta!`)
 				element.remove()
 			})
 			.catch(error => {
 				console.error('Error:', error)
-				alert(`Wystąpił błąd podczas usuwania ${type === 'menu' ? 'pozycji' : 'testimonialu'}.`)
+				alert(
+					`Wystąpił błąd podczas usuwania ${
+						type === 'menu' ? 'pozycji' : type === 'testimonial' ? 'testimonialu' : 'rezerwacji'
+					}.`
+				)
 			})
 	}
 
@@ -293,8 +305,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             <label for="testimonial-company">Firma</label>
                             <input type="text" id="testimonial-company" name="company" required>
                         </div>
-                            <button type="submit">Dodaj</button>
-                        </form>
+                        <button type="submit">Dodaj</button>
+                    </form>
                 `
 				document.getElementById('testimonial-form').addEventListener('submit', submitTestimonialForm)
 			} else if (selectedType === 'news') {
@@ -373,6 +385,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <option value="menu">Menu</option>
                         <option value="testimonial">Testimonial</option>
                         <option value="news">News</option>
+                        <option value="reservations">Rezerwacje</option>
                     </select>
                 </div>
                 <div id="list-container" class="list-container"></div>
@@ -488,6 +501,46 @@ document.addEventListener('DOMContentLoaded', function () {
 					.catch(error => {
 						console.error('Error:', error)
 						alert('Wystąpił błąd podczas ładowania news.')
+					})
+			} else if (selectedType === 'reservations') {
+				fetch('/api/admin/reservations', {
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('token')}`,
+					},
+				})
+					.then(response => response.json())
+					.then(data => {
+						listContainer.innerHTML = data
+							.map(
+								reservation => `
+                                <div class="element" id="element-${reservation.id}">
+                                    <div class="text-container">
+                                        <p>Imię i Nazwisko: ${
+																					reservation.firstName || reservation.user?.firstName || ''
+																				} ${reservation.lastName || reservation.user?.lastName || ''}</p>
+                                        <p>E-Mail: ${reservation.email}</p>
+                                        <p>Data: ${reservation.date}</p>
+                                        <p>Godzina: ${reservation.time}</p>
+                                        <p>Liczba Miejsc: ${reservation.seats}</p>
+                                        ${
+																					reservation.additionalInfo
+																						? `<p>Dodatkowe Uwagi: ${reservation.additionalInfo}</p>`
+																						: ''
+																				}
+                                        ${reservation.userId ? `<p>UserID: ${reservation.userId}</p>` : ''}
+                                        <p>Numer Stolika: ${reservation.tableId}</p>
+                                    </div>
+                                    <i class="fa-regular fa-circle-xmark" onclick="deleteItem('reservation', ${
+																			reservation.id
+																		})"></i>
+                                </div>
+                            `
+							)
+							.join('')
+					})
+					.catch(error => {
+						console.error('Error:', error)
+						alert('Wystąpił błąd podczas ładowania rezerwacji.')
 					})
 			}
 		})
@@ -793,18 +846,20 @@ document.addEventListener('DOMContentLoaded', function () {
 					reservationsList.innerHTML = reservations
 						.map(
 							reservation => `
-						<div class="element">
-							<div class="text-container">
-							<p>Data: ${reservation.date}</p>
-							<p>Godzina: ${reservation.time}</p>
-							<p>Miejsca: ${reservation.seats}</p>
-							${reservation.additionalInfo ? `<p>Uwagi: ${reservation.additionalInfo}</p>` : ''}
-							${reservation.firstName ? `<p>Imię: ${reservation.firstName}</p>` : ''}
-							${reservation.lastName ? `<p>Nazwisko: ${reservation.lastName}</p>` : ''}
-							</div>
-							<i class="fa-regular fa-circle-xmark" aria-hidden="true" onclick="cancelReservation(${reservation.id})"></i>
-						</div>
-					`
+                    <div class="element" id="element-${reservation.id}">
+                        <div class="text-container">
+                        <p>Data: ${reservation.date}</p>
+                        <p>Godzina: ${reservation.time}</p>
+                        <p>Miejsca: ${reservation.seats}</p>
+                        ${reservation.additionalInfo ? `<p>Uwagi: ${reservation.additionalInfo}</p>` : ''}
+                        ${reservation.firstName ? `<p>Imię: ${reservation.firstName}</p>` : ''}
+                        ${reservation.lastName ? `<p>Nazwisko: ${reservation.lastName}</p>` : ''}
+                        </div>
+                        <i class="fa-regular fa-circle-xmark" aria-hidden="true" onclick="cancelReservation(${
+													reservation.id
+												})"></i>
+                    </div>
+                `
 						)
 						.join('')
 				}
