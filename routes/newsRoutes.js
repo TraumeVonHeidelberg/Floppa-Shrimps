@@ -3,7 +3,7 @@ const express = require('express')
 const router = express.Router()
 const News = require('../models/news')
 const NewsHeaderText = require('../models/newsHeaderText')
-const User = require('../models/user') // Upewnij się, że ten import jest poprawny
+const User = require('../models/user')
 const authenticateToken = require('../middleware/authenticateToken')
 const multer = require('multer')
 const path = require('path')
@@ -58,12 +58,34 @@ router.get('/news/latest', async (req, res) => {
 			limit: 3,
 			order: [['createdAt', 'DESC']],
 			include: [
-				{ model: NewsHeaderText, as: 'headers' }, // Unikalny alias 'headers'
-				{ model: User, as: 'author', attributes: ['firstName', 'lastName', 'profilePicture'] }, // Unikalny alias 'author'
+				{ model: NewsHeaderText, as: 'headers' },
+				{ model: User, as: 'author', attributes: ['firstName', 'lastName', 'profilePicture'] },
 			],
 		})
 
-		console.log('Fetched news:', news) // Dodane logowanie
+		console.log('Fetched news:', news)
+		res.status(200).json(news)
+	} catch (error) {
+		console.error('Error fetching news:', error)
+		res.status(500).json({ message: error.message })
+	}
+})
+
+// Endpoint do pobierania pełnego newsa
+router.get('/news/:id', async (req, res) => {
+	try {
+		const news = await News.findOne({
+			where: { id: req.params.id },
+			include: [
+				{ model: NewsHeaderText, as: 'headers' },
+				{ model: User, as: 'author', attributes: ['firstName', 'lastName', 'profilePicture'] },
+			],
+		})
+
+		if (!news) {
+			return res.status(404).json({ message: 'News not found' })
+		}
+
 		res.status(200).json(news)
 	} catch (error) {
 		console.error('Error fetching news:', error)
