@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // Ustawienie URL API w zależności od środowiska (Electron vs przeglądarka)
+    const API_URL = (window && window.process && window.process.type === 'renderer') ? 'http://localhost:3000/api' : '/api';
+
     const reservationForm = document.getElementById('reservation-form');
     const firstNameField = document.getElementById('firstNameField');
     const lastNameField = document.getElementById('lastNameField');
@@ -56,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function fetchMaxSeats() {
         try {
-            const response = await fetch('/api/tables/max-seats');
+            const response = await fetch(`${API_URL}/tables/max-seats`);
             if (response.ok) {
                 const data = await response.json();
                 return data.maxSeats;
@@ -119,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('Token:', token);
         console.log('Reservation data before sending:', reservationData);
 
-        fetch('/api/reservations', {
+        fetch(`${API_URL}/reservations`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

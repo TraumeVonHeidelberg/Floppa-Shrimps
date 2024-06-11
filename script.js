@@ -1,4 +1,5 @@
 const { app, BrowserWindow } = require('electron');
+const path = require('path');
 
 function createWindow() {
     const win = new BrowserWindow({
@@ -12,7 +13,7 @@ function createWindow() {
     });
 
     win.maximize();
-    win.loadFile('public/index.html'); // Upewnij się, że ścieżka do pliku HTML jest poprawna
+    win.loadFile(path.join(__dirname, 'public', 'index.html')); // Upewnij się, że ścieżka do pliku HTML jest poprawna
     win.webContents.openDevTools(); // Otwórz narzędzia deweloperskie
 }
 
