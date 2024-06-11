@@ -576,6 +576,7 @@ section {
 
 .news-img {
 	width: 100%;
+	height: 25.6rem;
 }
 
 .news-footer {
@@ -587,6 +588,8 @@ section {
 }
 
 .user-avatar {
+	width: 3.2rem;
+	height: 3.2rem;
 	border-radius: 50%;
 }
 

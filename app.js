@@ -6,19 +6,17 @@ const path = require('path')
 const session = require('express-session')
 const menuRoutes = require('./routes/menuRoutes')
 const testimonialRoutes = require('./routes/testimonialRoutes')
-const { router: authRoutes } = require('./routes/auth') // Użyj destructuring do importu routera
+const { router: authRoutes } = require('./routes/auth')
 const reservationRoutes = require('./routes/reservationRoutes')
-const tableRoutes = require('./routes/tableRoutes');
+const tableRoutes = require('./routes/tableRoutes')
+const newsRoutes = require('./routes/newsRoutes') // Dodaj import dla newsRoutes
 
 const app = express()
 
-// Importowanie asocjacji
 require('./associations')
 
-// Middleware do parsowania JSON
 app.use(express.json())
 
-// Konfiguracja sesji
 app.use(
 	session({
 		secret: process.env.SESSION_SECRET,
@@ -28,19 +26,18 @@ app.use(
 	})
 )
 
-// Routing
 app.use('/api', menuRoutes)
 app.use('/api', testimonialRoutes)
 app.use('/api', authRoutes)
 app.use('/api', reservationRoutes)
-app.use('/api', tableRoutes);
+app.use('/api', tableRoutes)
+app.use('/api', newsRoutes) // Dodaj trasę dla newsRoutes
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.get('/', (req, res) => {
 	res.sendFile(path.join(__dirname, 'index.html'))
 })
 
-// Endpoint dla panelu administracyjnego
 app.get('/admin', (req, res) => {
 	res.sendFile(path.join(__dirname, 'public', 'admin.html'))
 })
