@@ -1,4 +1,3 @@
-// scripts/fullNews.js
 document.addEventListener('DOMContentLoaded', function () {
 	const params = new URLSearchParams(window.location.search)
 	const newsId = params.get('id')
@@ -33,6 +32,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			}" alt="Avatar użytkownika" class="user-avatar" id="news-author-avatar">${data.author.firstName} ${
 				data.author.lastName
 			}</span>`
+
+			// Set the background image of the header
+			const headerElement = document.querySelector('.main-news-header')
+			headerElement.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('./img/uploads/${
+				data.image || 'default-news.jpg'
+			}')`
 
 			// Update the main news content
 			const newsContent = document.getElementById('news-content')
