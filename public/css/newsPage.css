@@ -174,4 +174,9 @@ aside {
 	font-size: 1.6rem;
 	font-weight: 500;
 	color: #274eba;
+	transition: 0.3s color;
+}
+
+.aside-item a:hover {
+	color: #eb2a3c;
 }

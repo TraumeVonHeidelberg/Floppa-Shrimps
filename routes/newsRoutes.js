@@ -57,11 +57,31 @@ router.post('/news', authenticateToken, upload.single('image'), async (req, res)
 	}
 })
 
-// Endpoint do pobierania najnowszych newsów
+// Endpoint do pobierania najnowszych 3 newsów
 router.get('/news/latest', async (req, res) => {
 	try {
 		const news = await News.findAll({
 			limit: 3,
+			order: [['createdAt', 'DESC']],
+			include: [
+				{ model: NewsHeaderText, as: 'headers' },
+				{ model: User, as: 'author', attributes: ['firstName', 'lastName', 'profilePicture'] },
+			],
+		})
+
+		console.log('Fetched news:', news)
+		res.status(200).json(news)
+	} catch (error) {
+		console.error('Error fetching news:', error)
+		res.status(500).json({ message: error.message })
+	}
+})
+
+// Endpoint do pobierania najnowszych 5 newsów
+router.get('/news/latest/5', async (req, res) => {
+	try {
+		const news = await News.findAll({
+			limit: 5,
 			order: [['createdAt', 'DESC']],
 			include: [
 				{ model: NewsHeaderText, as: 'headers' },

@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		return
 	}
 
+	// Fetch and display the main news content
 	fetch(`http://localhost:3000/api/news/${newsId}`)
 		.then(response => {
 			if (!response.ok) {
@@ -81,17 +82,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             <button class="search-btn">Szukaj</button>
                         </div>
                     </div>
-                    <div class="aside-item">
+                    <div class="aside-item" id="latest-posts">
                         <h3 class="section-header section-header-left">Ostatnie Posty</h3>
-                        <a href="">Degustacja Nowego Menu</a>
-                        <a href="">Wprowadzenie Nowych Dań</a>
-                        <a href="">Promocja Na Dania Z Krewetkami</a>
-                        <a href="">Cos1</a>
-                        <a href="">Cos2</a>
-                    </div>
-                    <div class="aside-item">
-                        <h3 class="section-header section-header-left">Archiwum</hge3>
-                        <a href="">Maj 2024</a>
                     </div>
                     <div class="aside-item">
                         <h3 class="section-header section-header-left">Kategorie</h3>
@@ -141,6 +133,24 @@ document.addEventListener('DOMContentLoaded', function () {
 				.catch(error => {
 					console.error('Error fetching next news:', error)
 					document.getElementById('next-post-container').style.display = 'none'
+				})
+
+			// Fetch and display latest posts
+			fetch(`http://localhost:3000/api/news/latest/5`)
+				.then(response => response.json())
+				.then(latestData => {
+					console.log('Fetched latest news:', latestData) // Log the parsed JSON
+
+					const latestPostsContainer = document.getElementById('latest-posts')
+					latestData.forEach(item => {
+						const postLink = document.createElement('a')
+						postLink.href = `full-news.html?id=${item.id}`
+						postLink.textContent = item.title
+						latestPostsContainer.appendChild(postLink)
+					})
+				})
+				.catch(error => {
+					console.error('Error fetching latest news:', error)
 				})
 		})
 		.catch(error => console.error('Error fetching news:', error))
