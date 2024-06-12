@@ -320,16 +320,16 @@ section {
 	margin-bottom: 4.8rem;
 }
 
-.menu-grid-container {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 2.4rem;
-}
-
 /* MENU SECTION */
 
 .menu {
 	margin-bottom: 8rem;
+}
+
+.menu-grid-container {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 2.4rem;
 }
 
 .product-card {
@@ -604,8 +604,7 @@ section {
 	padding: 1.2rem;
 }
 
-.news-card a
-{
+.news-card a {
 	margin-top: auto;
 }
 
@@ -684,6 +683,9 @@ footer {
 /* ----------------------------------------------------------------------------------------------------- */
 
 @media (max-width: 768px) {
+	.menu-grid-container,.news-grid-container{
+		grid-template-columns: repeat(2, 1fr);
+	}
 	.dishes-container {
 		grid-template-columns: repeat(2, 1fr);
 		grid-template-rows: repeat(4, 1fr);
@@ -691,6 +693,9 @@ footer {
 }
 
 @media (max-width: 576px) {
+	.menu-grid-container,.news-grid-container {
+		grid-template-columns: repeat(1, 1fr);
+	}
 	.dishes-container {
 		grid-template-columns: repeat(1, 1fr);
 		grid-template-rows: repeat(8, 1fr);
