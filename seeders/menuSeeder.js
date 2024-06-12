@@ -31,7 +31,11 @@ const menuItems = [
 async function seedDatabase() {
 	try {
 		await sequelize.sync({ force: true })
-		await MenuItem.bulkCreate(menuItems)
+		// Ensure prices are formatted to two decimal places
+		const formattedMenuItems = menuItems.map(item => {
+			return { ...item, price: item.price.toFixed(2) }
+		})
+		await MenuItem.bulkCreate(formattedMenuItems)
 		console.log('Database seeded!')
 		sequelize.close()
 	} catch (err) {

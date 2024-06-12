@@ -482,15 +482,15 @@ document.addEventListener('DOMContentLoaded', function () {
 						listContainer.innerHTML = data
 							.map(
 								item => `
-							<div class="element" id="element-${item.id}">
-								<div class="text-container">
-									<p class="element-text" id="name-${item.id}">${item.name}</p>
-									<p class="element-text" id="description-${item.id}">${item.description}</p>
-									<p class="element-text" id="price-${item.id}">$${item.price.toFixed(2)}</p>
+								<div class="element" id="element-${item.id}">
+									<div class="text-container">
+										<p class="element-text" id="name-${item.id}">${item.name}</p>
+										<p class="element-text" id="description-${item.id}">${item.description}</p>
+										<p class="element-text" id="price-${item.id}">${parseFloat(item.price).toFixed(2)} zł</p>
+									</div>
+									<i class="fa-regular fa-circle-xmark" onclick="deleteItem('menu', ${item.id})"></i>
 								</div>
-								<i class="fa-regular fa-circle-xmark" onclick="deleteItem('menu', ${item.id})"></i>
-							</div>
-						`
+							`
 							)
 							.join('')
 						data.forEach(item => {
@@ -510,15 +510,15 @@ document.addEventListener('DOMContentLoaded', function () {
 						listContainer.innerHTML = data
 							.map(
 								item => `
-							<div class="element" id="element-${item.id}">
-								<div class="text-container">
-									<p class="element-text main-testimonial-text" id="text-${item.id}">${item.text}</p>
-									<p class="element-text" id="author-${item.id}">${item.author}</p>
-									<p class="element-text" id="company-${item.id}">${item.company}</p>
+								<div class="element" id="element-${item.id}">
+									<div class="text-container">
+										<p class="element-text main-testimonial-text" id="text-${item.id}">${item.text}</p>
+										<p class="element-text" id="author-${item.id}">${item.author}</p>
+										<p class="element-text" id="company-${item.id}">${item.company}</p>
+									</div>
+									<i class="fa-regular fa-circle-xmark" onclick="deleteItem('testimonial', ${item.id})"></i>
 								</div>
-								<i class="fa-regular fa-circle-xmark" onclick="deleteItem('testimonial', ${item.id})"></i>
-							</div>
-						`
+							`
 							)
 							.join('')
 						data.forEach(item => {

@@ -5,10 +5,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			const container = document.querySelector('.menu-grid-container')
 			container.innerHTML = '' // Czyść kontener przed dodaniem nowych elementów
 			data.forEach(item => {
+				const formattedPrice = parseFloat(item.price).toFixed(2)
 				const card = `<div class="product-card">
                           <p class="product-name">${item.name}</p>
                           <p class="product-with">${item.description}</p>
-                          <p class="product-price">${item.price} zł</p>
+                          <p class="product-price">${formattedPrice} zł</p>
                         </div>`
 				container.innerHTML += card
 			})
