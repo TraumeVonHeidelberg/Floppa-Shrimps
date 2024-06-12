@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const { Op } = require('sequelize')
 const News = require('../models/news')
 const NewsHeaderText = require('../models/newsHeaderText')
 const User = require('../models/user')
@@ -184,6 +185,52 @@ router.delete('/news/:id', authenticateToken, async (req, res) => {
 		res.status(200).json({ message: 'News deleted successfully' })
 	} catch (error) {
 		console.error('Error deleting news:', error)
+		res.status(500).json({ message: error.message })
+	}
+})
+
+// Endpoint do pobierania poprzedniego newsa
+router.get('/news/:id/previous', async (req, res) => {
+	try {
+		const news = await News.findOne({
+			where: { id: { [Op.lt]: req.params.id } },
+			order: [['id', 'DESC']],
+			include: [
+				{ model: NewsHeaderText, as: 'headers' },
+				{ model: User, as: 'author', attributes: ['firstName', 'lastName', 'profilePicture'] },
+			],
+		})
+
+		if (!news) {
+			return res.status(404).json({ message: 'No previous news found' })
+		}
+
+		res.status(200).json(news)
+	} catch (error) {
+		console.error('Error fetching previous news:', error)
+		res.status(500).json({ message: error.message })
+	}
+})
+
+// Endpoint do pobierania następnego newsa
+router.get('/news/:id/next', async (req, res) => {
+	try {
+		const news = await News.findOne({
+			where: { id: { [Op.gt]: req.params.id } },
+			order: [['id', 'ASC']],
+			include: [
+				{ model: NewsHeaderText, as: 'headers' },
+				{ model: User, as: 'author', attributes: ['firstName', 'lastName', 'profilePicture'] },
+			],
+		})
+
+		if (!news) {
+			return res.status(404).json({ message: 'No next news found' })
+		}
+
+		res.status(200).json(news)
+	} catch (error) {
+		console.error('Error fetching next news:', error)
 		res.status(500).json({ message: error.message })
 	}
 })

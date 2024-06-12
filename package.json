@@ -11,7 +11,7 @@
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
-		"electron": "^29.1.5"
+		"electron": "^29.4.2"
 	},
 	"dependencies": {
 		"@vonage/server-sdk": "^3.14.1",

@@ -57,12 +57,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="change-post">
                         <div class="previous-post">
                             <p class="call-to-action-sign">Poprzedni post</p>
-                            <p class="change-post-title"><i class="fa-solid fa-arrow-left"></i> Tytul Placeholder</p>
+                            <p class="change-post-title"><i class="fa-solid fa-arrow-left"></i> <span id="previous-post-title">Tytul Placeholder</span></p>
                         </div>
 
                         <div class="next-post">
                             <p class="call-to-action-sign">Następny post</p>
-                            <p class="change-post-title">Tytul Placeholder <i class="fa-solid fa-arrow-right"></i></p>
+                            <p class="change-post-title"><span id="next-post-title">Tytul Placeholder</span> <i class="fa-solid fa-arrow-right"></i></p>
                         </div>
                     </div>
 
@@ -102,6 +102,32 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                 </aside>
             `
+
+			// Fetch and update previous post
+			fetch(`http://localhost:3000/api/news/${newsId}/previous`)
+				.then(response => response.json())
+				.then(previousData => {
+					if (previousData) {
+						document.getElementById('previous-post-title').textContent = previousData.title
+						document.querySelector('.previous-post').addEventListener('click', () => {
+							window.location.href = `full-news.html?id=${previousData.id}`
+						})
+					}
+				})
+				.catch(error => console.error('Error fetching previous news:', error))
+
+			// Fetch and update next post
+			fetch(`http://localhost:3000/api/news/${newsId}/next`)
+				.then(response => response.json())
+				.then(nextData => {
+					if (nextData) {
+						document.getElementById('next-post-title').textContent = nextData.title
+						document.querySelector('.next-post').addEventListener('click', () => {
+							window.location.href = `full-news.html?id=${nextData.id}`
+						})
+					}
+				})
+				.catch(error => console.error('Error fetching next news:', error))
 		})
 		.catch(error => console.error('Error fetching news:', error))
 })
