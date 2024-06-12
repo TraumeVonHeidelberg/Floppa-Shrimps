@@ -28,9 +28,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			document.getElementById('news-footer').innerHTML = `${new Date(
 				data.createdAt
 			).toLocaleDateString()} <span class="avatar-name"><img src="./img/uploads/${
-				data.author.profilePicture || 'avatar-example.png'
-			}" alt="Avatar użytkownika" class="user-avatar" id="news-author-avatar">${data.author.firstName} ${
-				data.author.lastName
+				data.author?.profilePicture || 'avatar-example.png'
+			}" alt="Avatar użytkownika" class="user-avatar" id="news-author-avatar">${data.author?.firstName} ${
+				data.author?.lastName
 			}</span>`
 
 			// Set the background image of the header
@@ -57,12 +57,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="change-post">
                         <div class="previous-post">
                             <p class="call-to-action-sign">Poprzedni post</p>
-                            <p class="change-post-title"><i class="fa-solid fa-arrow-left"></i> <span id="previous-post-title">Tytul Placeholder</span></p>
+                            <p class="change-post-title" id="previous-post-container"><i class="fa-solid fa-arrow-left"></i> <span id="previous-post-title">Tytul Placeholder</span></p>
                         </div>
 
                         <div class="next-post">
                             <p class="call-to-action-sign">Następny post</p>
-                            <p class="change-post-title"><span id="next-post-title">Tytul Placeholder</span> <i class="fa-solid fa-arrow-right"></i></p>
+                            <p class="change-post-title" id="next-post-container"><span id="next-post-title">Tytul Placeholder</span> <i class="fa-solid fa-arrow-right"></i></p>
                         </div>
                     </div>
 
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <a href="">Cos2</a>
                     </div>
                     <div class="aside-item">
-                        <h3 class="section-header section-header-left">Archiwum</h3>
+                        <h3 class="section-header section-header-left">Archiwum</hge3>
                         <a href="">Maj 2024</a>
                     </div>
                     <div class="aside-item">
@@ -107,27 +107,41 @@ document.addEventListener('DOMContentLoaded', function () {
 			fetch(`http://localhost:3000/api/news/${newsId}/previous`)
 				.then(response => response.json())
 				.then(previousData => {
-					if (previousData) {
+					console.log('Fetched previous news:', previousData)
+					const previousPostContainer = document.getElementById('previous-post-container')
+					if (previousData && previousData.message !== 'No previous news found') {
 						document.getElementById('previous-post-title').textContent = previousData.title
-						document.querySelector('.previous-post').addEventListener('click', () => {
+						previousPostContainer.addEventListener('click', () => {
 							window.location.href = `full-news.html?id=${previousData.id}`
 						})
+					} else {
+						previousPostContainer.style.display = 'none'
 					}
 				})
-				.catch(error => console.error('Error fetching previous news:', error))
+				.catch(error => {
+					console.error('Error fetching previous news:', error)
+					document.getElementById('previous-post-container').style.display = 'none'
+				})
 
 			// Fetch and update next post
 			fetch(`http://localhost:3000/api/news/${newsId}/next`)
 				.then(response => response.json())
 				.then(nextData => {
-					if (nextData) {
+					console.log('Fetched next news:', nextData)
+					const nextPostContainer = document.getElementById('next-post-container')
+					if (nextData && nextData.message !== 'No next news found') {
 						document.getElementById('next-post-title').textContent = nextData.title
-						document.querySelector('.next-post').addEventListener('click', () => {
+						nextPostContainer.addEventListener('click', () => {
 							window.location.href = `full-news.html?id=${nextData.id}`
 						})
+					} else {
+						nextPostContainer.style.display = 'none'
 					}
 				})
-				.catch(error => console.error('Error fetching next news:', error))
+				.catch(error => {
+					console.error('Error fetching next news:', error)
+					document.getElementById('next-post-container').style.display = 'none'
+				})
 		})
 		.catch(error => console.error('Error fetching news:', error))
 })
