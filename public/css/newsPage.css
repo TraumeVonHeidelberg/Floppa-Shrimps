@@ -180,3 +180,31 @@ aside {
 .aside-item a:hover {
 	color: #eb2a3c;
 }
+
+/* Komenatrza */
+
+.comment {
+	display: flex;
+	gap: 3.2rem;
+	margin-bottom: 3.2rem;
+}
+
+.comment img {
+	width: 6.4rem;
+	height: 6.4rem;
+}
+
+.comment-text {
+	display: flex;
+	flex-direction: column;
+	gap: 0.8rem;
+}
+
+.comment p strong {
+	font-size: 2rem;
+	color: #274eba;
+}
+
+.main-comment-text {
+	font-size: 1.6rem;
+}

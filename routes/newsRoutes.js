@@ -4,6 +4,7 @@ const { Op } = require('sequelize')
 const News = require('../models/news')
 const NewsHeaderText = require('../models/newsHeaderText')
 const User = require('../models/user')
+const Comment = require('../models/comment')
 const authenticateToken = require('../middleware/authenticateToken')
 const multer = require('multer')
 const path = require('path')
@@ -54,6 +55,51 @@ router.post('/news', authenticateToken, upload.single('image'), async (req, res)
 		res.status(201).json({ message: 'News added successfully', news })
 	} catch (error) {
 		res.status(500).json({ message: error.message })
+	}
+})
+
+// Endpoint do dodawania komentarzy
+router.post('/news/:id/comments', authenticateToken, async (req, res) => {
+	const { text } = req.body
+	const userId = req.user.userId
+	const newsId = req.params.id
+
+	console.log(`Received comment: ${text} for newsId: ${newsId} from userId: ${userId}`)
+
+	try {
+		const comment = await Comment.create({
+			text,
+			userId,
+			newsId,
+		})
+
+		console.log(`Comment added: ${comment.text} for newsId: ${comment.newsId} from userId: ${comment.userId}`)
+
+		res.status(201).json(comment)
+	} catch (error) {
+		console.error('Error adding comment:', error)
+		res.status(500).json({ message: 'Error adding comment' })
+	}
+})
+
+// Endpoint do pobierania komentarzy
+router.get('/news/:id/comments', async (req, res) => {
+	const newsId = req.params.id
+
+	console.log(`Fetching comments for newsId: ${newsId}`)
+
+	try {
+		const comments = await Comment.findAll({
+			where: { newsId },
+			include: [{ model: User, as: 'author', attributes: ['firstName', 'lastName', 'username', 'profilePicture'] }],
+		})
+
+		console.log(`Fetched comments:`, comments)
+
+		res.status(200).json(comments)
+	} catch (error) {
+		console.error('Error fetching comments:', error)
+		res.status(500).json({ message: 'Error fetching comments' })
 	}
 })
 

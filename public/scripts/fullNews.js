@@ -70,8 +70,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     <p class="call-to-action-sign">Komentarze</p>
 
                     <div class="comment-content">
-                        <textarea name="" id="" placeholder="Napisz Komentarz"></textarea>
-                        <i class="fa-solid fa-chevron-right"></i>
+                        <textarea name="" id="comment-text" placeholder="Napisz Komentarz"></textarea>
+                        <i class="fa-solid fa-chevron-right" id="submit-comment"></i>
                     </div>
                 </article>
                 <aside>
@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <a href="">PlaceHolder</a>
                     </div>
                 </aside>
+                <div class="comment-section"></div>
             `
 
 			// Fetch and update previous post
@@ -139,8 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			fetch(`http://localhost:3000/api/news/latest/5`)
 				.then(response => response.json())
 				.then(latestData => {
-					console.log('Fetched latest news:', latestData) // Log the parsed JSON
-
+					console.log('Fetched latest news:', latestData)
 					const latestPostsContainer = document.getElementById('latest-posts')
 					latestData.forEach(item => {
 						const postLink = document.createElement('a')
@@ -152,6 +152,75 @@ document.addEventListener('DOMContentLoaded', function () {
 				.catch(error => {
 					console.error('Error fetching latest news:', error)
 				})
+
+			// Fetch and display comments
+			function fetchComments() {
+				fetch(`http://localhost:3000/api/news/${newsId}/comments`)
+					.then(response => response.json())
+					.then(comments => {
+						console.log('Fetched comments:', comments)
+						const commentSection = document.querySelector('.comment-section')
+						commentSection.innerHTML = ''
+						if (!Array.isArray(comments) || comments.length === 0) {
+							commentSection.innerHTML = '<p>Brak komentarzy</p>'
+						} else {
+							commentSection.innerHTML = comments
+								.map(
+									comment => `
+                                <div class="comment">
+                                    <img src="./img/uploads/${
+																			comment.author.profilePicture || 'avatar-example.png'
+																		}" alt="Avatar użytkownika" class="user-avatar">
+                                    <div class="comment-text">
+                                        <p><strong>${
+																					comment.author.username ||
+																					comment.author.firstName + ' ' + comment.author.lastName
+																				}</strong></p>
+                                        <p class="comment-date">${new Date(comment.createdAt).toLocaleString()}</p>
+                                        <p class="main-comment-text">${comment.text}</p>
+                                    </div>
+                                </div>
+                            `
+								)
+								.join('')
+						}
+					})
+					.catch(error => {
+						console.error('Error fetching comments:', error)
+						const commentSection = document.querySelector('.comment-section')
+						commentSection.innerHTML = '<p>Error loading comments</p>'
+					})
+			}
+
+			fetchComments()
+
+			// Add comment
+			document.getElementById('submit-comment').addEventListener('click', function () {
+				const commentText = document.getElementById('comment-text').value
+				console.log(`Submitting comment: ${commentText}`)
+				fetch(`http://localhost:3000/api/news/${newsId}/comments`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${localStorage.getItem('token')}`,
+					},
+					body: JSON.stringify({ text: commentText }),
+				})
+					.then(response => {
+						if (!response.ok) {
+							throw new Error('Network response was not ok')
+						}
+						return response.json()
+					})
+					.then(comment => {
+						console.log('Comment added:', comment)
+						// Refresh comments
+						fetchComments()
+					})
+					.catch(error => {
+						console.error('Error adding comment:', error)
+					})
+			})
 		})
 		.catch(error => console.error('Error fetching news:', error))
 })
