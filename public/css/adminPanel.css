@@ -167,6 +167,19 @@ form button {
 	margin-bottom: 2.4rem;
 }
 
+.news-list-container {
+	grid-template-columns: 1fr;
+}
+
+.news-meta,
+.header-text-pair {
+	margin-bottom: 3.2rem;
+}
+
+.news-meta img {
+	width: 50%;
+}
+
 /* User Profile */
 
 .user-content {

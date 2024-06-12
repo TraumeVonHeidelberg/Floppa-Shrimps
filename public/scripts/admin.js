@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const selectedType = elementTypeSelect.value
 			if (selectedType === 'menu') {
 				formContainer.innerHTML = `
-                    <form id="menu-form" spellcheck="false">
+                    <form id="menu-form">
                         <div class="configuration-item">
                             <label for="menu-name">Nazwa</label>
                             <input type="text" id="menu-name" name="name" required>
@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				document.getElementById('menu-form').addEventListener('submit', submitMenuForm)
 			} else if (selectedType === 'testimonial') {
 				formContainer.innerHTML = `
-                    <form id="testimonial-form" spellcheck="false">
+                    <form id="testimonial-form">
                         <div class="configuration-item">
                             <label for="testimonial-text">Tekst</label>
                             <textarea id="testimonial-text" name="text" required></textarea>
@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				document.getElementById('testimonial-form').addEventListener('submit', submitTestimonialForm)
 			} else if (selectedType === 'news') {
 				formContainer.innerHTML = `
-                    <form id="news-form" enctype="multipart/form-data" spellcheck="false">
+                    <form id="news-form" enctype="multipart/form-data">
                         <div class="configuration-item">
                             <label for="news-category">Kategoria</label>
                             <input type="text" id="news-category" name="category" required>
@@ -380,41 +380,47 @@ document.addEventListener('DOMContentLoaded', function () {
 		clearActiveClass()
 		listElementsBtn.classList.add('button-active')
 		mainContent.innerHTML = `
-            <div class="dynamic-content">
-                <div class="select-element">
-                    <label for="element-list-type">Wybierz typ elementu:</label>
-                    <select id="element-list-type" class="element-type">
-                        <option value="menu">Menu</option>
-                        <option value="testimonial">Testimonial</option>
-                        <option value="news">News</option>
-                        <option value="reservations">Rezerwacje</option>
-                    </select>
-                </div>
-                <div id="list-container" class="list-container"></div>
-            </div>
-        `
+			<div class="dynamic-content">
+				<div class="select-element">
+					<label for="element-list-type">Wybierz typ elementu:</label>
+					<select id="element-list-type" class="element-type">
+						<option value="menu">Menu</option>
+						<option value="testimonial">Testimonial</option>
+						<option value="news">News</option>
+						<option value="reservations">Rezerwacje</option>
+					</select>
+				</div>
+				<div id="list-container" class="list-container"></div>
+			</div>
+		`
 
 		const elementListTypeSelect = document.getElementById('element-list-type')
 		const listContainer = document.getElementById('list-container')
 
 		elementListTypeSelect.addEventListener('change', function () {
 			const selectedType = elementListTypeSelect.value
+
+			// Usuwanie klasy `news-list-container` przy każdej zmianie typu
+			listContainer.classList.remove('news-list-container')
+
 			if (selectedType === 'menu') {
 				fetch(`${API_URL}/menu`)
-					.then(response => response.json())
-					.then(data => {
+					.then(response => response.text()) // Zmiana z .json() na .text() dla logowania
+					.then(text => {
+						console.log('Response text:', text) // Logowanie odpowiedzi jako tekst
+						const data = JSON.parse(text) // Parsowanie tekstu do JSON
 						listContainer.innerHTML = data
 							.map(
 								item => `
-                        <div class="element" id="element-${item.id}">
-                            <div class="text-container">
-                                <p class="element-text" id="name-${item.id}">${item.name}</p>
-                                <p class="element-text" id="description-${item.id}">${item.description}</p>
-                                <p class="element-text" id="price-${item.id}">$${item.price.toFixed(2)}</p>
-                            </div>
-                            <i class="fa-regular fa-circle-xmark" onclick="deleteItem('menu', ${item.id})"></i>
-                        </div>
-                    `
+								<div class="element" id="element-${item.id}">
+									<div class="text-container">
+										<p class="element-text" id="name-${item.id}">${item.name}</p>
+										<p class="element-text" id="description-${item.id}">${item.description}</p>
+										<p class="element-text" id="price-${item.id}">$${item.price.toFixed(2)}</p>
+									</div>
+									<i class="fa-regular fa-circle-xmark" onclick="deleteItem('menu', ${item.id})"></i>
+								</div>
+							`
 							)
 							.join('')
 						data.forEach(item => {
@@ -429,20 +435,22 @@ document.addEventListener('DOMContentLoaded', function () {
 					})
 			} else if (selectedType === 'testimonial') {
 				fetch(`${API_URL}/testimonials`)
-					.then(response => response.json())
-					.then(data => {
+					.then(response => response.text())
+					.then(text => {
+						console.log('Response text:', text)
+						const data = JSON.parse(text)
 						listContainer.innerHTML = data
 							.map(
 								item => `
-                        <div class="element" id="element-${item.id}">
-                            <div class="text-container">
-                                <p class="element-text main-testimonial-text" id="text-${item.id}">${item.text}</p>
-                                <p class="element-text" id="author-${item.id}">${item.author}</p>
-                                <p class="element-text" id="company-${item.id}">${item.company}</p>
-                            </div>
-                            <i class="fa-regular fa-circle-xmark" onclick="deleteItem('testimonial', ${item.id})"></i>
-                        </div>
-                    `
+								<div class="element" id="element-${item.id}">
+									<div class="text-container">
+										<p class="element-text main-testimonial-text" id="text-${item.id}">${item.text}</p>
+										<p class="element-text" id="author-${item.id}">${item.author}</p>
+										<p class="element-text" id="company-${item.id}">${item.company}</p>
+									</div>
+									<i class="fa-regular fa-circle-xmark" onclick="deleteItem('testimonial', ${item.id})"></i>
+								</div>
+							`
 							)
 							.join('')
 						data.forEach(item => {
@@ -456,36 +464,45 @@ document.addEventListener('DOMContentLoaded', function () {
 						alert('Wystąpił błąd podczas ładowania testimonials.')
 					})
 			} else if (selectedType === 'news') {
-				fetch(`${API_URL}/news`)
-					.then(response => response.json())
-					.then(data => {
+				// Dodanie klasy news-list-container
+				listContainer.classList.add('news-list-container')
+
+				fetch(`${API_URL}/news`, {
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('token')}`,
+					},
+				})
+					.then(response => response.text())
+					.then(text => {
+						console.log('Response text:', text)
+						const data = JSON.parse(text)
 						listContainer.innerHTML = data
 							.map(
 								item => `
-                        <div class="element" id="element-${item.id}">
-                            <div class="text-container">
-                                <p class="element-text" id="category-${item.id}">${item.category}</p>
-                                <p class="element-text" id="title-${item.id}">${item.title}</p>
-                                <p class="element-text" id="introText-${item.id}">${item.introText}</p>
-                                <div id="headers-${item.id}">
-                                    ${item.headers
-																			.map((header, index) => `<p class="element-text news-header">${header}</p>`)
-																			.join('')}
-                                </div>
-                                <div id="texts-${item.id}">
-                                    ${item.texts
-																			.map((text, index) => `<p class="element-text news-text">${text}</p>`)
-																			.join('')}
-                                </div>
-                                ${
-																	item.image
-																		? `<img src="/uploads/${item.image}" alt="News Image" class="news-image">`
-																		: ''
-																}
-                            </div>
-                            <i class="fa-regular fa-circle-xmark" onclick="deleteItem('news', ${item.id})"></i>
-                        </div>
-                    `
+								<div class="element news-element" id="element-${item.id}">
+									<div class="news-item">
+										<div class="news-meta">
+											<p class="element-text" id="category-${item.id}">${item.category}</p>
+											<p class="element-text" id="title-${item.id}">${item.title}</p>
+											${item.image ? `<img src="/img/uploads/${item.image}" alt="News Image" class="news-image">` : ''}
+											<p class="element-text" id="introText-${item.id}">${item.introText}</p>
+										</div>
+										<div id="headers-texts-${item.id}">
+											${item.headers
+												.map(
+													(header, index) => `
+												<div class="header-text-pair">
+													<p class="element-text news-header" id="header-${item.id}-${index}">${header.header}</p>
+													<p class="element-text news-text" id="text-${item.id}-${index}">${header.text}</p>
+												</div>
+											`
+												)
+												.join('')}
+										</div>
+									</div>
+									<i class="fa-regular fa-circle-xmark" onclick="deleteItem('news', ${item.id})"></i>
+								</div>
+							`
 							)
 							.join('')
 						data.forEach(item => {
@@ -493,10 +510,8 @@ document.addEventListener('DOMContentLoaded', function () {
 							makeEditable(document.getElementById(`title-${item.id}`), 'news', item.id, 'title')
 							makeEditable(document.getElementById(`introText-${item.id}`), 'news', item.id, 'introText')
 							item.headers.forEach((header, index) => {
-								makeEditable(document.getElementById(`headers-${item.id}`).children[index], 'news', item.id, 'headers')
-							})
-							item.texts.forEach((text, index) => {
-								makeEditable(document.getElementById(`texts-${item.id}`).children[index], 'news', item.id, 'texts')
+								makeEditable(document.getElementById(`header-${item.id}-${index}`), 'news', item.id, 'header')
+								makeEditable(document.getElementById(`text-${item.id}-${index}`), 'news', item.id, 'text')
 							})
 						})
 					})
@@ -510,33 +525,29 @@ document.addEventListener('DOMContentLoaded', function () {
 						Authorization: `Bearer ${localStorage.getItem('token')}`,
 					},
 				})
-					.then(response => response.json())
-					.then(data => {
+					.then(response => response.text())
+					.then(text => {
+						console.log('Response text:', text)
+						const data = JSON.parse(text)
 						listContainer.innerHTML = data
 							.map(
 								reservation => `
-                                <div class="element" id="element-${reservation.id}">
-                                    <div class="text-container">
-                                        <p>Imię i Nazwisko: ${
-																					reservation.firstName || reservation.user?.firstName || ''
-																				} ${reservation.lastName || reservation.user?.lastName || ''}</p>
-                                        <p>E-Mail: ${reservation.email}</p>
-                                        <p>Data: ${reservation.date}</p>
-                                        <p>Godzina: ${reservation.time}</p>
-                                        <p>Liczba Miejsc: ${reservation.seats}</p>
-                                        ${
-																					reservation.additionalInfo
-																						? `<p>Dodatkowe Uwagi: ${reservation.additionalInfo}</p>`
-																						: ''
-																				}
-                                        ${reservation.userId ? `<p>UserID: ${reservation.userId}</p>` : ''}
-                                        <p>Numer Stolika: ${reservation.tableId}</p>
-                                    </div>
-                                    <i class="fa-regular fa-circle-xmark" onclick="deleteItem('reservation', ${
-																			reservation.id
-																		})"></i>
-                                </div>
-                            `
+									<div class="element" id="element-${reservation.id}">
+										<div class="text-container">
+											<p>Imię i Nazwisko: ${reservation.firstName || reservation.user?.firstName || ''} ${
+									reservation.lastName || reservation.user?.lastName || ''
+								}</p>
+											<p>E-Mail: ${reservation.email}</p>
+											<p>Data: ${reservation.date}</p>
+											<p>Godzina: ${reservation.time}</p>
+											<p>Liczba Miejsc: ${reservation.seats}</p>
+											${reservation.additionalInfo ? `<p>Dodatkowe Uwagi: ${reservation.additionalInfo}</p>` : ''}
+											${reservation.userId ? `<p>UserID: ${reservation.userId}</p>` : ''}
+											<p>Numer Stolika: ${reservation.tableId}</p>
+										</div>
+										<i class="fa-regular fa-circle-xmark" onclick="deleteItem('reservation', ${reservation.id})"></i>
+									</div>
+								`
 							)
 							.join('')
 					})
@@ -572,7 +583,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <p class="common-user-text">Email* <span class="user-data" contenteditable="true" data-field="email"></span></p>
                     <p class="common-user-text">Typ Konta* <span class="user-data" data-field="role"></span></p>  
                 </div>
-                <form action="" class="change-password-form hidden" spellcheck="false">
+                <form action="" class="change-password-form hidden">
                     <div class="configuration-item">
                         <label for="current-password">Stare hasło</label>
                         <input type="password" id="current-password" required>
