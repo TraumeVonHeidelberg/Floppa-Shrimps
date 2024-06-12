@@ -123,7 +123,10 @@ document.addEventListener('DOMContentLoaded', function () {
 				? `${API_URL}/menu/${id}`
 				: type === 'testimonial'
 				? `${API_URL}/testimonials/${id}`
+				: type === 'news'
+				? `${API_URL}/news/${id}`
 				: `${API_URL}/reservations/${id}`
+
 		const element = document.querySelector(`#element-${id}`)
 		fetch(url, {
 			method: 'DELETE',
@@ -138,14 +141,30 @@ document.addEventListener('DOMContentLoaded', function () {
 				return response.json()
 			})
 			.then(data => {
-				alert(`${type === 'menu' ? 'Pozycja' : type === 'testimonial' ? 'Testimonial' : 'Rezerwacja'} usunięta!`)
+				alert(
+					`${
+						type === 'menu'
+							? 'Pozycja'
+							: type === 'testimonial'
+							? 'Testimonial'
+							: type === 'news'
+							? 'News'
+							: 'Rezerwacja'
+					} usunięta!`
+				)
 				element.remove()
 			})
 			.catch(error => {
 				console.error('Error:', error)
 				alert(
 					`Wystąpił błąd podczas usuwania ${
-						type === 'menu' ? 'pozycji' : type === 'testimonial' ? 'testimonialu' : 'rezerwacji'
+						type === 'menu'
+							? 'pozycji'
+							: type === 'testimonial'
+							? 'testimonialu'
+							: type === 'news'
+							? 'newsa'
+							: 'rezerwacji'
 					}.`
 				)
 			})

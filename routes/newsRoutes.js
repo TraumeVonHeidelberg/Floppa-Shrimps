@@ -170,4 +170,22 @@ router.put('/news/:id', authenticateToken, async (req, res) => {
 		res.status(500).json({ message: 'Error updating news' })
 	}
 })
+
+// Endpoint do usuwania newsa
+router.delete('/news/:id', authenticateToken, async (req, res) => {
+	try {
+		const news = await News.findByPk(req.params.id)
+		if (!news) {
+			return res.status(404).json({ message: 'News not found' })
+		}
+		await News.destroy({
+			where: { id: req.params.id },
+		})
+		res.status(200).json({ message: 'News deleted successfully' })
+	} catch (error) {
+		console.error('Error deleting news:', error)
+		res.status(500).json({ message: error.message })
+	}
+})
+
 module.exports = router
