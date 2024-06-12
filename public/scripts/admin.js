@@ -151,12 +151,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 	}
 
-	function editItem(type, id, field, value) {
+	function editItem(type, id, field, value, index = null) {
 		console.log(`Edit item: type=${type}, id=${id}, field=${field}, value=${value}`)
-		const url = type === 'menu' ? `${API_URL}/menu/${id}` : `${API_URL}/testimonials/${id}`
-
+		let url
 		let data = {}
+
 		if (type === 'menu') {
+			url = `${API_URL}/menu/${id}`
 			const name = field === 'name' ? value : document.getElementById(`name-${id}`).textContent.trim()
 			const description =
 				field === 'description' ? value : document.getElementById(`description-${id}`).textContent.trim()
@@ -166,42 +167,55 @@ document.addEventListener('DOMContentLoaded', function () {
 					: parseFloat(document.getElementById(`price-${id}`).textContent.replace('$', '').trim())
 			data = { name, description, price }
 		} else if (type === 'testimonial') {
+			url = `${API_URL}/testimonials/${id}`
 			const text = field === 'text' ? value : document.getElementById(`text-${id}`).textContent.trim()
 			const author = field === 'author' ? value : document.getElementById(`author-${id}`).textContent.trim()
 			const company = field === 'company' ? value : document.getElementById(`company-${id}`).textContent.trim()
 			data = { text, author, company }
+		} else if (type === 'news') {
+			url = `${API_URL}/news/${id}`
+			if (field === 'header' || field === 'text') {
+				data[field] = value
+				data['index'] = index // Pass the index of the header or text to be updated
+			} else {
+				data[field] = value
+			}
 		}
+
+		console.log('Sending PUT request to:', url, 'with data:', data)
 
 		fetch(url, {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
+				Authorization: `Bearer ${localStorage.getItem('token')}`,
 			},
 			body: JSON.stringify(data),
 		})
 			.then(response => {
+				console.log('Response status:', response.status)
 				if (!response.ok) {
-					throw new Error('Network response was not ok')
+					return response.text().then(text => {
+						console.error('Error response text:', text)
+						throw new Error('Network response was not ok')
+					})
 				}
 				return response.json()
 			})
 			.then(data => {
-				alert(`${type === 'menu' ? 'Pozycja' : 'Testimonial'} zaktualizowany!`)
+				alert(`${type.charAt(0).toUpperCase() + type.slice(1)} zaktualizowany!`)
 				// Update the text content without reloading the list
-				if (field === 'name') document.getElementById(`name-${id}`).textContent = data.name
-				if (field === 'description') document.getElementById(`description-${id}`).textContent = data.description
-				if (field === 'price') document.getElementById(`price-${id}`).textContent = `$${data.price.toFixed(2)}`
-				if (field === 'text') document.getElementById(`text-${id}`).textContent = data.text
-				if (field === 'author') document.getElementById(`author-${id}`).textContent = data.author
-				if (field === 'company') document.getElementById(`company-${id}`).textContent = data.company
+				if (field !== 'header' && field !== 'text') {
+					document.getElementById(`${field}-${id}`).textContent = data[field]
+				}
 			})
 			.catch(error => {
 				console.error('Error:', error)
-				alert(`Wystąpił błąd podczas aktualizacji ${type === 'menu' ? 'pozycji' : 'testimonialu'}.`)
+				alert(`Wystąpił błąd podczas aktualizacji ${type}.`)
 			})
 	}
 
-	function makeEditable(element, type, id, field) {
+	function makeEditable(element, type, id, field, index = null) {
 		element.addEventListener('click', function () {
 			const originalValue = element.textContent.trim()
 			element.contentEditable = true
@@ -210,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			function handleBlur() {
 				const newValue = element.textContent.trim()
 				if (newValue !== originalValue) {
-					editItem(type, id, field, newValue)
+					editItem(type, id, field, newValue, index)
 				}
 				element.contentEditable = false
 				element.removeEventListener('blur', handleBlur)
@@ -229,6 +243,46 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			element.addEventListener('blur', handleBlur)
 			element.addEventListener('keydown', handleKeydown)
+		})
+	}
+
+	function makeImageEditable(imageElement, type, id) {
+		imageElement.addEventListener('click', function () {
+			const fileInput = document.createElement('input')
+			fileInput.type = 'file'
+			fileInput.accept = 'image/*'
+			fileInput.style.display = 'none'
+
+			fileInput.addEventListener('change', function () {
+				if (fileInput.files.length > 0) {
+					const formData = new FormData()
+					formData.append('image', fileInput.files[0])
+
+					fetch(`${API_URL}/news/${id}/image`, {
+						method: 'POST',
+						headers: {
+							Authorization: `Bearer ${localStorage.getItem('token')}`,
+						},
+						body: formData,
+					})
+						.then(response => {
+							if (!response.ok) {
+								throw new Error('Network response was not ok')
+							}
+							return response.json()
+						})
+						.then(data => {
+							alert('Obraz zaktualizowany!')
+							imageElement.src = `/img/uploads/${data.image}`
+						})
+						.catch(error => {
+							console.error('Error:', error)
+							alert('Wystąpił błąd podczas aktualizacji obrazu.')
+						})
+				}
+			})
+
+			fileInput.click()
 		})
 	}
 
@@ -400,27 +454,24 @@ document.addEventListener('DOMContentLoaded', function () {
 		elementListTypeSelect.addEventListener('change', function () {
 			const selectedType = elementListTypeSelect.value
 
-			// Usuwanie klasy `news-list-container` przy każdej zmianie typu
 			listContainer.classList.remove('news-list-container')
 
 			if (selectedType === 'menu') {
 				fetch(`${API_URL}/menu`)
-					.then(response => response.text()) // Zmiana z .json() na .text() dla logowania
-					.then(text => {
-						console.log('Response text:', text) // Logowanie odpowiedzi jako tekst
-						const data = JSON.parse(text) // Parsowanie tekstu do JSON
+					.then(response => response.json())
+					.then(data => {
 						listContainer.innerHTML = data
 							.map(
 								item => `
-								<div class="element" id="element-${item.id}">
-									<div class="text-container">
-										<p class="element-text" id="name-${item.id}">${item.name}</p>
-										<p class="element-text" id="description-${item.id}">${item.description}</p>
-										<p class="element-text" id="price-${item.id}">$${item.price.toFixed(2)}</p>
-									</div>
-									<i class="fa-regular fa-circle-xmark" onclick="deleteItem('menu', ${item.id})"></i>
+							<div class="element" id="element-${item.id}">
+								<div class="text-container">
+									<p class="element-text" id="name-${item.id}">${item.name}</p>
+									<p class="element-text" id="description-${item.id}">${item.description}</p>
+									<p class="element-text" id="price-${item.id}">$${item.price.toFixed(2)}</p>
 								</div>
-							`
+								<i class="fa-regular fa-circle-xmark" onclick="deleteItem('menu', ${item.id})"></i>
+							</div>
+						`
 							)
 							.join('')
 						data.forEach(item => {
@@ -435,22 +486,20 @@ document.addEventListener('DOMContentLoaded', function () {
 					})
 			} else if (selectedType === 'testimonial') {
 				fetch(`${API_URL}/testimonials`)
-					.then(response => response.text())
-					.then(text => {
-						console.log('Response text:', text)
-						const data = JSON.parse(text)
+					.then(response => response.json())
+					.then(data => {
 						listContainer.innerHTML = data
 							.map(
 								item => `
-								<div class="element" id="element-${item.id}">
-									<div class="text-container">
-										<p class="element-text main-testimonial-text" id="text-${item.id}">${item.text}</p>
-										<p class="element-text" id="author-${item.id}">${item.author}</p>
-										<p class="element-text" id="company-${item.id}">${item.company}</p>
-									</div>
-									<i class="fa-regular fa-circle-xmark" onclick="deleteItem('testimonial', ${item.id})"></i>
+							<div class="element" id="element-${item.id}">
+								<div class="text-container">
+									<p class="element-text main-testimonial-text" id="text-${item.id}">${item.text}</p>
+									<p class="element-text" id="author-${item.id}">${item.author}</p>
+									<p class="element-text" id="company-${item.id}">${item.company}</p>
 								</div>
-							`
+								<i class="fa-regular fa-circle-xmark" onclick="deleteItem('testimonial', ${item.id})"></i>
+							</div>
+						`
 							)
 							.join('')
 						data.forEach(item => {
@@ -464,7 +513,6 @@ document.addEventListener('DOMContentLoaded', function () {
 						alert('Wystąpił błąd podczas ładowania testimonials.')
 					})
 			} else if (selectedType === 'news') {
-				// Dodanie klasy news-list-container
 				listContainer.classList.add('news-list-container')
 
 				fetch(`${API_URL}/news`, {
@@ -472,37 +520,35 @@ document.addEventListener('DOMContentLoaded', function () {
 						Authorization: `Bearer ${localStorage.getItem('token')}`,
 					},
 				})
-					.then(response => response.text())
-					.then(text => {
-						console.log('Response text:', text)
-						const data = JSON.parse(text)
+					.then(response => response.json())
+					.then(data => {
 						listContainer.innerHTML = data
 							.map(
 								item => `
-								<div class="element news-element" id="element-${item.id}">
-									<div class="news-item">
-										<div class="news-meta">
-											<p class="element-text" id="category-${item.id}">${item.category}</p>
-											<p class="element-text" id="title-${item.id}">${item.title}</p>
-											${item.image ? `<img src="/img/uploads/${item.image}" alt="News Image" class="news-image">` : ''}
-											<p class="element-text" id="introText-${item.id}">${item.introText}</p>
-										</div>
-										<div id="headers-texts-${item.id}">
-											${item.headers
-												.map(
-													(header, index) => `
-												<div class="header-text-pair">
-													<p class="element-text news-header" id="header-${item.id}-${index}">${header.header}</p>
-													<p class="element-text news-text" id="text-${item.id}-${index}">${header.text}</p>
-												</div>
-											`
-												)
-												.join('')}
-										</div>
+							<div class="element news-element" id="element-${item.id}">
+								<div class="news-item">
+									<div class="news-meta">
+										<p class="element-text" id="category-${item.id}">${item.category}</p>
+										<p class="element-text" id="title-${item.id}">${item.title}</p>
+										${item.image ? `<img src="/img/uploads/${item.image}" alt="News Image" class="news-image" id="image-${item.id}">` : ''}
+										<p class="element-text" id="introText-${item.id}">${item.introText}</p>
 									</div>
-									<i class="fa-regular fa-circle-xmark" onclick="deleteItem('news', ${item.id})"></i>
+									<div id="headers-texts-${item.id}">
+										${item.headers
+											.map(
+												(header, index) => `
+											<div class="header-text-pair">
+												<p class="element-text news-header" id="header-${item.id}-${index}">${header.header}</p>
+												<p class="element-text news-text" id="text-${item.id}-${index}">${header.text}</p>
+											</div>
+										`
+											)
+											.join('')}
+									</div>
 								</div>
-							`
+								<i class="fa-regular fa-circle-xmark" onclick="deleteItem('news', ${item.id})"></i>
+							</div>
+						`
 							)
 							.join('')
 						data.forEach(item => {
@@ -510,9 +556,14 @@ document.addEventListener('DOMContentLoaded', function () {
 							makeEditable(document.getElementById(`title-${item.id}`), 'news', item.id, 'title')
 							makeEditable(document.getElementById(`introText-${item.id}`), 'news', item.id, 'introText')
 							item.headers.forEach((header, index) => {
-								makeEditable(document.getElementById(`header-${item.id}-${index}`), 'news', item.id, 'header')
-								makeEditable(document.getElementById(`text-${item.id}-${index}`), 'news', item.id, 'text')
+								makeEditable(document.getElementById(`header-${item.id}-${index}`), 'news', item.id, 'header', index)
+								makeEditable(document.getElementById(`text-${item.id}-${index}`), 'news', item.id, 'text', index)
 							})
+
+							const imageElement = document.getElementById(`image-${item.id}`)
+							if (imageElement) {
+								makeImageEditable(imageElement, 'news', item.id)
+							}
 						})
 					})
 					.catch(error => {
@@ -525,29 +576,27 @@ document.addEventListener('DOMContentLoaded', function () {
 						Authorization: `Bearer ${localStorage.getItem('token')}`,
 					},
 				})
-					.then(response => response.text())
-					.then(text => {
-						console.log('Response text:', text)
-						const data = JSON.parse(text)
+					.then(response => response.json())
+					.then(data => {
 						listContainer.innerHTML = data
 							.map(
 								reservation => `
-									<div class="element" id="element-${reservation.id}">
-										<div class="text-container">
-											<p>Imię i Nazwisko: ${reservation.firstName || reservation.user?.firstName || ''} ${
+						<div class="element" id="element-${reservation.id}">
+							<div class="text-container">
+								<p>Imię i Nazwisko: ${reservation.firstName || reservation.user?.firstName || ''} ${
 									reservation.lastName || reservation.user?.lastName || ''
 								}</p>
-											<p>E-Mail: ${reservation.email}</p>
-											<p>Data: ${reservation.date}</p>
-											<p>Godzina: ${reservation.time}</p>
-											<p>Liczba Miejsc: ${reservation.seats}</p>
-											${reservation.additionalInfo ? `<p>Dodatkowe Uwagi: ${reservation.additionalInfo}</p>` : ''}
-											${reservation.userId ? `<p>UserID: ${reservation.userId}</p>` : ''}
-											<p>Numer Stolika: ${reservation.tableId}</p>
-										</div>
-										<i class="fa-regular fa-circle-xmark" onclick="deleteItem('reservation', ${reservation.id})"></i>
-									</div>
-								`
+								<p>E-Mail: ${reservation.email}</p>
+								<p>Data: ${reservation.date}</p>
+								<p>Godzina: ${reservation.time}</p>
+								<p>Liczba Miejsc: ${reservation.seats}</p>
+								${reservation.additionalInfo ? `<p>Dodatkowe Uwagi: ${reservation.additionalInfo}</p>` : ''}
+								${reservation.userId ? `<p>UserID: ${reservation.userId}</p>` : ''}
+								<p>Numer Stolika: ${reservation.tableId}</p>
+							</div>
+							<i class="fa-regular fa-circle-xmark" onclick="deleteItem('reservation', ${reservation.id})"></i>
+						</div>
+					`
 							)
 							.join('')
 					})
@@ -558,7 +607,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		})
 
-		// Trigger the change event to load the default list
 		elementListTypeSelect.dispatchEvent(new Event('change'))
 	}
 
