@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize')
-const {sequelize} = require('../config/database')
+const { sequelize } = require('../config/database')
 const User = require('./user')
 const Table = require('./table')
 
@@ -83,11 +83,5 @@ const Reservation = sequelize.define(
 		],
 	}
 )
-
-User.hasMany(Reservation, { foreignKey: 'userId', as: 'reservations' })
-Reservation.belongsTo(User, { foreignKey: 'userId', as: 'user' })
-
-Table.hasMany(Reservation, { foreignKey: 'tableId', as: 'reservations' })
-Reservation.belongsTo(Table, { foreignKey: 'tableId', as: 'table' })
 
 module.exports = Reservation
