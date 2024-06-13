@@ -34,10 +34,11 @@ document.addEventListener('DOMContentLoaded', function () {
 		const description = document.getElementById('menu-description').value
 		const price = document.getElementById('menu-price').value
 
-		fetch(`${API_URL}/menu`, {
+		fetch(`${API_URL}/admin/menu`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
+				Authorization: `Bearer ${localStorage.getItem('token')}`,
 			},
 			body: JSON.stringify({ name, description, price }),
 		})
@@ -63,10 +64,11 @@ document.addEventListener('DOMContentLoaded', function () {
 		const author = document.getElementById('testimonial-author').value
 		const company = document.getElementById('testimonial-company').value
 
-		fetch(`${API_URL}/testimonials`, {
+		fetch(`${API_URL}/admin/testimonial`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
+				Authorization: `Bearer ${localStorage.getItem('token')}`,
 			},
 			body: JSON.stringify({ text, author, company }),
 		})
@@ -94,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		formData.append('headers', JSON.stringify(headers))
 		formData.append('texts', JSON.stringify(texts))
 
-		fetch(`${API_URL}/news`, {
+		fetch(`${API_URL}/admin/news`, {
 			method: 'POST',
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -118,14 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	function deleteItem(type, id) {
-		const url =
-			type === 'menu'
-				? `${API_URL}/menu/${id}`
-				: type === 'testimonial'
-				? `${API_URL}/testimonials/${id}`
-				: type === 'news'
-				? `${API_URL}/news/${id}`
-				: `${API_URL}/reservations/${id}`
+		const url = `${API_URL}/admin/${type}/${id}`
 
 		const element = document.querySelector(`#element-${id}`)
 		fetch(url, {
@@ -141,32 +136,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				return response.json()
 			})
 			.then(data => {
-				alert(
-					`${
-						type === 'menu'
-							? 'Pozycja'
-							: type === 'testimonial'
-							? 'Testimonial'
-							: type === 'news'
-							? 'News'
-							: 'Rezerwacja'
-					} usunięta!`
-				)
+				alert(`${type.charAt(0).toUpperCase() + type.slice(1)} usunięta!`)
 				element.remove()
 			})
 			.catch(error => {
 				console.error('Error:', error)
-				alert(
-					`Wystąpił błąd podczas usuwania ${
-						type === 'menu'
-							? 'pozycji'
-							: type === 'testimonial'
-							? 'testimonialu'
-							: type === 'news'
-							? 'newsa'
-							: 'rezerwacji'
-					}.`
-				)
+				alert(`Wystąpił błąd podczas usuwania ${type}.`)
 			})
 	}
 
@@ -176,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		let data = {}
 
 		if (type === 'menu') {
-			url = `${API_URL}/menu/${id}`
+			url = `${API_URL}/admin/menu/${id}`
 			const name = field === 'name' ? value : document.getElementById(`name-${id}`).textContent.trim()
 			const description =
 				field === 'description' ? value : document.getElementById(`description-${id}`).textContent.trim()
@@ -186,13 +161,13 @@ document.addEventListener('DOMContentLoaded', function () {
 					: parseFloat(document.getElementById(`price-${id}`).textContent.replace('$', '').trim())
 			data = { name, description, price }
 		} else if (type === 'testimonial') {
-			url = `${API_URL}/testimonials/${id}`
+			url = `${API_URL}/admin/testimonial/${id}`
 			const text = field === 'text' ? value : document.getElementById(`text-${id}`).textContent.trim()
 			const author = field === 'author' ? value : document.getElementById(`author-${id}`).textContent.trim()
 			const company = field === 'company' ? value : document.getElementById(`company-${id}`).textContent.trim()
 			data = { text, author, company }
 		} else if (type === 'news') {
-			url = `${API_URL}/news/${id}`
+			url = `${API_URL}/admin/news/${id}`
 			if (field === 'header' || field === 'text') {
 				data[field] = value
 				data['index'] = index // Pass the index of the header or text to be updated
@@ -277,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					const formData = new FormData()
 					formData.append('image', fileInput.files[0])
 
-					fetch(`${API_URL}/news/${id}/image`, {
+					fetch(`${API_URL}/admin/news/${id}/image`, {
 						method: 'POST',
 						headers: {
 							Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -860,7 +835,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			return
 		}
 
-		fetch(`${API_URL}/reservations/${reservationId}`, {
+		fetch(`${API_URL}/admin/reservations/${reservationId}`, {
 			method: 'DELETE',
 			headers: {
 				Authorization: `Bearer ${token}`,
@@ -905,7 +880,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			return
 		}
 
-		fetch(`${API_URL}/reservations`, {
+		fetch(`${API_URL}/admin/reservations`, {
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${token}`,
@@ -930,7 +905,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				console.log('Reservations:', reservations) // Logowanie otrzymanych rezerwacji
 				const reservationsList = document.getElementById('reservations-list')
 				if (reservations.length === 0) {
-					reservationsList.innerHTML = 'Brak rezerwacji'
+					reservationsList.innerHTML = ''
 				} else {
 					reservationsList.innerHTML = reservations
 						.map(

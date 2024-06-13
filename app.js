@@ -9,7 +9,8 @@ const testimonialRoutes = require('./routes/testimonialRoutes')
 const { router: authRoutes } = require('./routes/auth')
 const reservationRoutes = require('./routes/reservationRoutes')
 const tableRoutes = require('./routes/tableRoutes')
-const newsRoutes = require('./routes/newsRoutes') // Dodaj import dla newsRoutes
+const newsRoutes = require('./routes/newsRoutes')
+const adminRoutes = require('./routes/adminRoutes')
 
 const app = express()
 
@@ -32,6 +33,7 @@ app.use('/api', authRoutes)
 app.use('/api', reservationRoutes)
 app.use('/api', tableRoutes)
 app.use('/api', newsRoutes) // Dodaj trasę dla newsRoutes
+app.use('/api', adminRoutes)
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.get('/', (req, res) => {
