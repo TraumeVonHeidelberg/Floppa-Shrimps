@@ -83,8 +83,9 @@ router.post('/news/:id/comments', authenticateToken, async (req, res) => {
 })
 
 // Endpoint do pobierania komentarzy
-router.get('/news/:id/comments', async (req, res) => {
+router.get('/news/:id/comments', authenticateToken, async (req, res) => {
 	const newsId = req.params.id
+	const userId = req.user.userId
 
 	console.log(`Fetching comments for newsId: ${newsId}`)
 
@@ -96,10 +97,40 @@ router.get('/news/:id/comments', async (req, res) => {
 
 		console.log(`Fetched comments:`, comments)
 
-		res.status(200).json(comments)
+		const commentsWithCanDelete = comments.map(comment => {
+			const commentJson = comment.toJSON()
+			commentJson.canDelete = comment.userId === userId || req.user.role === 'admin'
+			return commentJson
+		})
+
+		res.status(200).json(commentsWithCanDelete)
 	} catch (error) {
 		console.error('Error fetching comments:', error)
 		res.status(500).json({ message: 'Error fetching comments' })
+	}
+})
+
+// Endpoint do usuwania komentarzy
+router.delete('/news/:newsId/comments/:commentId', authenticateToken, async (req, res) => {
+	const { commentId } = req.params
+	const userId = req.user.userId
+
+	try {
+		const comment = await Comment.findByPk(commentId)
+		if (!comment) {
+			return res.status(404).json({ error: 'Comment not found' })
+		}
+
+		// Check if the user is the owner of the comment or an admin
+		if (comment.userId !== userId && req.user.role !== 'admin') {
+			return res.status(403).json({ error: 'Unauthorized' })
+		}
+
+		await comment.destroy()
+		res.json({ message: 'Comment deleted' })
+	} catch (error) {
+		console.error('Error deleting comment:', error)
+		res.status(500).json({ error: 'Internal server error' })
 	}
 })
 
@@ -297,7 +328,7 @@ router.get('/news/:id/next', async (req, res) => {
 		res.status(200).json(news)
 	} catch (error) {
 		console.error('Error fetching next news:', error)
-		res.status(500).json({ message: error.message })
+		res.status500.json({ message: error.message })
 	}
 })
 

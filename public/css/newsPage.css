@@ -208,3 +208,9 @@ aside {
 .main-comment-text {
 	font-size: 1.6rem;
 }
+
+.comment i {
+	align-self: center;
+	font-size: 2rem;
+	cursor: pointer;
+}

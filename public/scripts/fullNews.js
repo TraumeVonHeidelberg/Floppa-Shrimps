@@ -155,8 +155,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			// Fetch and display comments
 			function fetchComments() {
-				fetch(`http://localhost:3000/api/news/${newsId}/comments`)
-					.then(response => response.json())
+				fetch(`http://localhost:3000/api/news/${newsId}/comments`, {
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('token')}`,
+					},
+				})
+					.then(response => {
+						if (!response.ok) {
+							throw new Error('Network response was not ok')
+						}
+						return response.json()
+					})
 					.then(comments => {
 						console.log('Fetched comments:', comments)
 						const commentSection = document.querySelector('.comment-section')
@@ -179,16 +188,56 @@ document.addEventListener('DOMContentLoaded', function () {
                                         <p class="comment-date">${new Date(comment.createdAt).toLocaleString()}</p>
                                         <p class="main-comment-text">${comment.text}</p>
                                     </div>
+                                    ${
+																			comment.canDelete
+																				? `<i class="fa-solid fa-x delete-comment" data-id="${comment.id}"></i>`
+																				: ''
+																		
+																		}
                                 </div>
                             `
 								)
 								.join('')
 						}
+
+						// Add event listeners to delete buttons
+						document.querySelectorAll('.delete-comment').forEach(button => {
+							button.addEventListener('click', function () {
+								const commentId = this.getAttribute('data-id')
+								deleteComment(commentId)
+							})
+						})
 					})
 					.catch(error => {
 						console.error('Error fetching comments:', error)
 						const commentSection = document.querySelector('.comment-section')
 						commentSection.innerHTML = '<p>Error loading comments</p>'
+					})
+			}
+
+			function deleteComment(commentId) {
+				fetch(`http://localhost:3000/api/news/${newsId}/comments/${commentId}`, {
+					method: 'DELETE',
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('token')}`,
+					},
+				})
+					.then(response => {
+						if (!response.ok) {
+							return response.text().then(text => {
+								console.error('Error response text:', text)
+								throw new Error(text)
+							})
+						}
+						return response.json()
+					})
+					.then(() => {
+						console.log(`Comment ${commentId} deleted`)
+						// Refresh comments
+						fetchComments()
+					})
+					.catch(error => {
+						console.error('Error deleting comment:', error)
 					})
 			}
 
