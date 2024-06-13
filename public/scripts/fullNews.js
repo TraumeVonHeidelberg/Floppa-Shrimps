@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						const commentSection = document.querySelector('.comment-section')
 						commentSection.innerHTML = ''
 						if (!Array.isArray(comments) || comments.length === 0) {
-							commentSection.innerHTML = '<p>Brak komentarzy</p>'
+							commentSection.innerHTML = '<p></p>'
 						} else {
 							commentSection.innerHTML = comments
 								.map(
@@ -192,7 +192,6 @@ document.addEventListener('DOMContentLoaded', function () {
 																			comment.canDelete
 																				? `<i class="fa-solid fa-x delete-comment" data-id="${comment.id}"></i>`
 																				: ''
-																		
 																		}
                                 </div>
                             `
