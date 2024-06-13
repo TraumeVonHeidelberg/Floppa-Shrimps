@@ -112,11 +112,35 @@ document.addEventListener('DOMContentLoaded', function () {
 			.then(data => {
 				alert('News dodany!')
 				document.getElementById('news-form').reset()
+				const headersTextsContainer = document.getElementById('headers-texts-container')
+				while (headersTextsContainer.firstChild && headersTextsContainer.childElementCount > 1) {
+					headersTextsContainer.removeChild(headersTextsContainer.firstChild)
+				}
+				addInitialNewsHeaderText()
+				// Zresetowanie wyświetlania nazwy pliku
+				document.getElementById('file-name').textContent = 'Brak wybranego pliku'
 			})
 			.catch(error => {
 				console.error('Error:', error)
 				alert('Wystąpił błąd podczas dodawania news.')
 			})
+	}
+
+	function addInitialNewsHeaderText() {
+		const headersTextsContainer = document.getElementById('headers-texts-container')
+		const headerTextContainer = document.createElement('div')
+		headerTextContainer.classList.add('header-text-container')
+		headerTextContainer.innerHTML = `
+			<div class="configuration-item">
+				<label for="news-header">Nagłówek</label>
+				<input type="text" class="news-header" name="header" required>
+			</div>
+			<div class="configuration-item">
+				<label for="news-text">Tekst</label>
+				<textarea class="news-text" name="text" required></textarea>
+			</div>
+		`
+		headersTextsContainer.insertBefore(headerTextContainer, headersTextsContainer.lastElementChild)
 	}
 
 	function deleteItem(type, id) {
@@ -279,15 +303,15 @@ document.addEventListener('DOMContentLoaded', function () {
 		const headerTextContainer = document.createElement('div')
 		headerTextContainer.classList.add('header-text-container')
 		headerTextContainer.innerHTML = `
-            <div class="configuration-item">
-                <label for="news-header">Nagłówek</label>
-                <input type="text" class="news-header" name="header" required>
-            </div>
-            <div class="configuration-item">
-                <label for="news-text">Tekst</label>
-                <textarea class="news-text" name="text" required></textarea>
-            </div>
-        `
+			<div class="configuration-item">
+				<label for="news-header">Nagłówek</label>
+				<input type="text" class="news-header" name="header" required>
+			</div>
+			<div class="configuration-item">
+				<label for="news-text">Tekst</label>
+				<textarea class="news-text" name="text" required></textarea>
+			</div>
+		`
 		headersTextsContainer.insertBefore(headerTextContainer, headersTextsContainer.lastElementChild)
 	}
 
@@ -318,11 +342,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     <form id="menu-form">
                         <div class="configuration-item">
                             <label for="menu-name">Nazwa</label>
-                            <input type="text" id="menu-name" name="name" required>
+                            <input type="text" id="menu-name" name="name" required spellcheck="false">
                         </div>
                         <div class="configuration-item">
                             <label for="menu-description">Opis</label>
-                            <textarea id="menu-description" name="description" required></textarea>
+                            <textarea id="menu-description" name="description" required spellcheck="false"></textarea>
                         </div>
                         <div class="configuration-item">
                             <label for="menu-price">Cena</label>
@@ -339,15 +363,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     <form id="testimonial-form">
                         <div class="configuration-item">
                             <label for="testimonial-text">Tekst</label>
-                            <textarea id="testimonial-text" name="text" required></textarea>
+                            <textarea id="testimonial-text" name="text" required spellcheck="false"></textarea>
                         </div>
                         <div class="configuration-item">
                             <label for="testimonial-author">Autor</label>
-                            <input type="text" id="testimonial-author" name="author" required>
+                            <input type="text" id="testimonial-author" name="author" required spellcheck="false">
                         </div>
                         <div class="configuration-item">
                             <label for="testimonial-company">Firma</label>
-                            <input type="text" id="testimonial-company" name="company">
+                            <input type="text" id="testimonial-company" name="company" spellcheck="false">
                         </div>
                         <button type="submit">Dodaj</button>
                     </form>
@@ -358,15 +382,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     <form id="news-form" enctype="multipart/form-data">
                         <div class="configuration-item">
                             <label for="news-category">Kategoria</label>
-                            <input type="text" id="news-category" name="category" required>
+                            <input type="text" id="news-category" name="category" required spellcheck="false">
                         </div>
                         <div class="configuration-item">
                             <label for="news-title">Tytuł</label>
-                            <input type="text" id="news-title" name="title" required>
+                            <input type="text" id="news-title" name="title" required spellcheck="false">
                         </div>
                         <div class="configuration-item">
                             <label for="news-intro-text">Wstępny tekst</label>
-                            <textarea id="news-intro-text" name="introText" required></textarea>
+                            <textarea id="news-intro-text" name="introText" required spellcheck="false"></textarea>
                         </div>
                         <div class="configuration-item">
                             <label for="news-image">Zdjęcie</label>
@@ -378,11 +402,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="header-text-container">
                                 <div class="configuration-item">
                                     <label for="news-header">Nagłówek</label>
-                                    <input type="text" class="news-header" name="header" required>
+                                    <input type="text" class="news-header" name="header" required spellcheck="false">
                                 </div>
                                 <div class="configuration-item">
                                     <label for="news-text">Tekst</label>
-                                    <textarea class="news-text" name="text" required></textarea>
+                                    <textarea class="news-text" name="text" required spellcheck="false"></textarea>
                                 </div>
                             </div>
                             <div class="configuration-item">
