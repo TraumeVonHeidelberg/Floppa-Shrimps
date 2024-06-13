@@ -68,4 +68,5 @@ async function createTriggers() {
     `)
 }
 
-module.exports = { sequelize, createTriggers }
+module.exports =  sequelize
+module.exports = createTriggers
