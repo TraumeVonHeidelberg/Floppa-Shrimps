@@ -1,10 +1,16 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('../config/database')
-const News = require('./news') // Importuj model News, aby odnieść się do klucza obcego
+const News = require('./news')
 
 const NewsHeaderText = sequelize.define(
 	'NewsHeaderText',
 	{
+		id: {
+			type: DataTypes.INTEGER,
+			primaryKey: true,
+			autoIncrement: true,
+			unique: true,
+		},
 		header: {
 			type: DataTypes.STRING,
 			allowNull: false,
@@ -15,16 +21,31 @@ const NewsHeaderText = sequelize.define(
 		},
 		newsId: {
 			type: DataTypes.INTEGER,
+			allowNull: false,
 			references: {
 				model: News,
 				key: 'id',
 			},
 			onDelete: 'CASCADE',
+		},
+		createdAt: {
+			type: DataTypes.DATE,
 			allowNull: false,
+			defaultValue: DataTypes.NOW,
+		},
+		updatedAt: {
+			type: DataTypes.DATE,
+			allowNull: false,
+			defaultValue: DataTypes.NOW,
 		},
 	},
 	{
 		timestamps: true,
+		indexes: [
+			{
+				fields: ['newsId'],
+			},
+		],
 	}
 )
 

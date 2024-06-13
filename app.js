@@ -47,8 +47,9 @@ app.get('/admin', (req, res) => {
 const PORT = process.env.PORT || 3000
 
 sequelize
-	.sync()
-	.then(() => {
+	.sync({ alter: true })
+	.then(async () => {
+		await createTriggers() // Uruchomienie triggerów po synchronizacji
 		app.listen(PORT, () => {
 			console.log(`Server is running on port ${PORT}`)
 		})
