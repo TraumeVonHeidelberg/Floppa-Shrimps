@@ -1,7 +1,5 @@
-require('dotenv').config()
-
+const { sequelize, createTriggers } = require('./config/database')
 const express = require('express')
-const {sequelize} = require('./config/database')
 const path = require('path')
 const session = require('express-session')
 const menuRoutes = require('./routes/menuRoutes')
@@ -32,7 +30,7 @@ app.use('/api', testimonialRoutes)
 app.use('/api', authRoutes)
 app.use('/api', reservationRoutes)
 app.use('/api', tableRoutes)
-app.use('/api', newsRoutes) // Dodaj trasę dla newsRoutes
+app.use('/api', newsRoutes)
 app.use('/api', adminRoutes)
 app.use(express.static(path.join(__dirname, 'public')))
 
@@ -47,9 +45,11 @@ app.get('/admin', (req, res) => {
 const PORT = process.env.PORT || 3000
 
 sequelize
-	.sync({ alter: true })
-	.then(async () => {
-		await createTriggers() // Uruchomienie triggerów po synchronizacji
+	.sync()
+	.then(() => {
+		return createTriggers()
+	})
+	.then(() => {
 		app.listen(PORT, () => {
 			console.log(`Server is running on port ${PORT}`)
 		})

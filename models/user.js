@@ -1,6 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize')
 const { sequelize } = require('../config/database')
-const Comment = require('./comment')
 
 const User = sequelize.define(
 	'User',
@@ -70,11 +69,6 @@ const User = sequelize.define(
 				fields: ['username'],
 			},
 		],
-		hooks: {
-			afterDestroy: async (user, options) => {
-				await Comment.destroy({ where: { userId: user.id } })
-			},
-		},
 	}
 )
 

@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize')
-const {sequelize} = require('../config/database')
-const User = require('./user')
-const News = require('./news')
+const {sequelize} = require('../config/database') // Poprawiony import
+const User = require('./user') // Użycie nazwy tabeli zamiast modelu
+const News = require('./news') // Użycie nazwy tabeli zamiast modelu
 
 const Comment = sequelize.define(
 	'Comment',
@@ -20,7 +20,7 @@ const Comment = sequelize.define(
 			type: DataTypes.INTEGER,
 			allowNull: false,
 			references: {
-				model: User,
+				model: 'Users', // Użycie nazwy tabeli jako string
 				key: 'id',
 			},
 		},
@@ -28,7 +28,7 @@ const Comment = sequelize.define(
 			type: DataTypes.INTEGER,
 			allowNull: false,
 			references: {
-				model: News,
+				model: 'News', // Użycie nazwy tabeli jako string
 				key: 'id',
 			},
 		},

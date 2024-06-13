@@ -6,6 +6,7 @@ const Testimonial = require('../models/testimonial')
 const News = require('../models/news')
 const NewsHeaderText = require('../models/newsHeaderText')
 const Reservation = require('../models/reservation')
+const User = require('../models/user')
 const authenticateToken = require('../middleware/authenticateToken')
 const multer = require('multer')
 const path = require('path')
@@ -31,14 +32,15 @@ router.get('/reservations', authenticateToken, async (req, res) => {
 		res.status(200).json(reservations)
 	} catch (error) {
 		console.error('Error fetching reservations:', error)
-		res.status(500).json({ message: 'Błąd serwera' })
+		res.status(500).json({ error: 'Błąd serwera', details: error.message })
 	}
 })
 
 router.post('/admin/menu', authenticateToken, async (req, res) => {
 	try {
 		const { name, description, price } = req.body
-		const menuItem = await MenuItem.create({ name, description, price })
+		const userId = req.user.userId // Pobieranie userId z tokenu
+		const menuItem = await MenuItem.create({ name, description, price, userId })
 		res.status(201).json(menuItem)
 	} catch (error) {
 		res.status(500).json({ message: 'Error adding menu item', error })
@@ -48,7 +50,8 @@ router.post('/admin/menu', authenticateToken, async (req, res) => {
 router.post('/admin/testimonial', authenticateToken, async (req, res) => {
 	try {
 		const { text, author, company } = req.body
-		const testimonial = await Testimonial.create({ text, author, company })
+		const userId = req.user.userId // Pobieranie userId z tokenu
+		const testimonial = await Testimonial.create({ text, author, company, userId })
 		res.status(201).json(testimonial)
 	} catch (error) {
 		res.status(500).json({ message: 'Error adding testimonial', error })
@@ -154,7 +157,7 @@ router.put('/admin/news/:id', authenticateToken, async (req, res) => {
 
 		res.status(200).json(news)
 	} catch (error) {
-		res.status500.json({ message: 'Error editing news', error })
+		res.status(500).json({ message: 'Error editing news', error })
 	}
 })
 

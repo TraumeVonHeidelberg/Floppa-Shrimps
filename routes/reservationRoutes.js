@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
 const Reservation = require('../models/reservation')
 const Table = require('../models/table')
-const User = require('../models/user') // Import modelu użytkownika
+const User = require('../models/user')
 const authenticateToken = require('../middleware/authenticateToken')
 const { Op } = require('sequelize')
 require('dotenv').config()
@@ -32,7 +32,7 @@ const sendConfirmationEmail = async (reservation, email) => {
 	}
 
 	try {
-		console.log('Wysyłanie e-maila do:', email) // Dodaj logowanie adresu e-mail
+		console.log('Wysyłanie e-maila do:', email)
 		await transporter.sendMail(mailOptions)
 		console.log('E-mail z potwierdzeniem został wysłany do:', email)
 	} catch (error) {
@@ -139,7 +139,7 @@ router.post('/reservations', optionalAuthenticateToken, async (req, res) => {
 		const user = await User.findByPk(userId)
 		if (user) {
 			userEmail = user.email
-			console.log('Logged in user email:', userEmail) // Dodaj logowanie e-maila
+			console.log('Logged in user email:', userEmail)
 		}
 	} else {
 		console.log('No user logged in')
@@ -165,7 +165,7 @@ router.post('/reservations', optionalAuthenticateToken, async (req, res) => {
 				const startTime = new Date(`${date}T${time}`)
 				const endTime = new Date(startTime)
 				endTime.setHours(startTime.getHours() + 2)
-				const formattedEndTime = endTime.toTimeString().split(' ')[0].slice(0, 5) // Zmiana tutaj
+				const formattedEndTime = endTime.toTimeString().split(' ')[0].slice(0, 5)
 
 				const reservation = await Reservation.create({
 					date,
@@ -196,29 +196,29 @@ router.post('/reservations', optionalAuthenticateToken, async (req, res) => {
 
 // Endpoint do anulowania rezerwacji
 router.delete('/reservations/:id', authenticateToken, async (req, res) => {
-    const { id } = req.params;
+	const { id } = req.params
 
-    try {
-        const reservation = await Reservation.findByPk(id);
-        if (!reservation) {
-            return res.status(404).json({ error: 'Rezerwacja nie znaleziona.' });
-        }
+	try {
+		const reservation = await Reservation.findByPk(id)
+		if (!reservation) {
+			return res.status(404).json({ error: 'Rezerwacja nie znaleziona.' })
+		}
 
-        const user = await User.findByPk(reservation.userId);
-        await reservation.destroy();
+		const user = await User.findByPk(reservation.userId)
+		await reservation.destroy()
 
-        if (user) {
-            await sendCancellationEmail(reservation, user.email);
-        } else if (reservation.email) {
-            await sendCancellationEmail(reservation, reservation.email);
-        }
+		if (user) {
+			await sendCancellationEmail(reservation, user.email)
+		} else if (reservation.email) {
+			await sendCancellationEmail(reservation, reservation.email)
+		}
 
-        res.status(200).json({ message: 'Rezerwacja anulowana.' });
-    } catch (error) {
-        console.error('Error deleting reservation:', error);
-        res.status(500).json({ error: 'Błąd serwera' });
-    }
-});
+		res.status(200).json({ message: 'Rezerwacja anulowana.' })
+	} catch (error) {
+		console.error('Error deleting reservation:', error)
+		res.status(500).json({ error: 'Błąd serwera' })
+	}
+})
 
 // Endpoint do pobierania rezerwacji użytkownika
 router.get('/reservations', authenticateToken, async (req, res) => {
@@ -230,7 +230,7 @@ router.get('/reservations', authenticateToken, async (req, res) => {
 			include: [
 				{
 					model: Table,
-					as: 'reservationTable',
+					as: 'table', // Poprawienie aliasu na zgodny z definicją w associations.js
 				},
 			],
 		})
@@ -251,7 +251,7 @@ router.get('/admin/reservations', authenticateToken, async (req, res) => {
 				include: [
 					{
 						model: Table,
-						as: 'reservationTable',
+						as: 'table', // Poprawienie aliasu na zgodny z definicją w associations.js
 					},
 					{
 						model: User,

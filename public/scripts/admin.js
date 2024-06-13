@@ -3,11 +3,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	const addElementsBtn = document.getElementById('add-elements-btn')
 	const listElementsBtn = document.getElementById('list-elements-btn')
-	const reservationsBtn = document.querySelector('aside button:nth-child(4)') // Przycisk Rezerwacje
+	const reservationsBtn = document.querySelector('aside button:nth-child(4)')
 	const userProfileBtn = document.getElementById('user-profile-btn')
 	const mainContent = document.getElementById('main-content')
 
-	let originalValue = '' // Przechowywanie oryginalnej wartości
+	let originalValue = ''
 
 	function clearActiveClass() {
 		document.querySelectorAll('aside button').forEach(button => button.classList.remove('button-active'))
@@ -121,7 +121,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	function deleteItem(type, id) {
 		const url = `${API_URL}/admin/${type}/${id}`
-
 		const element = document.querySelector(`#element-${id}`)
 		fetch(url, {
 			method: 'DELETE',
@@ -146,7 +145,6 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	function editItem(type, id, field, value, index = null) {
-		console.log(`Edit item: type=${type}, id=${id}, field=${field}, value=${value}`)
 		let url
 		let data = {}
 
@@ -158,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const price =
 				field === 'price'
 					? value
-					: parseFloat(document.getElementById(`price-${id}`).textContent.replace('$', '').trim())
+					: parseFloat(document.getElementById(`price-${id}`).textContent.replace('zł', '').trim())
 			data = { name, description, price }
 		} else if (type === 'testimonial') {
 			url = `${API_URL}/admin/testimonial/${id}`
@@ -170,13 +168,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			url = `${API_URL}/admin/news/${id}`
 			if (field === 'header' || field === 'text') {
 				data[field] = value
-				data['index'] = index // Pass the index of the header or text to be updated
+				data['index'] = index
 			} else {
 				data[field] = value
 			}
 		}
-
-		console.log('Sending PUT request to:', url, 'with data:', data)
 
 		fetch(url, {
 			method: 'PUT',
@@ -187,7 +183,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			body: JSON.stringify(data),
 		})
 			.then(response => {
-				console.log('Response status:', response.status)
 				if (!response.ok) {
 					return response.text().then(text => {
 						console.error('Error response text:', text)
@@ -198,7 +193,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 			.then(data => {
 				alert(`${type.charAt(0).toUpperCase() + type.slice(1)} zaktualizowany!`)
-				// Update the text content without reloading the list
 				if (field !== 'header' && field !== 'text') {
 					document.getElementById(`${field}-${id}`).textContent = data[field]
 				}
@@ -353,9 +347,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                         <div class="configuration-item">
                             <label for="testimonial-company">Firma</label>
-                            <input type="text" id="testimonial-company" name="company" required>
+                            <input type="text" id="testimonial-company" name="company">
                         </div>
-						                        <button type="submit">Dodaj</button>
+                        <button type="submit">Dodaj</button>
                     </form>
                 `
 				document.getElementById('testimonial-form').addEventListener('submit', submitTestimonialForm)
@@ -401,7 +395,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				document.getElementById('add-header-text-btn').addEventListener('click', addNewsHeaderText)
 				document.getElementById('news-form').addEventListener('submit', submitNewsForm)
 
-				// Custom file input handling
 				const fileInput = document.getElementById('news-image')
 				const fileBtn = document.getElementById('custom-file-btn')
 				const fileName = document.getElementById('file-name')
@@ -420,7 +413,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		})
 
-		// Trigger the change event to load the default form
 		elementTypeSelect.dispatchEvent(new Event('change'))
 	}
 
@@ -844,7 +836,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			.then(response => {
 				if (!response.ok) {
 					return response.json().then(err => {
-						// Read the response body to get error details
 						console.error('Error details:', err)
 						throw new Error('Network response was not ok')
 					})
@@ -887,14 +878,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			},
 		})
 			.then(response => {
-				console.log('Response status:', response.status) // Dodaj logowanie statusu odpowiedzi
+				console.log('Response status:', response.status)
 				if (!response.ok) {
 					if (response.status === 401 || response.status === 403) {
 						localStorage.removeItem('token')
 						window.location.href = '/index.html'
 					}
 					return response.text().then(text => {
-						// Dodaj logowanie treści odpowiedzi w przypadku błędu
 						console.error('Error response text:', text)
 						throw new Error('Network response was not ok')
 					})
@@ -902,7 +892,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				return response.json()
 			})
 			.then(reservations => {
-				console.log('Reservations:', reservations) // Logowanie otrzymanych rezerwacji
+				console.log('Reservations:', reservations)
 				const reservationsList = document.getElementById('reservations-list')
 				if (reservations.length === 0) {
 					reservationsList.innerHTML = ''
@@ -910,20 +900,18 @@ document.addEventListener('DOMContentLoaded', function () {
 					reservationsList.innerHTML = reservations
 						.map(
 							reservation => `
-                    <div class="element" id="element-${reservation.id}">
-                        <div class="text-container">
-                            <p>Data: ${reservation.date}</p>
-                            <p>Godzina: ${reservation.time}</p>
-                            <p>Miejsca: ${reservation.seats}</p>
-                            ${reservation.additionalInfo ? `<p>Uwagi: ${reservation.additionalInfo}</p>` : ''}
-                            ${reservation.firstName ? `<p>Imię: ${reservation.firstName}</p>` : ''}
-                            ${reservation.lastName ? `<p>Nazwisko: ${reservation.lastName}</p>` : ''}
-                        </div>
-                        <i class="fa-regular fa-circle-xmark" aria-hidden="true" onclick="cancelReservation(${
-													reservation.id
-												})"></i>
-                    </div>
-                `
+						<div class="element" id="element-${reservation.id}">
+							<div class="text-container">
+								<p>Data: ${reservation.date}</p>
+								<p>Godzina: ${reservation.time}</p>
+								<p>Miejsca: ${reservation.seats}</p>
+								${reservation.additionalInfo ? `<p>Uwagi: ${reservation.additionalInfo}</p>` : ''}
+								${reservation.firstName ? `<p>Imię: ${reservation.firstName}</p>` : ''}
+								${reservation.lastName ? `<p>Nazwisko: ${reservation.lastName}</p>` : ''}
+							</div>
+							<i class="fa-regular fa-circle-xmark" aria-hidden="true" onclick="cancelReservation(${reservation.id})"></i>
+						</div>
+					`
 						)
 						.join('')
 				}

@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize')
-const { sequelize } = require('../config/database') // Zmieniony import
-const User = require('./user')
+const {sequelize} = require('../config/database') // Poprawiony import
+const User = require('./user') // Użycie nazwy tabeli zamiast modelu
 
 const News = sequelize.define(
 	'News',
@@ -31,7 +31,7 @@ const News = sequelize.define(
 			type: DataTypes.INTEGER,
 			allowNull: false,
 			references: {
-				model: User,
+				model: 'Users', // Użycie nazwy tabeli jako string
 				key: 'id',
 			},
 		},
