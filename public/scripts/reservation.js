@@ -60,18 +60,22 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
-	async function populateSeatsOptions(availableSeats = null) {
+	async function populateSeatsOptions(availableSeats = null, selectedSeats = null) {
 		const maxSeats = await fetchMaxSeats()
 		seatsSelect.innerHTML = ''
 
 		for (let i = 1; i <= maxSeats; i++) {
 			const option = new Option(i, i)
-			if (i === 2) {
-				option.selected = true
-			}
 			if (availableSeats === null || availableSeats.includes(i)) {
 				seatsSelect.appendChild(option)
 			}
+		}
+
+		// Przywróć wcześniej wybraną liczbę miejsc, jeśli jest dostępna
+		if (selectedSeats && (availableSeats === null || availableSeats.includes(selectedSeats))) {
+			seatsSelect.value = selectedSeats
+		} else {
+			seatsSelect.value = 2
 		}
 	}
 
@@ -80,6 +84,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		const time = timeSelect.value
 
 		if (date && time) {
+			const selectedSeats = parseInt(seatsSelect.value) || 2
+
 			try {
 				const response = await fetch(`${API_URL}/available-seats`, {
 					method: 'POST',
@@ -89,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				if (response.ok) {
 					const data = await response.json()
-					populateSeatsOptions(data.availableSeats)
+					populateSeatsOptions(data.availableSeats, selectedSeats)
 				} else {
 					console.error('Error fetching available seats')
 				}
