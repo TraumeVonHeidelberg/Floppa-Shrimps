@@ -168,6 +168,17 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 	}
 
+	// Event listener for delete buttons
+	document.addEventListener('DOMContentLoaded', function () {
+		document.querySelectorAll('.delete-btn').forEach(button => {
+			button.addEventListener('click', function () {
+				const type = this.dataset.type
+				const id = this.dataset.id
+				deleteItem(type, id)
+			})
+		})
+	})
+
 	function editItem(type, id, field, value, index = null) {
 		let url
 		let data = {}
@@ -851,7 +862,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			return
 		}
 
-		fetch(`${API_URL}/admin/reservations/${reservationId}`, {
+		fetch(`${API_URL}/reservations/${reservationId}`, {
 			method: 'DELETE',
 			headers: {
 				Authorization: `Bearer ${token}`,

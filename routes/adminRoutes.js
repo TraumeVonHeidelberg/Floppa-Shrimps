@@ -174,9 +174,9 @@ router.delete('/admin/:type/:id', authenticateToken, async (req, res) => {
 		case 'news':
 			Model = News
 			break
-		case 'reservations':
+		case 'reservation':
 			Model = Reservation
-			break
+			break // zmieniono z 'reservations' na 'reservation'
 		default:
 			return res.status(400).json({ message: 'Invalid type' })
 	}
@@ -192,6 +192,5 @@ router.delete('/admin/:type/:id', authenticateToken, async (req, res) => {
 		res.status(500).json({ message: `Error deleting ${type}`, error })
 	}
 })
-
 
 module.exports = router
