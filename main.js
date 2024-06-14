@@ -1,4 +1,3 @@
-// main.js
 const { app, BrowserWindow } = require('electron')
 const path = require('path')
 const { spawn } = require('child_process')
@@ -37,10 +36,13 @@ function startServer() {
 	})
 }
 
-app.whenReady().then(() => {
+async function main() {
+	await app.whenReady()
 	startServer()
 	createWindow()
-})
+}
+
+main().catch(console.error)
 
 app.on('window-all-closed', () => {
 	if (process.platform !== 'darwin') {
