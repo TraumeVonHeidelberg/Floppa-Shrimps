@@ -10,6 +10,7 @@ const User = require('../models/user')
 const authenticateToken = require('../middleware/authenticateToken')
 const multer = require('multer')
 const path = require('path')
+const { transporter } = require('./auth')
 
 // Konfiguracja multer
 const storage = multer.diskStorage({
@@ -176,7 +177,7 @@ router.delete('/admin/:type/:id', authenticateToken, async (req, res) => {
 			break
 		case 'reservation':
 			Model = Reservation
-			break // zmieniono z 'reservations' na 'reservation'
+			break
 		default:
 			return res.status(400).json({ message: 'Invalid type' })
 	}
@@ -186,6 +187,19 @@ router.delete('/admin/:type/:id', authenticateToken, async (req, res) => {
 		if (!item) {
 			return res.status(404).json({ message: `${type} not found` })
 		}
+
+		// Jeśli typem jest rezerwacja, wysyłamy e-mail do użytkownika
+		if (type === 'reservation') {
+			const user = await User.findByPk(item.userId)
+			const mailOptions = {
+				from: process.env.EMAIL_USER,
+				to: user.email,
+				subject: 'Anulowanie rezerwacji',
+				text: `Twoja rezerwacja na dzień ${item.date} o godzinie ${item.time} została anulowana przez administratora.`,
+			}
+			await transporter.sendMail(mailOptions)
+		}
+
 		await item.destroy()
 		res.status(200).json({ message: `${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully` })
 	} catch (error) {
