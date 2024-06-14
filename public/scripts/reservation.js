@@ -112,8 +112,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	timeSelect.addEventListener('change', updateAvailableSeats)
 
+	// Populate options on initial load
 	populateTimeOptions(today.getUTCDay(), today)
-	populateSeatsOptions()
+	updateAvailableSeats()
 
 	reservationForm.addEventListener('submit', function (event) {
 		event.preventDefault()
