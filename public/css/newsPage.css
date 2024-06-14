@@ -214,3 +214,9 @@ aside {
 	font-size: 2rem;
 	cursor: pointer;
 }
+
+.main-comment-text button {
+	padding: 1.2rem 2.4rem;
+	background-color: black;
+	color: white;
+}
