@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-
 	//URL_API sluzy do komunikacji z serwerem; czyli w praktyce adres pod ktory wysylane sa rzadania HTTP jak get, post itd.
 	const API_URL = window && window.process && window.process.type === 'renderer' ? 'http://localhost:3000/api' : '/api'
 
@@ -11,16 +10,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	let originalValue = ''
 
-	//to prosta funkcja aby 
+	//to prosta funkcja aby usuwać klase z przycisków w sidebarze na panelu użytkownika (by nie były podświetlane na żółto)
 	function clearActiveClass() {
 		document.querySelectorAll('aside button').forEach(button => button.classList.remove('button-active'))
 	}
 
+	//prosta funkcja ktora sprawdza czy nowy e-mail wpisany przez uzytkownika jest poprawny
 	function validateEmail(email) {
+		//regula tworzenia e-maila za pomoca wyrazen regularnych
 		const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+		//re.test sprawdza czy email spelnia regule, lowerCase dla spojnosci danych
 		return re.test(String(email).toLowerCase())
 	}
 
+	//to funkcja ktora modyfikuje cene pozycji w menu by miala wartosci po przecinku (2 miejsca po przecinku)
 	function formatPriceInput(input) {
 		input.addEventListener('blur', function () {
 			let value = parseFloat(input.value)
@@ -31,36 +35,52 @@ document.addEventListener('DOMContentLoaded', function () {
 		})
 	}
 
+	//obsluga formularza dodania pozycji menu
 	function submitMenuForm(event) {
+		//domyslnie przegladarka odswieza strone po wyslaniu formularza, ja temu zapobiegam dla lepszych odczuc uzytkownika
 		event.preventDefault()
+
+		//pobranie wartosci z formularza
 		const name = document.getElementById('menu-name').value
 		const description = document.getElementById('menu-description').value
 		const price = document.getElementById('menu-price').value
 
+		//fetch sluzy do wysylania asynchronicznych zapytan HTTP do serwera i asynchroniczne odbieranie odpowiedzi
+		//w tym przypadku wysylane jest rzadanie POST sluzace do dodania pozycji menu na adres podany w API_URL
 		fetch(`${API_URL}/admin/menu`, {
 			method: 'POST',
+			//naglowki rzadania
+			//typ przesylanych danych jest w formacie json
+			//dodatkowo mamy autoryzacje poprzez token JWT dla bezpieczenstwa
 			headers: {
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${localStorage.getItem('token')}`,
 			},
+			//dane przeksztalcane sa na format json i dolaczane do rzadania
 			body: JSON.stringify({ name, description, price }),
 		})
+			//sprawdzana jest odpowiedz serwera
 			.then(response => {
 				if (!response.ok) {
 					throw new Error('Network response was not ok')
 				}
+				//jesli odpowiedz jest poprawna przeksztalcana jest na format json
 				return response.json()
 			})
 			.then(data => {
+				//informacja ze sie udalo
 				alert('Pozycja dodana do menu!')
+				//reset formularza gdyby uzytkownik chcial dodac nowa pozycje
 				document.getElementById('menu-form').reset()
 			})
+			//wychwytywanie potencjalnych bledow
 			.catch(error => {
 				console.error('Error:', error)
 				alert('Wystąpił błąd podczas dodawania pozycji do menu.')
 			})
 	}
 
+	//funkcja obslugujaca wysylanie formularza z opinią (podobna do tej z menu)
 	function submitTestimonialForm(event) {
 		event.preventDefault()
 		const text = document.getElementById('testimonial-text').value
@@ -91,11 +111,17 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 	}
 
+	//obsluga formularza do dodawania newsow podobna do tej z menu
 	function submitNewsForm(event) {
 		event.preventDefault()
+		//FormData to obiekt do tworzenia par klucz wartosc
 		const formData = new FormData(event.target)
+		//zbieranie wszystkich naglowkow newsa
 		const headers = Array.from(document.querySelectorAll('.news-header')).map(input => input.value)
+		//zbieranie wszystkich tekstow pod naglowkami
 		const texts = Array.from(document.querySelectorAll('.news-text')).map(textarea => textarea.value)
+		
+		//dodanie do FormData wszystkich naglowkow i tekstow i zamiana ich na format json
 		formData.append('headers', JSON.stringify(headers))
 		formData.append('texts', JSON.stringify(texts))
 
@@ -114,6 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 			.then(data => {
 				alert('News dodany!')
+				//resetowanie formularza
 				document.getElementById('news-form').reset()
 				const headersTextsContainer = document.getElementById('headers-texts-container')
 				while (headersTextsContainer.firstChild && headersTextsContainer.childElementCount > 1) {
@@ -129,6 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 	}
 
+	//to funkcja ktora sluzy do dodawania dodatkowych par naglowek-tekst po kliknieciu przycisku
 	function addInitialNewsHeaderText() {
 		const headersTextsContainer = document.getElementById('headers-texts-container')
 		const headerTextContainer = document.createElement('div')
@@ -143,6 +171,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				<textarea class="news-text" name="text" required></textarea>
 			</div>
 		`
+
+		//dodawanie tego html przed przyciskiem
 		headersTextsContainer.insertBefore(headerTextContainer, headersTextsContainer.lastElementChild)
 	}
 
