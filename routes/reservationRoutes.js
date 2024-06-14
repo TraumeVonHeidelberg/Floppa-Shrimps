@@ -271,4 +271,26 @@ router.get('/admin/reservations', authenticateToken, async (req, res) => {
 	}
 })
 
+// Endpoint do sprawdzania dostępnych miejsc dla określonej daty i godziny
+router.post('/available-seats', async (req, res) => {
+	const { date, time } = req.body
+
+	try {
+		const tables = await Table.findAll()
+
+		const availableSeats = []
+		for (const table of tables) {
+			const isAvailable = await isTableAvailable(table.id, date, time)
+			if (isAvailable) {
+				availableSeats.push(table.seats)
+			}
+		}
+
+		res.status(200).json({ availableSeats })
+	} catch (error) {
+		console.error('Error checking available seats:', error)
+		res.status(500).json({ error: 'Błąd serwera' })
+	}
+})
+
 module.exports = router

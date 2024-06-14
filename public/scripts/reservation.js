@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-	// Ustawienie URL API w zależności od środowiska (Electron vs przeglądarka)
 	const API_URL = window && window.process && window.process.type === 'renderer' ? 'http://localhost:3000/api' : '/api'
 
 	const reservationForm = document.getElementById('reservation-form')
@@ -61,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
-	async function populateSeatsOptions() {
+	async function populateSeatsOptions(availableSeats = null) {
 		const maxSeats = await fetchMaxSeats()
 		seatsSelect.innerHTML = ''
 
@@ -70,7 +69,33 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (i === 2) {
 				option.selected = true
 			}
-			seatsSelect.appendChild(option)
+			if (availableSeats === null || availableSeats.includes(i)) {
+				seatsSelect.appendChild(option)
+			}
+		}
+	}
+
+	async function updateAvailableSeats() {
+		const date = reservationDate.value
+		const time = timeSelect.value
+
+		if (date && time) {
+			try {
+				const response = await fetch(`${API_URL}/available-seats`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ date, time }),
+				})
+
+				if (response.ok) {
+					const data = await response.json()
+					populateSeatsOptions(data.availableSeats)
+				} else {
+					console.error('Error fetching available seats')
+				}
+			} catch (error) {
+				console.error('Error:', error)
+			}
 		}
 	}
 
@@ -81,7 +106,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		const selectedDate = new Date(this.value)
 		const dayOfWeek = selectedDate.getUTCDay()
 		populateTimeOptions(dayOfWeek, selectedDate)
+		updateAvailableSeats()
 	})
+
+	timeSelect.addEventListener('change', updateAvailableSeats)
 
 	populateTimeOptions(today.getUTCDay(), today)
 	populateSeatsOptions()
@@ -150,16 +178,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	toggleAdditionalFields()
 
-	// Nasłuchiwanie na zdarzenia logowania i wylogowania
 	window.addEventListener('storage', event => {
 		if (event.key === 'token') {
 			toggleAdditionalFields()
 		}
 	})
 
-	// Nasłuchiwanie na zdarzenia logowania przy użyciu niestandardowego zdarzenia
 	document.addEventListener('userLoggedIn', toggleAdditionalFields)
 
-	// Sprawdzenie, czy użytkownik jest zalogowany na początku
 	toggleAdditionalFields()
 })
