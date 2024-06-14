@@ -101,6 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	const today = new Date()
 	reservationDate.min = today.toISOString().split('T')[0]
+	reservationDate.value = today.toISOString().split('T')[0] // Ustawienie dzisiejszej daty jako domyślnej
 
 	reservationDate.addEventListener('change', function () {
 		const selectedDate = new Date(this.value)
@@ -157,7 +158,9 @@ document.addEventListener('DOMContentLoaded', function () {
 				} else {
 					alert('Rezerwacja została złożona pomyślnie!')
 					reservationForm.reset()
-					seatsSelect.value = '2'
+					reservationDate.value = today.toISOString().split('T')[0] // Resetowanie daty do dzisiejszej
+					populateTimeOptions(today.getUTCDay(), today) // Odświeżenie dostępnych godzin
+					populateSeatsOptions()
 				}
 			})
 			.catch(error => console.error('Error:', error))
