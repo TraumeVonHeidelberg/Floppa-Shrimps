@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		const headers = Array.from(document.querySelectorAll('.news-header')).map(input => input.value)
 		//zbieranie wszystkich tekstow pod naglowkami
 		const texts = Array.from(document.querySelectorAll('.news-text')).map(textarea => textarea.value)
-		
+
 		//dodanie do FormData wszystkich naglowkow i tekstow i zamiana ich na format json
 		formData.append('headers', JSON.stringify(headers))
 		formData.append('texts', JSON.stringify(texts))
@@ -176,8 +176,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		headersTextsContainer.insertBefore(headerTextContainer, headersTextsContainer.lastElementChild)
 	}
 
+	//to sluzy do usuwania pozycji
 	function deleteItem(type, id) {
+		//type jest pobierany dynamicznie zaleznie od elementu np. menu, testimonials, news etc.
+		//podobnie jak id
 		const url = `${API_URL}/admin/${type}/${id}`
+		//identyfikacja elementu do usuniecia
 		const element = document.querySelector(`#element-${id}`)
 		fetch(url, {
 			method: 'DELETE',
@@ -192,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				return response.json()
 			})
 			.then(data => {
-				alert(`${type.charAt(0).toUpperCase() + type.slice(1)} usunięta!`)
+				alert(`Pozycja ${type.charAt(0).toUpperCase() + type.slice(1)} usunięta!`)
 				element.remove()
 			})
 			.catch(error => {
@@ -201,10 +205,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 	}
 
-	// Event listener for delete buttons
+	// dodawanie event listenera do kazdego przycisku delete (tagu <i> w praktyce)
 	document.addEventListener('DOMContentLoaded', function () {
 		document.querySelectorAll('.delete-btn').forEach(button => {
 			button.addEventListener('click', function () {
+				//pobierane type i id
 				const type = this.dataset.type
 				const id = this.dataset.id
 				deleteItem(type, id)
@@ -212,12 +217,20 @@ document.addEventListener('DOMContentLoaded', function () {
 		})
 	})
 
+	//funkcja do edycji elementow
+	//type: Typ elementu, który ma być edytowany (menu, testimonial, news).
+	//id: Identyfikator elementu, który ma być edytowany.
+	//field: Pole, które ma być zaktualizowane.
+	//value: Nowa wartość dla zaktualizowanego pola.
+	//index: (Opcjonalnie) Indeks używany w przypadku edycji pól header lub text dla typu news by wiedziec ktory header badz text jest edytowany
 	function editItem(type, id, field, value, index = null) {
 		let url
 		let data = {}
 
 		if (type === 'menu') {
 			url = `${API_URL}/admin/menu/${id}`
+
+			//.trim() zapewnia ze wartosc nie zawiera bialych znakow
 			const name = field === 'name' ? value : document.getElementById(`name-${id}`).textContent.trim()
 			const description =
 				field === 'description' ? value : document.getElementById(`description-${id}`).textContent.trim()
@@ -242,6 +255,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		}
 
+		//rzadanie PUT sluzy do aktualizacji istniejacego zasobu
 		fetch(url, {
 			method: 'PUT',
 			headers: {
@@ -260,7 +274,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				return response.json()
 			})
 			.then(data => {
-				alert(`${type.charAt(0).toUpperCase() + type.slice(1)} zaktualizowany!`)
+				alert(`Pozycja ${type.charAt(0).toUpperCase() + type.slice(1)} zaktualizowana!`)
 				if (field !== 'header' && field !== 'text') {
 					document.getElementById(`${field}-${id}`).textContent = data[field]
 				}
@@ -271,34 +285,40 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 	}
 
+	//funkcja czyniąca pola możliwymi do edycji
 	function makeEditable(element, type, id, field, index = null) {
 		element.addEventListener('click', function () {
-			const originalValue = element.textContent.trim()
-			element.contentEditable = true
-			element.focus()
+			const originalValue = element.textContent.trim() // Zapisanie oryginalnej wartości tekstu
+			element.contentEditable = true // Ustawienie elementu jako edytowalny
+			element.focus() // Skierowanie focusu na element
 
+			// Funkcja obsługująca zdarzenie "blur"
 			function handleBlur() {
-				const newValue = element.textContent.trim()
+				const newValue = element.textContent.trim() // Pobranie nowej wartości tekstu
 				if (newValue !== originalValue) {
-					editItem(type, id, field, newValue, index)
+					// Jeśli nowa wartość różni się od oryginalnej
+					editItem(type, id, field, newValue, index) // Wywołanie funkcji aktualizującej dane na serwerze
 				}
-				element.contentEditable = false
-				element.removeEventListener('blur', handleBlur)
-				element.removeEventListener('keydown', handleKeydown)
+				element.contentEditable = false // Przywrócenie pierwotnego stanu elementu
+				element.removeEventListener('blur', handleBlur) // Usunięcie nasłuchiwania zdarzenia "blur"
+				element.removeEventListener('keydown', handleKeydown) // Usunięcie nasłuchiwania zdarzenia "keydown"
 			}
 
+			// Funkcja obsługująca zdarzenie "keydown"
 			function handleKeydown(event) {
 				if (event.key === 'Enter') {
-					event.preventDefault()
-					element.blur()
+					// Jeśli naciśnięto klawisz "Enter"
+					event.preventDefault() // Zablokowanie domyślnego zachowania (np. nowa linia)
+					element.blur() // Zakończenie edycji i utrata focusu
 				} else if (event.key === 'Escape') {
-					element.textContent = originalValue
-					element.blur()
+					// Jeśli naciśnięto klawisz "Escape"
+					element.textContent = originalValue // Przywrócenie oryginalnej wartości tekstu
+					element.blur() // Zakończenie edycji i utrata focusu
 				}
 			}
 
-			element.addEventListener('blur', handleBlur)
-			element.addEventListener('keydown', handleKeydown)
+			element.addEventListener('blur', handleBlur) // Dodanie nasłuchiwania zdarzenia "blur"
+			element.addEventListener('keydown', handleKeydown) // Dodanie nasłuchiwania zdarzenia "keydown"
 		})
 	}
 
