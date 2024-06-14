@@ -838,14 +838,13 @@ document.addEventListener('DOMContentLoaded', function () {
 					alert('Profil zaktualizowany pomyślnie')
 					field.setAttribute('data-original-value', fieldValue) // Zaktualizuj oryginalną wartość
 
-					// Aktualizacja pseudonimu w górnej części profilu użytkownika
-					if (fieldName === 'username') {
-						const userNameDisplay = document.querySelector('.user-name')
-						const firstName = document.querySelector('.user-data[data-field="firstName"]').textContent.trim()
-						const lastName = document.querySelector('.user-data[data-field="lastName"]').textContent.trim()
-						const username = fieldValue ? `(${fieldValue})` : ''
-						userNameDisplay.textContent = `${firstName} ${lastName} ${username}`
-					}
+					// Aktualizacja imienia, nazwiska i pseudonimu w górnej części profilu użytkownika
+					const userNameDisplay = document.querySelector('.user-name')
+					const firstName = document.querySelector('.user-data[data-field="firstName"]').textContent.trim()
+					const lastName = document.querySelector('.user-data[data-field="lastName"]').textContent.trim()
+					const username = document.querySelector('.user-data[data-field="username"]').textContent.trim() || ''
+					const usernameDisplay = username ? `(${username})` : ''
+					userNameDisplay.textContent = `${firstName} ${lastName} ${usernameDisplay}`
 				}
 			})
 			.catch(error => {
