@@ -1,3 +1,4 @@
+//Wyświetlanie skrótów trzech najnowszych newsów w index.html
 document.addEventListener('DOMContentLoaded', function () {
 	fetch('http://localhost:3000/api/news/latest')
 		.then(response => response.json())

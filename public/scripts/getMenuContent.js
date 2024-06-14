@@ -1,3 +1,4 @@
+//Prosta funkcja która dodaje pozycje do wyświetlenia w Menu w index.html
 document.addEventListener('DOMContentLoaded', function () {
 	fetch('http://localhost:3000/api/menu')
 		.then(response => response.json())
