@@ -1,32 +1,61 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
+// main.js
+const { app, BrowserWindow } = require('electron')
+const path = require('path')
+const { spawn } = require('child_process')
+
+let serverProcess
 
 function createWindow() {
-    const win = new BrowserWindow({
-        width: 800,
-        height: 600,
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false, // Umożliwia integrację Node.js w renderer process
-            enableRemoteModule: true, // Umożliwia użycie modułu remote
-        },
-    });
+	const win = new BrowserWindow({
+		width: 800,
+		height: 600,
+		webPreferences: {
+			nodeIntegration: true,
+			contextIsolation: false,
+			enableRemoteModule: true,
+		},
+	})
 
-    win.maximize();
-    win.loadFile(path.join(__dirname, 'public', 'index.html')); // Upewnij się, że ścieżka do pliku HTML jest poprawna
-    win.webContents.openDevTools(); // Otwórz narzędzia deweloperskie
+	win.maximize()
+	win.loadFile(path.join(__dirname, 'public', 'index.html'))
+	win.webContents.openDevTools()
 }
 
-app.whenReady().then(createWindow);
+function startServer() {
+	serverProcess = spawn('node', [path.join(__dirname, 'app.js')])
+
+	serverProcess.stdout.on('data', data => {
+		console.log(`Server: ${data}`)
+	})
+
+	serverProcess.stderr.on('data', data => {
+		console.error(`Server error: ${data}`)
+	})
+
+	serverProcess.on('close', code => {
+		console.log(`Server process exited with code ${code}`)
+	})
+}
+
+app.whenReady().then(() => {
+	startServer()
+	createWindow()
+})
 
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
-});
+	if (process.platform !== 'darwin') {
+		app.quit()
+	}
+})
 
 app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow();
-    }
-});
+	if (BrowserWindow.getAllWindows().length === 0) {
+		createWindow()
+	}
+})
+
+app.on('quit', () => {
+	if (serverProcess) {
+		serverProcess.kill()
+	}
+})
