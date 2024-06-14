@@ -966,7 +966,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			return
 		}
 
-		fetch(`${API_URL}/admin/reservations`, {
+		fetch(`${API_URL}/reservations`, {
+			// Zmiana z /admin/reservations na /reservations
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${token}`,
@@ -995,18 +996,18 @@ document.addEventListener('DOMContentLoaded', function () {
 					reservationsList.innerHTML = reservations
 						.map(
 							reservation => `
-						<div class="element" id="element-${reservation.id}">
-							<div class="text-container">
-								<p>Data: ${reservation.date}</p>
-								<p>Godzina: ${reservation.time}</p>
-								<p>Miejsca: ${reservation.seats}</p>
-								${reservation.additionalInfo ? `<p>Uwagi: ${reservation.additionalInfo}</p>` : ''}
-								${reservation.firstName ? `<p>Imię: ${reservation.firstName}</p>` : ''}
-								${reservation.lastName ? `<p>Nazwisko: ${reservation.lastName}</p>` : ''}
+							<div class="element" id="element-${reservation.id}">
+								<div class="text-container">
+									<p>Data: ${reservation.date}</p>
+									<p>Godzina: ${reservation.time}</p>
+									<p>Miejsca: ${reservation.seats}</p>
+									${reservation.additionalInfo ? `<p>Uwagi: ${reservation.additionalInfo}</p>` : ''}
+									${reservation.firstName ? `<p>Imię: ${reservation.firstName}</p>` : ''}
+									${reservation.lastName ? `<p>Nazwisko: ${reservation.lastName}</p>` : ''}
+								</div>
+								<i class="fa-regular fa-circle-xmark" aria-hidden="true" onclick="cancelReservation(${reservation.id})"></i>
 							</div>
-							<i class="fa-regular fa-circle-xmark" aria-hidden="true" onclick="cancelReservation(${reservation.id})"></i>
-						</div>
-					`
+						`
 						)
 						.join('')
 				}

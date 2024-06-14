@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage })
 
-// Dodajemy nową trasę do pobierania rezerwacji dla zalogowanych użytkowników
+// Endpoint do pobierania rezerwacji użytkownika
 router.get('/reservations', authenticateToken, async (req, res) => {
 	try {
 		const reservations = await Reservation.findAll({
