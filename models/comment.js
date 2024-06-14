@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize')
-const { sequelize } = require('../config/database') // Poprawiony import
-const User = require('./user') // Użycie nazwy tabeli zamiast modelu
-const News = require('./news') // Użycie nazwy tabeli zamiast modelu
+const { sequelize } = require('../config/database') 
+const User = require('./user') 
+const News = require('./news') 
 
 const Comment = sequelize.define(
 	'Comment',

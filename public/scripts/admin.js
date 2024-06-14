@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
+
+	//URL_API sluzy do komunikacji z serwerem; czyli w praktyce adres pod ktory wysylane sa rzadania HTTP jak get, post itd.
 	const API_URL = window && window.process && window.process.type === 'renderer' ? 'http://localhost:3000/api' : '/api'
 
 	const addElementsBtn = document.getElementById('add-elements-btn')
@@ -9,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	let originalValue = ''
 
+	//to prosta funkcja aby 
 	function clearActiveClass() {
 		document.querySelectorAll('aside button').forEach(button => button.classList.remove('button-active'))
 	}
