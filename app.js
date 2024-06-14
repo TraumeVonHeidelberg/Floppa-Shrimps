@@ -45,7 +45,7 @@ app.get('/admin', (req, res) => {
 const PORT = process.env.PORT || 3000
 
 sequelize
-	.sync()
+	.sync({alter:'true'})
 	.then(() => {
 		return createTriggers()
 	})
