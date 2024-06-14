@@ -111,6 +111,26 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 	}
 
+	//to funkcja ktora sluzy do dodawania dodatkowych par naglowek-tekst po kliknieciu przycisku
+	function addNewsHeaderText() {
+		const headersTextsContainer = document.getElementById('headers-texts-container')
+		const headerTextContainer = document.createElement('div')
+		headerTextContainer.classList.add('header-text-container')
+		headerTextContainer.innerHTML = `
+			<div class="configuration-item">
+				<label for="news-header">Nagłówek</label>
+				<input type="text" class="news-header" name="header" required>
+			</div>
+			<div class="configuration-item">
+				<label for="news-text">Tekst</label>
+				<textarea class="news-text" name="text" required></textarea>
+			</div>
+		`
+
+		//dodawanie tego html przed przyciskiem
+		headersTextsContainer.insertBefore(headerTextContainer, headersTextsContainer.lastElementChild)
+	}
+
 	//obsluga formularza do dodawania newsow podobna do tej z menu
 	function submitNewsForm(event) {
 		event.preventDefault()
@@ -146,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				while (headersTextsContainer.firstChild && headersTextsContainer.childElementCount > 1) {
 					headersTextsContainer.removeChild(headersTextsContainer.firstChild)
 				}
-				addInitialNewsHeaderText()
+				addNewsHeaderText()
 				// Zresetowanie wyświetlania nazwy pliku
 				document.getElementById('file-name').textContent = 'Brak wybranego pliku'
 			})
@@ -154,26 +174,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				console.error('Error:', error)
 				alert('Wystąpił błąd podczas dodawania news.')
 			})
-	}
-
-	//to funkcja ktora sluzy do dodawania dodatkowych par naglowek-tekst po kliknieciu przycisku
-	function addInitialNewsHeaderText() {
-		const headersTextsContainer = document.getElementById('headers-texts-container')
-		const headerTextContainer = document.createElement('div')
-		headerTextContainer.classList.add('header-text-container')
-		headerTextContainer.innerHTML = `
-			<div class="configuration-item">
-				<label for="news-header">Nagłówek</label>
-				<input type="text" class="news-header" name="header" required>
-			</div>
-			<div class="configuration-item">
-				<label for="news-text">Tekst</label>
-				<textarea class="news-text" name="text" required></textarea>
-			</div>
-		`
-
-		//dodawanie tego html przed przyciskiem
-		headersTextsContainer.insertBefore(headerTextContainer, headersTextsContainer.lastElementChild)
 	}
 
 	//to sluzy do usuwania pozycji
@@ -322,6 +322,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		})
 	}
 
+	//funkcja umozliwiajaca edycje zdjec
 	function makeImageEditable(imageElement, type, id) {
 		imageElement.addEventListener('click', function () {
 			const fileInput = document.createElement('input')
@@ -332,6 +333,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			fileInput.addEventListener('change', function () {
 				if (fileInput.files.length > 0) {
 					const formData = new FormData()
+
+					//do FormData dodawany jest plik
 					formData.append('image', fileInput.files[0])
 
 					fetch(`${API_URL}/admin/news/${id}/image`, {
@@ -358,27 +361,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			})
 
+			//wyswietlenie okna dialogowego do wyboru pliku
 			fileInput.click()
 		})
 	}
 
-	function addNewsHeaderText() {
-		const headersTextsContainer = document.getElementById('headers-texts-container')
-		const headerTextContainer = document.createElement('div')
-		headerTextContainer.classList.add('header-text-container')
-		headerTextContainer.innerHTML = `
-			<div class="configuration-item">
-				<label for="news-header">Nagłówek</label>
-				<input type="text" class="news-header" name="header" required>
-			</div>
-			<div class="configuration-item">
-				<label for="news-text">Tekst</label>
-				<textarea class="news-text" name="text" required></textarea>
-			</div>
-		`
-		headersTextsContainer.insertBefore(headerTextContainer, headersTextsContainer.lastElementChild)
-	}
-
+	//dynamiczne ładowanie formularzy do dodawania elementow
 	function loadAddElements() {
 		clearActiveClass()
 		addElementsBtn.classList.add('button-active')
@@ -504,23 +492,24 @@ document.addEventListener('DOMContentLoaded', function () {
 		elementTypeSelect.dispatchEvent(new Event('change'))
 	}
 
+	//wylistowanie elementow w panelu admina
 	function loadListElements() {
 		clearActiveClass()
 		listElementsBtn.classList.add('button-active')
 		mainContent.innerHTML = `
-			<div class="dynamic-content">
-				<div class="select-element">
-					<label for="element-list-type">Wybierz typ elementu:</label>
-					<select id="element-list-type" class="element-type">
-						<option value="menu">Menu</option>
-						<option value="testimonial">Testimonial</option>
-						<option value="news">News</option>
-						<option value="reservations">Rezerwacje</option>
-					</select>
-				</div>
-				<div id="list-container" class="list-container"></div>
+		<div class="dynamic-content">
+			<div class="select-element">
+				<label for="element-list-type">Wybierz typ elementu:</label>
+				<select id="element-list-type" class="element-type">
+					<option value="menu">Menu</option>
+					<option value="testimonial">Testimonial</option>
+					<option value="news">News</option>
+					<option value="reservations">Rezerwacje</option>
+				</select>
 			</div>
-		`
+			<div id="list-container" class="list-container"></div>
+		</div>
+	`
 
 		const elementListTypeSelect = document.getElementById('element-list-type')
 		const listContainer = document.getElementById('list-container')
@@ -531,21 +520,25 @@ document.addEventListener('DOMContentLoaded', function () {
 			listContainer.classList.remove('news-list-container')
 
 			if (selectedType === 'menu') {
-				fetch(`${API_URL}/menu`)
+				fetch(`${API_URL}/menu`, {
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('token')}`,
+					},
+				})
 					.then(response => response.json())
 					.then(data => {
 						listContainer.innerHTML = data
 							.map(
 								item => `
-								<div class="element" id="element-${item.id}">
-									<div class="text-container">
-										<p class="element-text" id="name-${item.id}">${item.name}</p>
-										<p class="element-text" id="description-${item.id}">${item.description}</p>
-										<p class="element-text" id="price-${item.id}">${parseFloat(item.price).toFixed(2)} zł</p>
-									</div>
-									<i class="fa-regular fa-circle-xmark" onclick="deleteItem('menu', ${item.id})"></i>
+							<div class="element" id="element-${item.id}">
+								<div class="text-container">
+									<p class="element-text" id="name-${item.id}">${item.name}</p>
+									<p class="element-text" id="description-${item.id}">${item.description}</p>
+									<p class="element-text" id="price-${item.id}">${parseFloat(item.price).toFixed(2)} zł</p>
 								</div>
-							`
+								<i class="fa-regular fa-circle-xmark" onclick="deleteItem('menu', ${item.id})"></i>
+							</div>
+						`
 							)
 							.join('')
 						data.forEach(item => {
@@ -559,21 +552,25 @@ document.addEventListener('DOMContentLoaded', function () {
 						alert('Wystąpił błąd podczas ładowania pozycji menu.')
 					})
 			} else if (selectedType === 'testimonial') {
-				fetch(`${API_URL}/testimonials`)
+				fetch(`${API_URL}/testimonials`, {
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('token')}`,
+					},
+				})
 					.then(response => response.json())
 					.then(data => {
 						listContainer.innerHTML = data
 							.map(
 								item => `
-								<div class="element" id="element-${item.id}">
-									<div class="text-container">
-										<p class="element-text main-testimonial-text" id="text-${item.id}">${item.text}</p>
-										<p class="element-text" id="author-${item.id}">${item.author}</p>
-										<p class="element-text" id="company-${item.id}">${item.company}</p>
-									</div>
-									<i class="fa-regular fa-circle-xmark" onclick="deleteItem('testimonial', ${item.id})"></i>
+							<div class="element" id="element-${item.id}">
+								<div class="text-container">
+									<p class="element-text main-testimonial-text" id="text-${item.id}">${item.text}</p>
+									<p class="element-text" id="author-${item.id}">${item.author}</p>
+									<p class="element-text" id="company-${item.id}">${item.company}</p>
 								</div>
-							`
+								<i class="fa-regular fa-circle-xmark" onclick="deleteItem('testimonial', ${item.id})"></i>
+							</div>
+						`
 							)
 							.join('')
 						data.forEach(item => {
@@ -599,30 +596,30 @@ document.addEventListener('DOMContentLoaded', function () {
 						listContainer.innerHTML = data
 							.map(
 								item => `
-							<div class="element news-element" id="element-${item.id}">
-								<div class="news-item">
-									<div class="news-meta">
-										<p class="element-text" id="category-${item.id}">${item.category}</p>
-										<p class="element-text" id="title-${item.id}">${item.title}</p>
-										${item.image ? `<img src="/img/uploads/${item.image}" alt="News Image" class="news-image" id="image-${item.id}">` : ''}
-										<p class="element-text" id="introText-${item.id}">${item.introText}</p>
-									</div>
-									<div id="headers-texts-${item.id}">
-										${item.headers
-											.map(
-												(header, index) => `
-											<div class="header-text-pair">
-												<p class="element-text news-header" id="header-${item.id}-${index}">${header.header}</p>
-												<p class="element-text news-text" id="text-${item.id}-${index}">${header.text}</p>
-											</div>
-										`
-											)
-											.join('')}
-									</div>
+						<div class="element news-element" id="element-${item.id}">
+							<div class="news-item">
+								<div class="news-meta">
+									<p class="element-text" id="category-${item.id}">${item.category}</p>
+									<p class="element-text" id="title-${item.id}">${item.title}</p>
+									${item.image ? `<img src="/img/uploads/${item.image}" alt="News Image" class="news-image" id="image-${item.id}">` : ''}
+									<p class="element-text" id="introText-${item.id}">${item.introText}</p>
 								</div>
-								<i class="fa-regular fa-circle-xmark" onclick="deleteItem('news', ${item.id})"></i>
+								<div id="headers-texts-${item.id}">
+									${item.headers
+										.map(
+											(header, index) => `
+										<div class="header-text-pair">
+											<p class="element-text news-header" id="header-${item.id}-${index}">${header.header}</p>
+											<p class="element-text news-text" id="text-${item.id}-${index}">${header.text}</p>
+										</div>
+									`
+										)
+										.join('')}
+								</div>
 							</div>
-						`
+							<i class="fa-regular fa-circle-xmark" onclick="deleteItem('news', ${item.id})"></i>
+						</div>
+					`
 							)
 							.join('')
 						data.forEach(item => {
@@ -655,22 +652,22 @@ document.addEventListener('DOMContentLoaded', function () {
 						listContainer.innerHTML = data
 							.map(
 								reservation => `
-						<div class="element" id="element-${reservation.id}">
-							<div class="text-container">
-								<p>Imię i Nazwisko: ${reservation.firstName || reservation.user?.firstName || ''} ${
+					<div class="element" id="element-${reservation.id}">
+						<div class="text-container">
+							<p>Imię i Nazwisko: ${reservation.firstName || reservation.user?.firstName || ''} ${
 									reservation.lastName || reservation.user?.lastName || ''
 								}</p>
-								<p>E-Mail: ${reservation.email}</p>
-								<p>Data: ${reservation.date}</p>
-								<p>Godzina: ${reservation.time}</p>
-								<p>Liczba Miejsc: ${reservation.seats}</p>
-								${reservation.additionalInfo ? `<p>Dodatkowe Uwagi: ${reservation.additionalInfo}</p>` : ''}
-								${reservation.userId ? `<p>UserID: ${reservation.userId}</p>` : ''}
-								<p>Numer Stolika: ${reservation.tableId}</p>
-							</div>
-							<i class="fa-regular fa-circle-xmark" onclick="deleteItem('reservation', ${reservation.id})"></i>
+							<p>E-Mail: ${reservation.email}</p>
+							<p>Data: ${reservation.date}</p>
+							<p>Godzina: ${reservation.time}</p>
+							<p>Liczba Miejsc: ${reservation.seats}</p>
+							${reservation.additionalInfo ? `<p>Dodatkowe Uwagi: ${reservation.additionalInfo}</p>` : ''}
+							${reservation.userId ? `<p>UserID: ${reservation.userId}</p>` : ''}
+							<p>Numer Stolika: ${reservation.tableId}</p>
 						</div>
-					`
+						<i class="fa-regular fa-circle-xmark" onclick="deleteItem('reservation', ${reservation.id})"></i>
+					</div>
+				`
 							)
 							.join('')
 					})
@@ -681,9 +678,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		})
 
+		//to jest uzywane by domyslnie wczytywac elementy dla jednej z opcji
 		elementListTypeSelect.dispatchEvent(new Event('change'))
 	}
 
+	//prosta funkcja ktora tworzy dynamicznie panel uzytkownika
 	function loadUserProfile() {
 		clearActiveClass()
 		userProfileBtn.classList.add('button-active')
@@ -726,29 +725,35 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	function loadUserInfo() {
+		// Pobieranie tokenu z localStorage
 		const token = localStorage.getItem('token')
 		if (!token) {
+			// Jeśli token nie istnieje, przekierowanie na stronę logowania
 			window.location.href = '/index.html'
 			return
 		}
 
+		// Wysyłanie żądania GET do API w celu pobrania informacji o profilu użytkownika
 		fetch(`${API_URL}/profile`, {
 			method: 'GET',
 			headers: {
-				Authorization: `Bearer ${token}`,
+				Authorization: `Bearer ${token}`, // Dodanie tokenu do nagłówka autoryzacji
 			},
 		})
 			.then(response => {
 				if (!response.ok) {
+					// Jeśli odpowiedź nie jest OK, sprawdzamy status
 					if (response.status === 401 || response.status === 403) {
+						// Jeśli status to 401 lub 403, usuwamy token i przekierowujemy na stronę logowania
 						localStorage.removeItem('token')
 						window.location.href = '/index.html'
 					}
 					throw new Error('Network response was not ok')
 				}
-				return response.json()
+				return response.json() // Parsowanie odpowiedzi do formatu JSON
 			})
 			.then(user => {
+				// Aktualizacja danych użytkownika w interfejsie użytkownika
 				document.querySelector('.user-name').textContent = `${user.firstName} ${user.lastName} ${
 					user.username ? `(${user.username})` : ''
 				}`
@@ -766,15 +771,17 @@ document.addEventListener('DOMContentLoaded', function () {
 					field.addEventListener('focus', event => {
 						originalValue = event.target.textContent.trim() // Zapisz oryginalną wartość przed edycją
 					})
-					field.addEventListener('blur', handleProfileUpdate)
+					field.addEventListener('blur', handleProfileUpdate) // Dodanie event listenera do obsługi aktualizacji profilu
 				})
 
+				// Obsługa zmiany zdjęcia profilowego
 				document.getElementById('user-profile-picture').addEventListener('click', () => {
 					document.getElementById('profile-picture-input').click()
 				})
 
 				document.getElementById('profile-picture-input').addEventListener('change', handleProfilePictureChange)
 
+				// Obsługa zmiany hasła
 				document.querySelector('.change-password').addEventListener('click', () => {
 					document.querySelector('.change-password-form').classList.toggle('hidden')
 				})
@@ -790,6 +797,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						return
 					}
 
+					// Wysyłanie żądania PUT do API w celu zmiany hasła
 					fetch(`${API_URL}/change-password`, {
 						method: 'PUT',
 						headers: {
@@ -813,7 +821,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						})
 				})
 
-				// Show admin options if user is an admin
+				// Pokaż opcje administratora, jeśli użytkownik jest administratorem
 				if (user.role === 'admin') {
 					document.getElementById('add-elements-btn').style.display = 'flex'
 					document.getElementById('list-elements-btn').style.display = 'flex'
