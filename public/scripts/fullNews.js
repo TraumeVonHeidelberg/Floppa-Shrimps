@@ -141,11 +141,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			// Fetch and display comments
 			function fetchComments() {
-				fetch(`http://localhost:3000/api/news/${newsId}/comments`, {
-					headers: {
-						Authorization: `Bearer ${localStorage.getItem('token')}`,
-					},
-				})
+				const token = localStorage.getItem('token')
+				const headers = token ? { Authorization: `Bearer ${token}` } : {}
+
+				fetch(`http://localhost:3000/api/news/${newsId}/comments`, { headers })
 					.then(response => {
 						if (!response.ok) {
 							throw new Error('Network response was not ok')
@@ -157,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						const commentSection = document.querySelector('.comment-section')
 						commentSection.innerHTML = ''
 						if (!Array.isArray(comments) || comments.length === 0) {
-							commentSection.innerHTML = '<p></p>'
+							commentSection.innerHTML = '<p>No comments</p>'
 						} else {
 							commentSection.innerHTML = comments
 								.map(
@@ -307,6 +306,8 @@ document.addEventListener('DOMContentLoaded', function () {
 					})
 					.then(comment => {
 						console.log('Comment added:', comment)
+						// Clear the comment textarea
+						document.getElementById('comment-text').value = ''
 						// Refresh comments
 						fetchComments()
 					})
@@ -314,6 +315,13 @@ document.addEventListener('DOMContentLoaded', function () {
 						console.error('Error adding comment:', error)
 					})
 			})
+
+			// Disable comment textarea and hide submit button for unauthenticated users
+			const token = localStorage.getItem('token')
+			if (!token) {
+				document.getElementById('comment-text').disabled = true
+				document.getElementById('submit-comment').style.display = 'none'
+			}
 		})
 		.catch(error => console.error('Error fetching news:', error))
 })

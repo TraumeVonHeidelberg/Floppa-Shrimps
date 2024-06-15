@@ -86,8 +86,10 @@ router.post('/news/:id/comments', authenticateToken, async (req, res) => {
 router.get('/news/:id/comments', authenticateToken, async (req, res) => {
 	const newsId = req.params.id
 	const userId = req.user.userId
+	const userRole = req.user.role
 
 	console.log(`Fetching comments for newsId: ${newsId}`)
+	console.log(`Request made by user: ${userId} with role: ${userRole}`)
 
 	try {
 		const comments = await Comment.findAll({
@@ -95,12 +97,15 @@ router.get('/news/:id/comments', authenticateToken, async (req, res) => {
 			include: [{ model: User, as: 'author', attributes: ['firstName', 'lastName', 'username', 'profilePicture'] }],
 		})
 
-		console.log(`Fetched comments:`, comments)
+		console.log(`Fetched comments: ${comments.length} comments found`)
 
 		const commentsWithCanDelete = comments.map(comment => {
 			const commentJson = comment.toJSON()
-			commentJson.canDelete = comment.userId === userId || req.user.role === 'admin'
+			commentJson.canDelete = comment.userId === userId || userRole === 'admin'
 			commentJson.canEdit = comment.userId === userId
+			console.log(
+				`Comment ID: ${comment.id}, User ID: ${comment.userId}, canDelete: ${commentJson.canDelete}, canEdit: ${commentJson.canEdit}`
+			)
 			return commentJson
 		})
 
