@@ -97,14 +97,14 @@ document.addEventListener('DOMContentLoaded', function () {
 	/**
 	 * Populates the seats select options based on the available seats and the
 	 * selected seats. If availableSeats is null, all seats are available.
-	 * 
+	 *
 	 * @param {Array|null} availableSeats - An array of available seats or null.
 	 * @param {number|null} selectedSeats - The selected number of seats or null.
 	 */
 	async function populateSeatsOptions(availableSeats = null, selectedSeats = null) {
 		// Fetch the maximum number of seats from the server
 		const maxSeats = await fetchMaxSeats()
-		
+
 		// Clear the seats select options
 		seatsSelect.innerHTML = ''
 
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		for (let i = 1; i <= maxSeats; i++) {
 			// Create a new option element for each seat number
 			const option = new Option(i, i)
-			
+
 			// If availableSeats is null or if the current seat number is included in availableSeats,
 			// add the option element to the seats select options
 			if (availableSeats === null || availableSeats.includes(i)) {
@@ -204,7 +204,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		if (!token) {
 			if (!firstName || !lastName || !email) {
-				alert('Proszę wypełnić wszystkie pola.')
+				Swal.fire({
+					title: 'Uwaga!',
+					text: 'Proszę wypełnić wszystkie pola.',
+					icon: 'warning',
+					confirmButtonText: 'OK',
+				})
 				return
 			}
 			reservationData = { ...reservationData, firstName, lastName, email }
@@ -227,9 +232,19 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 			.then(data => {
 				if (data.error) {
-					alert(data.error)
+					Swal.fire({
+						title: 'Błąd!',
+						text: data.error,
+						icon: 'error',
+						confirmButtonText: 'OK',
+					})
 				} else {
-					alert('Rezerwacja została złożona pomyślnie!')
+					Swal.fire({
+						title: 'Sukces!',
+						text: 'Rezerwacja została złożona pomyślnie!',
+						icon: 'success',
+						confirmButtonText: 'OK',
+					})
 					reservationForm.reset()
 					reservationDate.value = today.toISOString().split('T')[0] // Resetowanie daty do dzisiejszej
 					populateTimeOptions(today.getUTCDay(), today) // Odświeżenie dostępnych godzin

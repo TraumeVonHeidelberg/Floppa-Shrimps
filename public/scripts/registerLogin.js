@@ -90,7 +90,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		console.log('Password:', password)
 
 		if (!firstName || !lastName || !email || !password) {
-			alert('Proszę wypełnić wszystkie pola')
+			Swal.fire({
+				title: 'Uwaga!',
+				text: 'Proszę wypełnić wszystkie pola',
+				icon: 'warning',
+				confirmButtonText: 'OK',
+			})
 			return
 		}
 
@@ -104,9 +109,19 @@ document.addEventListener('DOMContentLoaded', function () {
 			.then(response => response.json())
 			.then(data => {
 				if (data.errors) {
-					alert(data.errors.map(error => error.msg).join('\n'))
+					Swal.fire({
+						title: 'Błędy!',
+						html: data.errors.map(error => `<p>${error.msg}</p>`).join(''),
+						icon: 'error',
+						confirmButtonText: 'OK',
+					})
 				} else {
-					alert(data.msg)
+					Swal.fire({
+						title: 'Informacja',
+						text: data.msg,
+						icon: 'info',
+						confirmButtonText: 'OK',
+					})
 					if (data.msg === 'Użytkownik zarejestrowany. Sprawdź swoją skrzynkę e-mail.') {
 						document.getElementById('modal').style.display = 'none'
 					}
@@ -114,7 +129,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 			.catch(error => {
 				console.error('Error:', error)
-				alert('Wystąpił błąd podczas rejestracji.')
+				Swal.fire({
+					title: 'Błąd!',
+					text: 'Wystąpił błąd podczas rejestracji.',
+					icon: 'error',
+					confirmButtonText: 'OK',
+				})
 			})
 	}
 
@@ -127,7 +147,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		const password = document.getElementById('login-password').value
 
 		if (!email || !password) {
-			alert('Proszę wypełnić wszystkie pola')
+			Swal.fire({
+				title: 'Uwaga!',
+				text: 'Proszę wypełnić wszystkie pola',
+				icon: 'warning',
+				confirmButtonText: 'OK',
+			})
 			return
 		}
 
@@ -141,9 +166,19 @@ document.addEventListener('DOMContentLoaded', function () {
 			.then(response => response.json())
 			.then(data => {
 				if (data.errors) {
-					alert(data.errors.map(error => error.msg).join('\n'))
+					Swal.fire({
+						title: 'Błąd!',
+						html: data.errors.map(error => `<p>${error.msg}</p>`).join(''),
+						icon: 'error',
+						confirmButtonText: 'OK',
+					})
 				} else {
-					alert('Zalogowano pomyślnie')
+					Swal.fire({
+						title: 'Sukces!',
+						text: 'Zalogowano pomyślnie',
+						icon: 'success',
+						confirmButtonText: 'OK',
+					})
 					localStorage.setItem('token', data.token)
 					document.getElementById('modal').style.display = 'none'
 					loadUserProfilePicture()
@@ -156,14 +191,24 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 			.catch(error => {
 				console.error('Error:', error)
-				alert('Wystąpił błąd podczas logowania.')
+				Swal.fire({
+					title: 'Błąd!',
+					text: 'Wystąpił błąd podczas logowania.',
+					icon: 'error',
+					confirmButtonText: 'OK',
+				})
 			})
 	}
 
 	// Funkcja obsługująca wylogowanie
 	function handleLogout() {
 		localStorage.removeItem('token')
-		alert('Wylogowano pomyślnie')
+		Swal.fire({
+			title: 'Sukces!',
+			text: 'Wylogowano pomyślnie',
+			icon: 'success',
+			confirmButtonText: 'OK',
+		})
 		location.reload()
 	}
 
@@ -193,7 +238,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				})
 				.catch(error => {
 					console.error('Error loading user profile:', error)
-					alert('Błąd podczas ładowania profilu użytkownika.')
+					Swal.fire({
+						title: 'Błąd!',
+						text: 'Błąd podczas ładowania profilu użytkownika.',
+						icon: 'error',
+						confirmButtonText: 'OK',
+					})
 				})
 		}
 	}
@@ -210,7 +260,12 @@ document.addEventListener('DOMContentLoaded', function () {
 	const token = urlParams.get('token')
 	if (token) {
 		localStorage.setItem('token', token)
-		alert('Zalogowano pomyślnie po weryfikacji emaila')
+		Swal.fire({
+			title: 'Sukces!',
+			text: 'Zalogowano pomyślnie po weryfikacji emaila',
+			icon: 'success',
+			confirmButtonText: 'OK',
+		})
 		loadUserProfilePicture()
 		btn.onclick = function (event) {
 			userOptions.classList.toggle('hidden')

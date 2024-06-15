@@ -104,14 +104,25 @@ document.addEventListener('DOMContentLoaded', function () {
 			// Handle the parsed response data
 			.then(data => {
 				// Display a success message to the user
-				alert('Pozycja dodana do menu!')
+				Swal.fire({
+					title: 'Sukces!',
+					text: 'Pozycja dodana do menu!',
+					icon: 'success',
+					confirmButtonText: 'OK',
+				})
 				// Reset the form fields to their initial state
 				document.getElementById('menu-form').reset()
 			})
 			// Handle any errors that occur during the process
 			.catch(error => {
 				console.error('Error:', error) // Log the error to the console
-				alert('Wystąpił błąd podczas dodawania pozycji do menu.') // Display an error message to the user
+				// Display an error message to the user
+				Swal.fire({
+					title: 'Błąd!',
+					text: 'Wystąpił błąd podczas dodawania pozycji do menu.',
+					icon: 'error',
+					confirmButtonText: 'OK',
+				})
 			})
 	}
 
@@ -145,7 +156,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 			.then(data => {
 				// Display a success message to the user
-				alert('Testimonial added!')
+				Swal.fire({
+					title: 'Success!',
+					text: 'Opinia Dodana!',
+					icon: 'success',
+					confirmButtonText: 'OK',
+				})
 				// Reset the form fields to their initial state
 				document.getElementById('testimonial-form').reset()
 			})
@@ -153,7 +169,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				// Log the error to the console
 				console.error('Error:', error)
 				// Display an error message to the user
-				alert('An error occurred while adding the testimonial.')
+				Swal.fire({
+					title: 'Error!',
+					text: 'An error occurred while adding the testimonial.',
+					icon: 'error',
+					confirmButtonText: 'OK',
+				})
 			})
 	}
 
@@ -226,7 +247,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 			.then(data => {
 				// Display a success message to the user.
-				alert('News added!')
+				Swal.fire({
+					title: 'Success!',
+					text: 'News Dodany!',
+					icon: 'success',
+					confirmButtonText: 'OK',
+				})
 
 				// Reset the form.
 				document.getElementById('news-form').reset()
@@ -248,7 +274,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				console.error('Error:', error)
 
 				// Display an error message to the user.
-				alert('An error occurred while adding the news.')
+				Swal.fire({
+					title: 'Error!',
+					text: 'Wystąpił błąd podczas dodawania newsa.',
+					icon: 'error',
+					confirmButtonText: 'OK',
+				})
 			})
 	}
 
@@ -279,12 +310,24 @@ document.addEventListener('DOMContentLoaded', function () {
 				return response.json() // Parse the response as JSON.
 			})
 			.then(data => {
-				alert(`Pozycja ${type.charAt(0).toUpperCase() + type.slice(1)} usunięta!`) // Display a success message to the user.
+				// Display a success message to the user.
+				Swal.fire({
+					title: 'Sukces!',
+					text: `Pozycja ${type.charAt(0).toUpperCase() + type.slice(1)} usunięta!`,
+					icon: 'success',
+					confirmButtonText: 'OK',
+				})
 				element.remove() // Remove the element from the webpage.
 			})
 			.catch(error => {
 				console.error('Error:', error) // Log the error to the console.
-				alert(`Wystąpił błąd podczas usuwania ${type}.`) // Display an error message to the user.
+				// Display an error message to the user.
+				Swal.fire({
+					title: 'Błąd!',
+					text: `Wystąpił błąd podczas usuwania ${type}.`,
+					icon: 'error',
+					confirmButtonText: 'OK',
+				})
 			})
 	}
 
@@ -375,7 +418,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 			.then(data => {
 				// Display a success message to the user.
-				alert(`Pozycja ${type.charAt(0).toUpperCase() + type.slice(1)} zaktualizowana!`)
+				Swal.fire({
+					title: 'Sukces!',
+					text: `Pozycja ${type.charAt(0).toUpperCase() + type.slice(1)} zaktualizowana!`,
+					icon: 'success',
+					confirmButtonText: 'OK',
+				})
 				// If the field is not 'header' or 'text', update the text content of the element with the new value.
 				if (field !== 'header' && field !== 'text') {
 					document.getElementById(`${field}-${id}`).textContent = data[field]
@@ -384,7 +432,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			.catch(error => {
 				// Log the error to the console and display an error message to the user.
 				console.error('Error:', error)
-				alert(`Wystąpił błąd podczas aktualizacji ${type}.`)
+				Swal.fire({
+					title: 'Błąd!',
+					text: `Wystąpił błąd podczas aktualizacji ${type}.`,
+					icon: 'error',
+					confirmButtonText: 'OK',
+				})
 			})
 	}
 
@@ -490,14 +543,24 @@ document.addEventListener('DOMContentLoaded', function () {
 						})
 						.then(data => {
 							// Display a success message to the user
-							alert('Obraz zaktualizowany!')
+							Swal.fire({
+								title: 'Sukces!',
+								text: 'Obraz zaktualizowany!',
+								icon: 'success',
+								confirmButtonText: 'OK',
+							})
 							// Update the image source to display the new image
 							imageElement.src = `/img/uploads/${data.image}`
 						})
 						.catch(error => {
 							console.error('Error:', error) // Log any errors to the console
 							// Display an error message to the user
-							alert('Wystąpił błąd podczas aktualizacji obrazu.')
+							Swal.fire({
+								title: 'Błąd!',
+								text: 'Wystąpił błąd podczas aktualizacji obrazu.',
+								icon: 'error',
+								confirmButtonText: 'OK',
+							})
 						})
 				}
 			})
@@ -714,7 +777,12 @@ document.addEventListener('DOMContentLoaded', function () {
 					})
 					.catch(error => {
 						console.error('Error:', error)
-						alert('Wystąpił błąd podczas ładowania pozycji menu.')
+						Swal.fire({
+							title: 'Błąd!',
+							text: 'Wystąpił błąd podczas ładowania pozycji menu.',
+							icon: 'error',
+							confirmButtonText: 'OK',
+						})
 					})
 			} else if (selectedType === 'testimonial') {
 				fetch(`${API_URL}/testimonials`, {
@@ -746,7 +814,12 @@ document.addEventListener('DOMContentLoaded', function () {
 					})
 					.catch(error => {
 						console.error('Error:', error)
-						alert('Wystąpił błąd podczas ładowania testimonials.')
+						Swal.fire({
+							title: 'Błąd!',
+							text: 'Wystąpił błąd podczas ładowania opinii.',
+							icon: 'error',
+							confirmButtonText: 'OK',
+						})
 					})
 			} else if (selectedType === 'news') {
 				listContainer.classList.add('news-list-container')
@@ -808,7 +881,12 @@ document.addEventListener('DOMContentLoaded', function () {
 					})
 					.catch(error => {
 						console.error('Error:', error)
-						alert('Wystąpił błąd podczas ładowania news.')
+						Swal.fire({
+							title: 'Błąd!',
+							text: 'Wystąpił błąd podczas ładowania news.',
+							icon: 'error',
+							confirmButtonText: 'OK',
+						})
 					})
 			} else if (selectedType === 'reservations') {
 				fetch(`${API_URL}/admin/reservations`, {
@@ -844,7 +922,12 @@ document.addEventListener('DOMContentLoaded', function () {
 					})
 					.catch(error => {
 						console.error('Error:', error)
-						alert('Wystąpił błąd podczas ładowania rezerwacji.')
+						Swal.fire({
+							title: 'Błąd!',
+							text: 'Wystąpił błąd podczas ładowania rezerwacji.',
+							icon: 'error',
+							confirmButtonText: 'OK',
+						})
 					})
 			}
 		})
@@ -986,7 +1069,12 @@ document.addEventListener('DOMContentLoaded', function () {
 					const confirmPassword = document.getElementById('confirm-password').value
 
 					if (newPassword !== confirmPassword) {
-						alert('New password and password confirmation do not match.')
+						Swal.fire({
+							title: 'Error!',
+							text: 'Stare i Nowe Hasło do Siebie Nie Pasują',
+							icon: 'error',
+							confirmButtonText: 'OK',
+						})
 						return
 					}
 
@@ -1002,15 +1090,30 @@ document.addEventListener('DOMContentLoaded', function () {
 						.then(response => response.json())
 						.then(data => {
 							if (data.errors) {
-								alert(data.errors.map(error => error.msg).join('\n'))
+								Swal.fire({
+									title: 'Błąd!',
+									text: data.errors.map(error => error.msg).join('\n'),
+									icon: 'error',
+									confirmButtonText: 'OK',
+								})
 							} else {
-								alert('Password updated successfully.')
+								Swal.fire({
+									title: 'Success!',
+									text: 'Hasło pomyślnie zaktualizowane.',
+									icon: 'success',
+									confirmButtonText: 'OK',
+								})
 								document.querySelector('.change-password-form').classList.add('hidden')
 							}
 						})
 						.catch(error => {
 							console.error('Error changing password:', error)
-							alert('Error changing password.')
+							Swal.fire({
+								title: 'Error!',
+								text: 'Błąd zmiany hasła.',
+								icon: 'error',
+								confirmButtonText: 'OK',
+							})
 						})
 				})
 
@@ -1025,7 +1128,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 			.catch(error => {
 				console.error('Error loading user profile:', error)
-				alert('Error loading user profile.')
+				Swal.fire({
+					title: 'Error!',
+					text: 'Error loading user profile.',
+					icon: 'error',
+					confirmButtonText: 'OK',
+				})
 			})
 	}
 
@@ -1045,15 +1153,30 @@ document.addEventListener('DOMContentLoaded', function () {
 				.then(response => response.json())
 				.then(data => {
 					if (data.errors) {
-						alert(data.errors.map(error => error.msg).join('\n'))
+						Swal.fire({
+							title: 'Error!',
+							text: data.errors.map(error => error.msg).join('\n'),
+							icon: 'error',
+							confirmButtonText: 'OK',
+						})
 					} else {
-						alert('Zdjęcie profilowe zaktualizowane pomyślnie')
+						Swal.fire({
+							title: 'Sukces!',
+							text: 'Zdjęcie profilowe zaktualizowane pomyślnie',
+							icon: 'success',
+							confirmButtonText: 'OK',
+						})
 						loadUserProfile()
 					}
 				})
 				.catch(error => {
 					console.error('Error uploading profile picture:', error)
-					alert('Błąd podczas zmiany zdjęcia profilowego.')
+					Swal.fire({
+						title: 'Błąd!',
+						text: 'Błąd podczas zmiany zdjęcia profilowego.',
+						icon: 'error',
+						confirmButtonText: 'OK',
+					})
 				})
 		}
 	}
@@ -1080,19 +1203,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		if (fieldName === 'firstName' || fieldName === 'lastName') {
 			if (fieldValue === '') {
-				alert(`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} nie może być puste.`)
+				Swal.fire({
+					title: 'Błąd!',
+					text: `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} nie może być puste.`,
+					icon: 'error',
+					confirmButtonText: 'OK',
+				})
 				field.textContent = originalValue // Przywróć oryginalną wartość
 				return
 			}
 			if (!isCapitalized(fieldValue)) {
-				alert(`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} musi zaczynać się wielką literą.`)
+				Swal.fire({
+					title: 'Błąd!',
+					text: `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} musi zaczynać się wielką literą.`,
+					icon: 'error',
+					confirmButtonText: 'OK',
+				})
+
 				field.textContent = originalValue // Przywróć oryginalną wartość
 				return
 			}
 		}
 
 		if (fieldName === 'email' && !validateEmail(fieldValue)) {
-			alert('Proszę podać poprawny adres e-mail.')
+			Swal.fire({
+				title: 'Błąd!',
+				text: 'Proszę podać poprawny adres e-mail.',
+				icon: 'error',
+				confirmButtonText: 'OK',
+			})
 			field.textContent = originalValue // Przywróć oryginalną wartość
 			return
 		}
@@ -1109,10 +1248,20 @@ document.addEventListener('DOMContentLoaded', function () {
 			.then(response => response.json())
 			.then(data => {
 				if (data.errors) {
-					alert(data.errors.map(error => error.msg).join('\n'))
+					Swal.fire({
+						title: 'Błędy!',
+						html: data.errors.map(error => `<p>${error.msg}</p>`).join(''),
+						icon: 'error',
+						confirmButtonText: 'OK',
+					})
 					field.textContent = originalValue // Przywróć oryginalną wartość w przypadku błędu
 				} else {
-					alert('Profil zaktualizowany pomyślnie')
+					Swal.fire({
+						title: 'Sukces!',
+						text: 'Profil zaktualizowany pomyślnie',
+						icon: 'success',
+						confirmButtonText: 'OK',
+					})
 					field.setAttribute('data-original-value', fieldValue) // Zaktualizuj oryginalną wartość
 
 					// Aktualizacja imienia, nazwiska i pseudonimu w górnej części profilu użytkownika
@@ -1126,7 +1275,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 			.catch(error => {
 				console.error('Error updating profile:', error)
-				alert('Błąd podczas aktualizacji profilu.')
+				Swal.fire({
+					title: 'Błąd!',
+					text: 'Błąd podczas aktualizacji profilu.',
+					icon: 'error',
+					confirmButtonText: 'OK',
+				})
 				field.textContent = originalValue // Przywróć oryginalną wartość w przypadku błędu
 			})
 	}
@@ -1171,13 +1325,24 @@ document.addEventListener('DOMContentLoaded', function () {
 			})
 			.then(data => {
 				// Display a success message and reload the user's reservations
-				alert('Rezerwacja anulowana!')
+				Swal.fire({
+					title: 'Sukces!',
+					text: 'Rezerwacja anulowana!',
+					icon: 'success',
+					confirmButtonText: 'OK',
+				})
+
 				loadUserReservations() // Reload the user's reservations
 			})
 			.catch(error => {
 				// Log the error details and display an error message
 				console.error('Error:', error)
-				alert('Wystąpił błąd podczas anulowania rezerwacji.')
+				Swal.fire({
+					title: 'Błąd!',
+					text: 'Wystąpił błąd podczas anulowania rezerwacji.',
+					icon: 'error',
+					confirmButtonText: 'OK',
+				})
 			})
 	}
 
@@ -1309,7 +1474,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			.catch(error => {
 				// Log any errors to the console and display an error message to the user
 				console.error('Error loading reservations:', error)
-				alert('Błąd podczas ładowania rezerwacji.')
+				Swal.fire({
+					title: 'Błąd!',
+					text: 'Błąd podczas ładowania rezerwacji.',
+					icon: 'error',
+					confirmButtonText: 'OK',
+				})
 			})
 	}
 
