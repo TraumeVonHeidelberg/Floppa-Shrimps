@@ -56,6 +56,14 @@ document.addEventListener('DOMContentLoaded', function () {
 		})
 	}
 
+	// Helper function to get the correct image path
+	function getImagePath(image) {
+		if (window && window.process && window.process.type === 'renderer') {
+			return `http://localhost:3000/${image}`
+		}
+		return `/img/uploads/${image}`
+	}
+
 	/**
 	 * This function handles the submission of the menu item form.
 	 * It prevents the default form submission behavior, which is to refresh the page.
@@ -834,34 +842,30 @@ document.addEventListener('DOMContentLoaded', function () {
 						listContainer.innerHTML = data
 							.map(
 								item => `
-                        <div class="element news-element" id="element-${item.id}">
-                            <div class="news-item">
-                                <div class="news-meta">
-                                    <p class="element-text" id="category-${item.id}">${item.category}</p>
-                                    <p class="element-text" id="title-${item.id}">${item.title}</p>
-                                    ${
-																			item.image
-																				? `<img src="/img/uploads/${item.image}" alt="News Image" class="news-image" id="image-${item.id}">`
-																				: ''
-																		}
-                                    <p class="element-text" id="introText-${item.id}">${item.introText}</p>
-                                </div>
-                                <div id="headers-texts-${item.id}">
-                                    ${item.headers
-																			.map(
-																				(header, index) => `
-                                        <div class="header-text-pair">
-                                            <p class="element-text news-header" id="header-${item.id}-${index}">${header.header}</p>
-                                            <p class="element-text news-text" id="text-${item.id}-${index}">${header.text}</p>
-                                        </div>
-                                    `
-																			)
-																			.join('')}
-                                </div>
-                            </div>
-                            <i class="fa-regular fa-circle-xmark" onclick="deleteItem('news', ${item.id})"></i>
-                        </div>
-                    `
+								<div class="element news-element" id="element-${item.id}">
+									<div class="news-item">
+										<div class="news-meta">
+											<p class="element-text" id="category-${item.id}">${item.category}</p>
+											<p class="element-text" id="title-${item.id}">${item.title}</p>
+											${item.image ? `<img src="${getImagePath(item.image)}" alt="News Image" class="news-image" id="image-${item.id}">` : ''}
+											<p class="element-text" id="introText-${item.id}">${item.introText}</p>
+										</div>
+										<div id="headers-texts-${item.id}">
+											${item.headers
+												.map(
+													(header, index) => `
+												<div class="header-text-pair">
+													<p class="element-text news-header" id="header-${item.id}-${index}">${header.header}</p>
+													<p class="element-text news-text" id="text-${item.id}-${index}">${header.text}</p>
+												</div>
+											`
+												)
+												.join('')}
+										</div>
+									</div>
+									<i class="fa-regular fa-circle-xmark" onclick="deleteItem('news', ${item.id})"></i>
+								</div>
+							`
 							)
 							.join('')
 						data.forEach(item => {

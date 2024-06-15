@@ -270,8 +270,16 @@ router.get('/news', async (req, res) => {
 			],
 		})
 
-		console.log('Fetched all news:', news)
-		res.status(200).json(news)
+		// Dynamically set the image paths
+		const newsWithImagePaths = news.map(item => {
+			if (item.image) {
+				item.image = `/img/uploads/${item.image}`
+			}
+			return item
+		})
+
+		console.log('Fetched all news:', newsWithImagePaths)
+		res.status(200).json(newsWithImagePaths)
 	} catch (error) {
 		console.error('Error fetching all news:', error)
 		res.status(500).json({ message: error.message })
