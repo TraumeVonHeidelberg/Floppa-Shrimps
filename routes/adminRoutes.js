@@ -188,16 +188,18 @@ router.delete('/admin/:type/:id', authenticateToken, async (req, res) => {
 			return res.status(404).json({ message: `${type} not found` })
 		}
 
-		// Jeśli typem jest rezerwacja, wysyłamy e-mail do użytkownika
-		if (type === 'reservation') {
+		// Jeśli typem jest rezerwacja, wysyłamy e-mail do użytkownika (jeśli istnieje)
+		if (type === 'reservation' && item.userId) {
 			const user = await User.findByPk(item.userId)
-			const mailOptions = {
-				from: process.env.EMAIL_USER,
-				to: user.email,
-				subject: 'Anulowanie rezerwacji',
-				text: `Twoja rezerwacja na dzień ${item.date} o godzinie ${item.time} została anulowana przez administratora.`,
+			if (user) {
+				const mailOptions = {
+					from: process.env.EMAIL_USER,
+					to: user.email,
+					subject: 'Anulowanie rezerwacji',
+					text: `Twoja rezerwacja na dzień ${item.date} o godzinie ${item.time} została anulowana przez administratora.`,
+				}
+				await transporter.sendMail(mailOptions)
 			}
-			await transporter.sendMail(mailOptions)
 		}
 
 		await item.destroy()
