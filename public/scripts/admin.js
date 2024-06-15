@@ -15,15 +15,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		document.querySelectorAll('aside button').forEach(button => button.classList.remove('button-active'))
 	}
 
-	//prosta funkcja ktora sprawdza czy nowy e-mail wpisany przez uzytkownika jest poprawny
-	function validateEmail(email) {
-		//regula tworzenia e-maila za pomoca wyrazen regularnych
-		const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-		//re.test sprawdza czy email spelnia regule, lowerCase dla spojnosci danych
-		return re.test(String(email).toLowerCase())
-	}
-
 	//to funkcja ktora modyfikuje cene pozycji w menu by miala wartosci po przecinku (2 miejsca po przecinku)
 	function formatPriceInput(input) {
 		input.addEventListener('blur', function () {
@@ -875,13 +866,36 @@ document.addEventListener('DOMContentLoaded', function () {
 			return // Jeśli wartość się nie zmieniła, nie wysyłaj żądania
 		}
 
-		// Walidacja e-maila
+		// Walidacja
+		function validateEmail(email) {
+			const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+			return re.test(String(email).toLowerCase())
+		}
+
+		function isCapitalized(str) {
+			return str.charAt(0) === str.charAt(0).toUpperCase()
+		}
+
+		if (fieldName === 'firstName' || fieldName === 'lastName') {
+			if (fieldValue === '') {
+				alert(`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} nie może być puste.`)
+				field.textContent = originalValue // Przywróć oryginalną wartość
+				return
+			}
+			if (!isCapitalized(fieldValue)) {
+				alert(`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} musi zaczynać się wielką literą.`)
+				field.textContent = originalValue // Przywróć oryginalną wartość
+				return
+			}
+		}
+
 		if (fieldName === 'email' && !validateEmail(fieldValue)) {
 			alert('Proszę podać poprawny adres e-mail.')
 			field.textContent = originalValue // Przywróć oryginalną wartość
 			return
 		}
 
+		// Wysłanie żądania PUT do API
 		fetch(`${API_URL}/profile`, {
 			method: 'PUT',
 			headers: {
