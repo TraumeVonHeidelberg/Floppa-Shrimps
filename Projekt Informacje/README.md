@@ -30,3 +30,5 @@ Aplikacja ta stara się realizować wszelkie potencjalne potrzeby restauracji po
    Formularz dostosowany jest do godzin otwarcia restauracji, nie można rezerwować na czas wcześniejszy niż obecny, dostępne stoliki są cały czas weryfikowane.
    Takich funkcji i zależności jest zaś dużo więcej, bo starałem się uczynić aplikacje jak najbardziej kompleksową.
    Dodatkowo kod posiada wszelkie konieczne logowania błędów i komentarze.
+   
+   Zrobiłem też zadanie dodatkowe z moodle i można to potraktować jako plus.
