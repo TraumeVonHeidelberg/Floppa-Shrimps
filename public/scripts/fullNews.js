@@ -7,6 +7,18 @@ document.addEventListener('DOMContentLoaded', function () {
 		return
 	}
 
+	// Function to check if the user is authenticated and update the UI accordingly
+	function updateUI() {
+		const token = localStorage.getItem('token')
+		if (!token) {
+			document.getElementById('comment-text').disabled = true
+			document.getElementById('submit-comment').style.display = 'none'
+		} else {
+			document.getElementById('comment-text').disabled = false
+			document.getElementById('submit-comment').style.display = 'block'
+		}
+	}
+
 	// Fetch and display the main news content
 	fetch(`http://localhost:3000/api/news/${newsId}`)
 		.then(response => {
@@ -70,8 +82,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     <p class="call-to-action-sign">Komentarze</p>
 
                     <div class="comment-content">
-                        <textarea name="" id="comment-text" placeholder="Napisz Komentarz"></textarea>
-                        <i class="fa-solid fa-chevron-right" id="submit-comment"></i>
+                        <textarea name="" id="comment-text" placeholder="Napisz Komentarz" disabled></textarea>
+                        <i class="fa-solid fa-chevron-right" id="submit-comment" style="display: none;"></i>
                     </div>
                 </article>
                 <aside>
@@ -141,11 +153,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			// Fetch and display comments
 			function fetchComments() {
-				fetch(`http://localhost:3000/api/news/${newsId}/comments`, {
-					headers: {
-						Authorization: `Bearer ${localStorage.getItem('token')}`,
-					},
-				})
+				const headers = localStorage.getItem('token')
+					? {
+							Authorization: `Bearer ${localStorage.getItem('token')}`,
+					  }
+					: {}
+
+				fetch(`http://localhost:3000/api/news/${newsId}/comments`, { headers })
 					.then(response => {
 						if (!response.ok) {
 							throw new Error('Network response was not ok')
@@ -247,10 +261,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				// Replace the comment text with a textarea for editing
 				commentTextElement.innerHTML = `
-				<textarea class="edit-comment-textarea">${originalText}</textarea>
-				<button class="save-comment">Save</button>
-				<button class="cancel-edit">Cancel</button>
-			`
+					<textarea class="edit-comment-textarea">${originalText}</textarea>
+					<button class="save-comment">Save</button>
+					<button class="cancel-edit">Cancel</button>
+				`
 
 				// Add event listener to the save button
 				commentDiv.querySelector('.save-comment').addEventListener('click', function () {
@@ -285,7 +299,9 @@ document.addEventListener('DOMContentLoaded', function () {
 				})
 			}
 
+			// Initial fetch of comments and update UI
 			fetchComments()
+			updateUI()
 
 			// Add comment
 			document.getElementById('submit-comment').addEventListener('click', function () {
@@ -314,6 +330,25 @@ document.addEventListener('DOMContentLoaded', function () {
 						console.error('Error adding comment:', error)
 					})
 			})
+
+			// Example login function to demonstrate dynamic UI update
+			function login() {
+				// Mock login process
+				localStorage.setItem('token', 'mock-token')
+				updateUI()
+				fetchComments()
+			}
+
+			// Example logout function to demonstrate dynamic UI update
+			function logout() {
+				localStorage.removeItem('token')
+				updateUI()
+				fetchComments()
+			}
+
+			// Attach login/logout functions to buttons for demonstration
+			document.getElementById('login-btn').addEventListener('click', login)
+			document.getElementById('logout-btn').addEventListener('click', logout)
 		})
 		.catch(error => console.error('Error fetching news:', error))
 })
