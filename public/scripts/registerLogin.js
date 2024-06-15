@@ -126,9 +126,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		const email = document.getElementById('login-email').value
 		const password = document.getElementById('login-password').value
 
-		console.log('Email:', email)
-		console.log('Password:', password)
-
 		if (!email || !password) {
 			alert('Proszę wypełnić wszystkie pola')
 			return
