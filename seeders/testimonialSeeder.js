@@ -28,13 +28,27 @@ const testimonials = [
 	},
 ]
 
+// This function seeds the database with sample testimonials.
+// It performs the following steps:
+// 1. Uses the bulkCreate method of the Testimonial model to create multiple testimonials in the database.
+// 2. Logs a message indicating that the database has been seeded.
+// 3. Closes the database connection.
+// If an error occurs during any of these steps, it logs the error and closes the database connection.
 async function seedDatabase() {
 	try {
+		// Create multiple testimonials in the database using the bulkCreate method
 		await Testimonial.bulkCreate(testimonials)
+
+		// Log a message indicating that the database has been seeded
 		console.log('Database seeded!')
+
+		// Close the database connection
 		sequelize.close()
 	} catch (err) {
+		// Log the error that occurred during the seeding process
 		console.error('Error seeding database:', err)
+
+		// Close the database connection
 		sequelize.close()
 	}
 }

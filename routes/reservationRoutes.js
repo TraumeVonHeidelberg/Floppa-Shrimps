@@ -18,70 +18,139 @@ const transporter = nodemailer.createTransport({
 	},
 })
 
-// Funkcja wysyłająca e-mail potwierdzający
+/**
+ * Function to send a confirmation email to the user.
+ *
+ * @param {Object} reservation - The reservation object containing details of the reservation.
+ * @param {string} email - The email address of the user.
+ */
 const sendConfirmationEmail = async (reservation, email) => {
+	// Destructure the required properties from the reservation object
 	const { date, time, seats, additionalInfo } = reservation
 
+	// Create the email options object
 	const mailOptions = {
+		// Set the sender email address
 		from: process.env.EMAIL_USER,
+		// Set the recipient email address
 		to: email,
+		// Set the subject of the email
 		subject: 'Potwierdzenie rezerwacji',
+		// Set the text content of the email
 		text: `Twoja rezerwacja została pomyślnie złożona!\n\nSzczegóły rezerwacji:\nData: ${date}\nGodzina: ${time}\nMiejsca: ${seats}\nDodatkowe informacje: ${
 			additionalInfo || 'Brak'
 		}\n\nDziękujemy!`,
 	}
 
 	try {
+		// Log the email address being sent to
 		console.log('Wysyłanie e-maila do:', email)
+		// Send the email using the transporter
 		await transporter.sendMail(mailOptions)
+		// Log that the email has been sent
 		console.log('E-mail z potwierdzeniem został wysłany do:', email)
 	} catch (error) {
+		// Log any errors that occur during email sending
 		console.error('Błąd podczas wysyłania e-maila:', error)
 	}
 }
 
+/**
+ * Sends a cancellation email to the user.
+ *
+ * @param {Object} reservation - The reservation object containing details of the reservation.
+ * @param {string} email - The email address of the user.
+ */
 const sendCancellationEmail = async (reservation, email) => {
+	// Destructure the required properties from the reservation object
 	const { date, time, seats, additionalInfo } = reservation
 
+	// Create the email options object
 	const mailOptions = {
+		// Set the sender email address
 		from: process.env.EMAIL_USER,
+		// Set the recipient email address
 		to: email,
+		// Set the subject of the email
 		subject: 'Anulowanie rezerwacji',
+		// Set the text content of the email
 		text: `Twoja rezerwacja została anulowana.\n\nSzczegóły rezerwacji:\nData: ${date}\nGodzina: ${time}\nMiejsca: ${seats}\nDodatkowe informacje: ${
 			additionalInfo || 'Brak'
 		}\n\nDziękujemy!`,
 	}
 
 	try {
+		// Log the email address being sent to
 		console.log('Wysyłanie e-maila do:', email)
+		// Send the email using the transporter
 		await transporter.sendMail(mailOptions)
+		// Log that the email has been sent
 		console.log('E-mail o anulowaniu został wysłany do:', email)
 	} catch (error) {
+		// Log any errors that occur during email sending
 		console.error('Błąd podczas wysyłania e-maila:', error)
 	}
 }
 
-// Funkcja sprawdzająca dostępność stolika
+// This function checks if a table is available for a reservation at a given date and time.
+// It takes three parameters:
+// - tableId: The ID of the table to check availability for.
+// - date: The date of the reservation in the format 'YYYY-MM-DD'.
+// - time: The start time of the reservation in the format 'HH:MM'.
+// - duration (optional): The duration of the reservation in hours. Defaults to 2.
+//
+// The function returns a Promise that resolves to a boolean value. It returns true if the table is available,
+// and false otherwise.
+//
+// The function first creates a Date object for the start time of the reservation. It then creates another Date object
+// for the end time of the reservation by adding the duration (in hours) to the start time.
+//
+// The function then queries the database to find any reservations that overlap with the time range specified by
+// the start time and end time. It uses the Sequelize ORM's Op.between operator to check if the reservation's time
+// or end time falls within the range specified. It also checks for reservations on the same date and for the
+// specified table.
+//
+// If there are no overlapping reservations, the function returns true, indicating that the table is available.
+// If there are any overlapping reservations, the function returns false, indicating that the table is not available.
 const isTableAvailable = async (tableId, date, time, duration = 2) => {
+	// Create a Date object for the start time of the reservation
 	const startTime = new Date(`${date}T${time}`)
+
+	// Create a Date object for the end time of the reservation by adding the duration (in hours) to the start time
 	const endTime = new Date(startTime)
 	endTime.setHours(startTime.getHours() + duration)
 
+	// Query the database to find any reservations that overlap with the time range specified
 	const overlappingReservations = await Reservation.findAll({
 		where: {
-			tableId,
-			date,
+			tableId, // Check for reservations on the specified table
+			date, // Check for reservations on the specified date
 			[Op.or]: [
-				{ time: { [Op.between]: [time, endTime.toTimeString().split(' ')[0]] } },
-				{ endTime: { [Op.between]: [time, endTime.toTimeString().split(' ')[0]] } },
+				{
+					time: {
+						[Op.between]: [
+							time, // Check if the reservation's time falls within the range specified
+							endTime.toTimeString().split(' ')[0],
+						],
+					},
+				},
+				{
+					endTime: {
+						[Op.between]: [
+							time, // Check if the reservation's end time falls within the range specified
+							endTime.toTimeString().split(' ')[0],
+						],
+					},
+				},
 			],
 		},
 	})
 
+	// If there are no overlapping reservations, the table is available
 	return overlappingReservations.length === 0
 }
 
-// Endpoint do sprawdzania dostępności rezerwacji
+// Endpoint for checking table availability
 router.post('/check-availability', async (req, res) => {
 	const { date, time, seats } = req.body
 
@@ -106,26 +175,48 @@ router.post('/check-availability', async (req, res) => {
 	}
 })
 
-// Middleware to authenticate and set req.user for authenticated users
+/**
+ * Middleware function to authenticate and set req.user for authenticated users.
+ * This function checks if the request has an authorization header and if it does,
+ * it tries to verify the JWT token in that header and set req.user with the user's ID.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {Function} next - The next middleware function to call.
+ */
 const optionalAuthenticateToken = (req, res, next) => {
+	// Check if the request has an authorization header
 	const authHeader = req.headers['authorization']
 	if (!authHeader) {
-		return next() // Skip authentication for non-authenticated users
+		// If the header is not present, skip authentication for non-authenticated users
+		return next()
 	}
 
+	// Extract the token from the authorization header
 	const token = authHeader && authHeader.split(' ')[1]
-	if (token == null) return next()
+	if (token == null) {
+		// If the token is not present, skip authentication
+		return next()
+	}
 
+	// Verify the token using the JWT_SECRET environment variable
 	jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-		if (err) return next()
+		if (err) {
+			// If there is an error verifying the token, skip authentication
+			return next()
+		}
+
+		// If the token is valid, set req.user with the user's ID
 		req.user = {
 			userId: user.userId,
 		}
+
+		// Call the next middleware function
 		next()
 	})
 }
 
-// Endpoint do tworzenia rezerwacji
+// Endpoint for making a reservation
 router.post('/reservations', optionalAuthenticateToken, async (req, res) => {
 	const { date, time, seats, additionalInfo, firstName, lastName, email } = req.body
 	let userId = null
@@ -194,7 +285,7 @@ router.post('/reservations', optionalAuthenticateToken, async (req, res) => {
 	}
 })
 
-// Endpoint do anulowania rezerwacji
+// Endpoint to cancel reservation
 router.delete('/reservations/:id', authenticateToken, async (req, res) => {
 	const { id } = req.params
 

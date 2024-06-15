@@ -14,9 +14,27 @@ document.addEventListener('DOMContentLoaded', function () {
 		weekend: { start: 12, end: 24 },
 	}
 
-	function populateTimeOptions(dayOfWeek, selectedDate) {
-		timeSelect.innerHTML = ''
+	/**
++ * This function populates the time select options based on the selected day and date.
++ * It takes in two parameters: dayOfWeek, which is the number representing the day of the week,
++ * and selectedDate, which is the date selected by the user.
++ * 
++ * The function first clears the options in the time select element.
++ * 
++ * It then determines the start and end hours based on whether the day is a weekday or weekend.
++ * 
++ * It also checks if the selected date is today and if it is, it skips any times before the current time.
++ * 
++ * The function then loops through each hour between the start and end hours.
++ * For each hour, it creates an option for each 30 minute interval.
++ * 
++ * The created options are added to the time select element.
++ */
 
+	function populateTimeOptions(dayOfWeek, selectedDate) {
+		timeSelect.innerHTML = '' // Clear the options in the time select element
+
+		// Determine the start and end hours based on whether the day is a weekday or weekend
 		let startHour, endHour
 		if (dayOfWeek >= 1 && dayOfWeek <= 5) {
 			startHour = openingHours.weekday.start
@@ -26,11 +44,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			endHour = openingHours.weekend.end
 		}
 
+		// Check if the selected date is today and if it is, skip any times before the current time
 		const currentDateTime = new Date()
 		const isToday = selectedDate.toDateString() === currentDateTime.toDateString()
 
+		// Loop through each hour between the start and end hours
 		for (let hour = startHour; hour < endHour; hour++) {
-			const hourFormatted = hour.toString().padStart(2, '0')
+			const hourFormatted = hour.toString().padStart(2, '0') // Format the hour as a two-digit string
 
 			for (let minutes of ['00', '30']) {
 				const timeString = `${hourFormatted}:${minutes}`
@@ -38,6 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				const [hours, mins] = timeString.split(':')
 				timeOption.setHours(hours, mins)
 
+				// Skip any times before the current time if the selected date is today
 				if (isToday && timeOption <= currentDateTime) continue
 
 				timeSelect.appendChild(new Option(timeString, timeString))
@@ -45,33 +66,63 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
+	/**
+	 * Fetches the maximum number of seats from the server.
+	 * If the fetch is successful, it returns the maximum number of seats.
+	 * If the fetch fails, it logs an error and returns a default value of 10.
+	 *
+	 * @return {Promise<number>} The maximum number of seats or a default value.
+	 */
 	async function fetchMaxSeats() {
 		try {
+			// Send a GET request to the server to fetch the maximum number of seats
 			const response = await fetch(`${API_URL}/tables/max-seats`)
+
+			// Check if the response was successful (status code in the 200-299 range)
 			if (response.ok) {
+				// Parse the response as JSON and extract the maximum number of seats
 				const data = await response.json()
 				return data.maxSeats
 			} else {
+				// If the response is not successful, throw an error
 				throw new Error('Error fetching max seats')
 			}
 		} catch (error) {
+			// If any errors occur during the fetch, log the error and return a default value
 			console.error('Error:', error)
 			return 10
 		}
 	}
 
+	/**
+	 * Populates the seats select options based on the available seats and the
+	 * selected seats. If availableSeats is null, all seats are available.
+	 * 
+	 * @param {Array|null} availableSeats - An array of available seats or null.
+	 * @param {number|null} selectedSeats - The selected number of seats or null.
+	 */
 	async function populateSeatsOptions(availableSeats = null, selectedSeats = null) {
+		// Fetch the maximum number of seats from the server
 		const maxSeats = await fetchMaxSeats()
+		
+		// Clear the seats select options
 		seatsSelect.innerHTML = ''
 
+		// Loop through each seat number from 1 to the maximum number of seats
 		for (let i = 1; i <= maxSeats; i++) {
+			// Create a new option element for each seat number
 			const option = new Option(i, i)
+			
+			// If availableSeats is null or if the current seat number is included in availableSeats,
+			// add the option element to the seats select options
 			if (availableSeats === null || availableSeats.includes(i)) {
 				seatsSelect.appendChild(option)
 			}
 		}
 
-		// Przywróć wcześniej wybraną liczbę miejsc, jeśli jest dostępna
+		// If selectedSeats is not null and is included in availableSeats or if availableSeats is null,
+		// set the value of the seats select options to the selected number of seats.
+		// Otherwise, set the value to 2.
 		if (selectedSeats && (availableSeats === null || availableSeats.includes(selectedSeats))) {
 			seatsSelect.value = selectedSeats
 		} else {
@@ -79,27 +130,42 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
+	// This function updates the available seats based on the selected date and time.
+	// It sends a POST request to the server with the selected date and time as the request body.
+	// If the response is successful, it parses the JSON data and passes the available seats and the selected seats to the populateSeatsOptions function.
+	// If the response is not successful, it logs an error message to the console.
+	// If any errors occur during the process, it logs the error to the console.
 	async function updateAvailableSeats() {
+		// Get the selected date and time from the form fields
 		const date = reservationDate.value
 		const time = timeSelect.value
 
+		// If both date and time are selected, proceed with the update
 		if (date && time) {
+			// Get the selected number of seats from the seats select options
 			const selectedSeats = parseInt(seatsSelect.value) || 2
 
 			try {
+				// Send a POST request to the server with the selected date and time as the request body
 				const response = await fetch(`${API_URL}/available-seats`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ date, time }),
 				})
 
+				// Check if the response is successful
 				if (response.ok) {
+					// Parse the JSON data from the response
 					const data = await response.json()
+
+					// Pass the available seats and the selected seats to the populateSeatsOptions function
 					populateSeatsOptions(data.availableSeats, selectedSeats)
 				} else {
+					// If the response is not successful, log an error message to the console
 					console.error('Error fetching available seats')
 				}
 			} catch (error) {
+				// If any errors occur during the process, log the error to the console
 				console.error('Error:', error)
 			}
 		}

@@ -16,7 +16,7 @@ Aplikacja ta stara się realizować wszelkie potencjalne potrzeby restauracji po
    potraw w celu zachęcenia gości do odwiedzenia. Reszta elementów stopniowo przeprowadza użytkownika przez wszelkie istotne informacje zapewniając unikalny
    design na każdym etapie. Posiadam również wiele skryptów stricte frontendowych co wyróżnia moją aplikację, chociażby data w stopce będzie zawsze aktualna, pojawiający się kolor dla nawigacji, offset dla linków w nawigacji itd.
 2. Wyjątkowo rozbudowany backend. Aplikacja działa na bazie danych składającej się z ośmiu tabel (widocznych na dołączonym schemacie). Każda z tabel
-   posiada konieczne ograniczenia, powiązania, triggery i indexy zgodnie z wymaganiami tam gdzie uznałem to za stosowne. Poszedłem jednak o krok dalej w
+   posiada konieczne ograniczenia, powiązania, triggery i indexy zgodnie z wymaganiami tam gdzie uznałem to za stosowne. Dodatkowo powiązania między tabelami można zobaczyć w associations.js. Poszedłem jednak o krok dalej w
    mojej pracy z bazą danych umożliwiając użytkownikom (a w szczególności adminowi) interakcję z nią bez wykonywania żadnych zapytań sql. Niemalże każdy
    element który zarządzany jest przez baze danych może być edytowany, usuwany, dodawany z poziomu przystępnego interfejsu graficznego, dodatkowo zapewniając
    walidacje tych danych na każdym etapie. Nawet gdyby admin usunął wszystkie tabele z bazy zostaną one automatycznie odbudowane w tym scenariuszu po uruchomieniu serwera. Edycja poszczególnych kolumn chociażby ich ograniczeń, typów danych to również kwestia edycji jednej linijki w modelach i uruchomienia opcji alter:"true" w sync w pliku app.js (bądź force w bardziej skrajnych przypadkach). Wszystkie zapytania dziejące się w bazie danych wyświetlane są w terminalu.
@@ -30,5 +30,6 @@ Aplikacja ta stara się realizować wszelkie potencjalne potrzeby restauracji po
    Formularz dostosowany jest do godzin otwarcia restauracji, nie można rezerwować na czas wcześniejszy niż obecny, dostępne stoliki są cały czas weryfikowane.
    Takich funkcji i zależności jest zaś dużo więcej, bo starałem się uczynić aplikacje jak najbardziej kompleksową.
    Dodatkowo kod posiada wszelkie konieczne logowania błędów i komentarze.
-   
+
+   Nie napisałem skryptów tworzących baze danych, ponieważ wszystko odbywa się przez sequelize, a na konsoli dynamicznie logowane są wszystkie operacje na bazie danych.
    Zrobiłem też zadanie dodatkowe z moodle i można to potraktować jako plus.

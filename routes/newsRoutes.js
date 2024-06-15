@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+//The Op object in Sequelize is used to create complex query conditions using operators.
 const { Op } = require('sequelize')
 const News = require('../models/news')
 const NewsHeaderText = require('../models/newsHeaderText')
@@ -20,19 +21,20 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage })
 
-// Logowanie przy każdym żądaniu do /api/news
-router.use((req, res, next) => {
-	console.log(`Request received at /api/news: ${req.method} ${req.originalUrl}`)
-	next()
-})
+// // Logowanie przy każdym żądaniu do /api/news
+// router.use((req, res, next) => {
+// 	console.log(`Request received at /api/news: ${req.method} ${req.originalUrl}`)
+// 	next()
+// })
 
-// Endpoint do dodawania newsów
+// Endpoint for adding news
 router.post('/news', authenticateToken, upload.single('image'), async (req, res) => {
 	const { category, title, introText, headers, texts } = req.body
 	const userId = req.user.userId
 	const image = req.file ? req.file.filename : null
 
 	try {
+		// Create the news entry
 		const news = await News.create({
 			category,
 			title,
@@ -41,6 +43,7 @@ router.post('/news', authenticateToken, upload.single('image'), async (req, res)
 			userId,
 		})
 
+		// Parse and add headers and texts
 		const headersArray = JSON.parse(headers)
 		const textsArray = JSON.parse(texts)
 
@@ -58,7 +61,7 @@ router.post('/news', authenticateToken, upload.single('image'), async (req, res)
 	}
 })
 
-// Endpoint do dodawania komentarzy
+// Endpoint for adding comments
 router.post('/news/:id/comments', authenticateToken, async (req, res) => {
 	const { text } = req.body
 	const userId = req.user.userId
@@ -67,6 +70,7 @@ router.post('/news/:id/comments', authenticateToken, async (req, res) => {
 	console.log(`Received comment: ${text} for newsId: ${newsId} from userId: ${userId}`)
 
 	try {
+		// Create the comment entry
 		const comment = await Comment.create({
 			text,
 			userId,
@@ -82,8 +86,8 @@ router.post('/news/:id/comments', authenticateToken, async (req, res) => {
 	}
 })
 
-// Endpoint do pobierania komentarzy
-router.get('/news/:id/comments', authenticateToken, async (req, res) => {
+// Endpoint for fetching comments
+router.get('/news/:id/comments', async (req, res) => {
 	const newsId = req.params.id
 	const userId = req.user ? req.user.userId : null
 	const userRole = req.user ? req.user.role : null
@@ -96,6 +100,7 @@ router.get('/news/:id/comments', authenticateToken, async (req, res) => {
 	}
 
 	try {
+		// Fetch all comments related to the news
 		const comments = await Comment.findAll({
 			where: { newsId },
 			include: [{ model: User, as: 'author', attributes: ['firstName', 'lastName', 'username', 'profilePicture'] }],
@@ -103,6 +108,7 @@ router.get('/news/:id/comments', authenticateToken, async (req, res) => {
 
 		console.log(`Fetched comments: ${comments.length} comments found`)
 
+		// Add permissions to each comment
 		const commentsWithPermissions = comments.map(comment => {
 			const commentJson = comment.toJSON()
 			commentJson.canDelete = comment.userId === userId || userRole === 'admin'
@@ -120,12 +126,13 @@ router.get('/news/:id/comments', authenticateToken, async (req, res) => {
 	}
 })
 
-// Endpoint do usuwania komentarzy
+// Endpoint for deleting comments
 router.delete('/news/:newsId/comments/:commentId', authenticateToken, async (req, res) => {
 	const { commentId } = req.params
 	const userId = req.user.userId
 
 	try {
+		// Find the comment by ID
 		const comment = await Comment.findByPk(commentId)
 		if (!comment) {
 			return res.status(404).json({ error: 'Comment not found' })
@@ -136,6 +143,7 @@ router.delete('/news/:newsId/comments/:commentId', authenticateToken, async (req
 			return res.status(403).json({ error: 'Unauthorized' })
 		}
 
+		// Delete the comment
 		await comment.destroy()
 		res.json({ message: 'Comment deleted' })
 	} catch (error) {
@@ -144,13 +152,14 @@ router.delete('/news/:newsId/comments/:commentId', authenticateToken, async (req
 	}
 })
 
-// Endpoint do edytowania komentarzy
+// Endpoint for editing comments
 router.put('/news/:newsId/comments/:commentId', authenticateToken, async (req, res) => {
 	const { commentId } = req.params
 	const { text } = req.body
 	const userId = req.user.userId
 
 	try {
+		// Find the comment by ID
 		const comment = await Comment.findByPk(commentId)
 		if (!comment) {
 			return res.status(404).json({ error: 'Comment not found' })
@@ -161,6 +170,7 @@ router.put('/news/:newsId/comments/:commentId', authenticateToken, async (req, r
 			return res.status(403).json({ error: 'Unauthorized' })
 		}
 
+		// Update the comment text
 		comment.text = text
 		await comment.save()
 		res.json({ message: 'Comment updated' })
@@ -170,9 +180,10 @@ router.put('/news/:newsId/comments/:commentId', authenticateToken, async (req, r
 	}
 })
 
-// Endpoint do pobierania najnowszych 3 newsów
+// Endpoint for fetching the latest 3 news
 router.get('/news/latest', async (req, res) => {
 	try {
+		// Fetch the latest 3 news entries
 		const news = await News.findAll({
 			limit: 3,
 			order: [['createdAt', 'DESC']],
@@ -190,9 +201,10 @@ router.get('/news/latest', async (req, res) => {
 	}
 })
 
-// Endpoint do pobierania najnowszych 5 newsów
+// Endpoint for fetching the latest 5 news
 router.get('/news/latest/5', async (req, res) => {
 	try {
+		// Fetch the latest 5 news entries
 		const news = await News.findAll({
 			limit: 5,
 			order: [['createdAt', 'DESC']],
@@ -210,9 +222,10 @@ router.get('/news/latest/5', async (req, res) => {
 	}
 })
 
-// Endpoint do pobierania pełnego newsa
+// Endpoint for fetching a single news entry by ID
 router.get('/news/:id', async (req, res) => {
 	try {
+		// Fetch the news entry by ID
 		const news = await News.findOne({
 			where: { id: req.params.id },
 			include: [
@@ -232,9 +245,10 @@ router.get('/news/:id', async (req, res) => {
 	}
 })
 
-// Endpoint do pobierania wszystkich newsów
+// Endpoint for fetching all news entries
 router.get('/news', async (req, res) => {
 	try {
+		// Fetch all news entries
 		const news = await News.findAll({
 			order: [['createdAt', 'DESC']],
 			include: [
@@ -251,13 +265,16 @@ router.get('/news', async (req, res) => {
 	}
 })
 
+// Endpoint for uploading an image for a news entry
 router.post('/news/:id/image', authenticateToken, upload.single('image'), async (req, res) => {
 	try {
+		// Find the news entry by ID
 		const news = await News.findByPk(req.params.id)
 		if (!news) {
 			return res.status(404).json({ message: 'News not found' })
 		}
 
+		// Update the image field
 		if (req.file) {
 			news.image = req.file.filename
 			await news.save()
@@ -270,22 +287,24 @@ router.post('/news/:id/image', authenticateToken, upload.single('image'), async 
 	}
 })
 
+// Endpoint for updating a news entry
 router.put('/news/:id', authenticateToken, async (req, res) => {
 	const { category, title, introText, header, text, index } = req.body
 	try {
+		// Find the news entry by ID
 		const news = await News.findByPk(req.params.id)
 		if (!news) {
 			return res.status(404).json({ message: 'News not found' })
 		}
 
-		// Aktualizacja głównych pól newsa
+		// Update the main fields of the news entry
 		if (category) news.category = category
 		if (title) news.title = title
 		if (introText) news.introText = introText
 
 		await news.save()
 
-		// Aktualizacja nagłówków i tekstów
+		// Update headers and texts if provided
 		if ((header !== undefined || text !== undefined) && index !== undefined) {
 			const headers = await NewsHeaderText.findAll({ where: { newsId: news.id } })
 			if (headers[index]) {
@@ -305,13 +324,16 @@ router.put('/news/:id', authenticateToken, async (req, res) => {
 	}
 })
 
-// Endpoint do usuwania newsa
+// Endpoint for deleting a news entry
 router.delete('/news/:id', authenticateToken, async (req, res) => {
 	try {
+		// Find the news entry by ID
 		const news = await News.findByPk(req.params.id)
 		if (!news) {
 			return res.status(404).json({ message: 'News not found' })
 		}
+
+		// Delete the news entry
 		await News.destroy({
 			where: { id: req.params.id },
 		})
@@ -322,9 +344,10 @@ router.delete('/news/:id', authenticateToken, async (req, res) => {
 	}
 })
 
-// Endpoint do pobierania poprzedniego newsa
+// Endpoint for fetching the previous news entry
 router.get('/news/:id/previous', async (req, res) => {
 	try {
+		// Find the previous news entry by ID
 		const news = await News.findOne({
 			where: { id: { [Op.lt]: req.params.id } },
 			order: [['id', 'DESC']],
@@ -345,9 +368,10 @@ router.get('/news/:id/previous', async (req, res) => {
 	}
 })
 
-// Endpoint do pobierania następnego newsa
+// Endpoint for fetching the next news entry
 router.get('/news/:id/next', async (req, res) => {
 	try {
+		// Find the next news entry by ID
 		const news = await News.findOne({
 			where: { id: { [Op.gt]: req.params.id } },
 			order: [['id', 'ASC']],

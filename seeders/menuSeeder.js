@@ -56,17 +56,35 @@ const menuItems = [
 	},
 ]
 
+/**
+ * This function seeds the database with sample menu items.
+ * It synchronizes the database, formats the price values, 
+ * and bulk creates the menu items in the database.
+ * If an error occurs, it logs the error and closes the database connection.
+ */
 async function seedDatabase() {
 	try {
-		await sequelize.sync({ alter: true }) // Wykonaj synchronizację bez wymuszania usunięcia tabel
+		// Synchronize the database, but without forcing the deletion of tables
+		await sequelize.sync({ alter: true })
+		
+		// Format the price values to two decimal places
 		const formattedMenuItems = menuItems.map(item => {
 			return { ...item, price: item.price.toFixed(2) }
 		})
+		
+		// Bulk create the menu items in the database
 		await MenuItem.bulkCreate(formattedMenuItems)
+		
+		// Log a message indicating that the database has been seeded
 		console.log('Database seeded!')
+		
+		// Close the database connection
 		sequelize.close()
 	} catch (err) {
+		// Log the error that occurred during the seeding process
 		console.error('Error seeding database:', err)
+		
+		// Close the database connection
 		sequelize.close()
 	}
 }

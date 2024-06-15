@@ -7,13 +7,31 @@ document.addEventListener('DOMContentLoaded', function () {
 		return
 	}
 
-	// Function to check if the user is authenticated and update the UI accordingly
+	/**
+	 * Function to update the user interface based on the user's authentication status.
+	 *
+	 * This function checks if the user is authenticated by retrieving the token
+	 * from the local storage. If the token does not exist, it means the user is not
+	 * authenticated and the UI elements related to commenting are disabled.
+	 *
+	 * If the token exists, it means the user is authenticated and the UI elements
+	 * related to commenting are enabled.
+	 *
+	 * @return {void} This function does not return anything.
+	 */
 	function updateUI() {
+		// Retrieve the token from the local storage
 		const token = localStorage.getItem('token')
+
+		// Check if the token exists
 		if (!token) {
+			// If the token does not exist, the user is not authenticated
+			// Disable the comment text input field and hide the submit comment button
 			document.getElementById('comment-text').disabled = true
 			document.getElementById('submit-comment').style.display = 'none'
 		} else {
+			// If the token exists, the user is authenticated
+			// Enable the comment text input field and show the submit comment button
 			document.getElementById('comment-text').disabled = false
 			document.getElementById('submit-comment').style.display = 'block'
 		}
@@ -150,113 +168,158 @@ document.addEventListener('DOMContentLoaded', function () {
 				.catch(error => {
 					console.error('Error fetching latest news:', error)
 				})
-
-			// Fetch and display comments
+		
+			// Function to fetch comments from the API and display them in the comment section
 			function fetchComments() {
+				// Check if the user is authenticated, and set the appropriate headers for the API request
 				const headers = localStorage.getItem('token')
 					? {
 							Authorization: `Bearer ${localStorage.getItem('token')}`,
 					  }
 					: {}
 
+				// Send a GET request to the API to fetch the comments for the current news item
 				fetch(`http://localhost:3000/api/news/${newsId}/comments`, { headers })
 					.then(response => {
+						// If the response is not ok, throw an error
 						if (!response.ok) {
 							throw new Error('Network response was not ok')
 						}
+						// Parse the response as JSON and return the comments
 						return response.json()
 					})
 					.then(comments => {
+						// Log the fetched comments to the console
 						console.log('Fetched comments:', comments)
+						// Get the comment section element from the DOM
 						const commentSection = document.querySelector('.comment-section')
+						// Clear the comment section
 						commentSection.innerHTML = ''
+
+						// Check if the comments are an array and not empty
 						if (!Array.isArray(comments) || comments.length === 0) {
+							// If there are no comments, display a message
 							commentSection.innerHTML = '<p></p>'
 						} else {
+							// If there are comments, map each comment to a HTML string
 							commentSection.innerHTML = comments
 								.map(
 									comment => `
                                 <div class="comment" data-id="${comment.id}">
                                     <img src="./img/uploads/${
-																			comment.author.profilePicture || 'avatar-example.png'
-																		}" alt="Avatar użytkownika" class="user-avatar">
+																				comment.author.profilePicture || 'avatar-example.png'
+																			}" alt="Avatar użytkownika" class="user-avatar">
                                     <div class="comment-text">
                                         <p><strong>${
-																					comment.author.username ||
-																					comment.author.firstName + ' ' + comment.author.lastName
-																				}</strong></p>
+																						comment.author.username ||
+																						comment.author.firstName + ' ' + comment.author.lastName
+																					}</strong></p>
                                         <p class="comment-date">${new Date(comment.createdAt).toLocaleString()}</p>
                                         <p class="main-comment-text">${comment.text}</p>
                                     </div>
                                     ${
-																			comment.canEdit
-																				? `<i class="fa-solid fa-pen edit-comment" data-id="${comment.id}"></i>`
-																				: ''
-																		}
+																				comment.canEdit
+																					? `<i class="fa-solid fa-pen edit-comment" data-id="${comment.id}"></i>`
+																					: ''
+																			}
                                     ${
-																			comment.canDelete
-																				? `<i class="fa-solid fa-x delete-comment" data-id="${comment.id}"></i>`
-																				: ''
-																		}
+																				comment.canDelete
+																					? `<i class="fa-solid fa-x delete-comment" data-id="${comment.id}"></i>`
+																					: ''
+																			}
                                 </div>
                             `
 								)
+								// Reverse the order of the comments
 								.reverse()
+								// Join the HTML strings into a single string
 								.join('')
+
+							// Add event listeners to delete buttons
+							document.querySelectorAll('.delete-comment').forEach(button => {
+								button.addEventListener('click', function () {
+									// Get the comment ID from the button's data attribute
+									const commentId = this.getAttribute('data-id')
+									// Call the deleteComment function with the comment ID
+									deleteComment(commentId)
+								})
+							})
+
+							// Add event listeners to edit buttons
+							document.querySelectorAll('.edit-comment').forEach(button => {
+								button.addEventListener('click', function () {
+									// Get the comment ID from the button's data attribute
+									const commentId = this.getAttribute('data-id')
+									// Call the editComment function with the comment ID
+									editComment(commentId)
+								})
+							})
 						}
-
-						// Add event listeners to delete buttons
-						document.querySelectorAll('.delete-comment').forEach(button => {
-							button.addEventListener('click', function () {
-								const commentId = this.getAttribute('data-id')
-								deleteComment(commentId)
-							})
-						})
-
-						// Add event listeners to edit buttons
-						document.querySelectorAll('.edit-comment').forEach(button => {
-							button.addEventListener('click', function () {
-								const commentId = this.getAttribute('data-id')
-								editComment(commentId)
-							})
-						})
 					})
 					.catch(error => {
+						// Log any errors that occur during the API request
 						console.error('Error fetching comments:', error)
+						// Display an error message in the comment section
 						const commentSection = document.querySelector('.comment-section')
 						commentSection.innerHTML = '<p>Error loading comments</p>'
 					})
 			}
 
+			/**
+			 * Deletes a comment with the specified ID by making a DELETE request to the
+			 * server API.
+			 *
+			 * @param {string} commentId - The ID of the comment to delete.
+			 */
 			function deleteComment(commentId) {
-				fetch(`http://localhost:3000/api/news/${newsId}/comments/${commentId}`, {
+				// Construct the URL for the API request
+				const url = `http://localhost:3000/api/news/${newsId}/comments/${commentId}`
+
+				// Make a DELETE request to the API
+				fetch(url, {
+					// Specify the HTTP method
 					method: 'DELETE',
+					// Include the user's token in the request headers for authentication
 					headers: {
 						Authorization: `Bearer ${localStorage.getItem('token')}`,
 					},
 				})
 					.then(response => {
+						// If the response is not successful, log the error response text
+						// and throw an error
 						if (!response.ok) {
 							return response.text().then(text => {
 								console.error('Error response text:', text)
 								throw new Error(text)
 							})
 						}
+						// If the response is successful, parse it as JSON
 						return response.json()
 					})
 					.then(() => {
+						// Log that the comment was deleted
 						console.log(`Comment ${commentId} deleted`)
-						// Refresh comments
+						// Refresh the comments to update the UI
 						fetchComments()
 					})
 					.catch(error => {
+						// Log any errors that occur during the API request
 						console.error('Error deleting comment:', error)
 					})
 			}
 
+			/**
+			 * Edit a comment by replacing its text with a textarea for editing,
+			 * and adding event listeners to the save and cancel buttons.
+			 *
+			 * @param {string} commentId - The ID of the comment to edit.
+			 */
 			function editComment(commentId) {
+				// Select the comment div element with the matching ID
 				const commentDiv = document.querySelector(`.comment[data-id="${commentId}"]`)
+				// Select the element with the class 'main-comment-text' within the comment div
 				const commentTextElement = commentDiv.querySelector('.main-comment-text')
+				// Get the original text content of the comment
 				const originalText = commentTextElement.textContent
 
 				// Replace the comment text with a textarea for editing
@@ -268,7 +331,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				// Add event listener to the save button
 				commentDiv.querySelector('.save-comment').addEventListener('click', function () {
+					// Get the updated text from the textarea
 					const updatedText = commentDiv.querySelector('.edit-comment-textarea').value
+					// Send a PUT request to update the comment with the new text
 					fetch(`http://localhost:3000/api/news/${newsId}/comments/${commentId}`, {
 						method: 'PUT',
 						headers: {
@@ -278,23 +343,28 @@ document.addEventListener('DOMContentLoaded', function () {
 						body: JSON.stringify({ text: updatedText }),
 					})
 						.then(response => {
+							// If the response is not successful, throw an error
 							if (!response.ok) {
 								throw new Error('Network response was not ok')
 							}
+							// Parse the response as JSON
 							return response.json()
 						})
 						.then(() => {
+							// Log that the comment was updated
 							console.log(`Comment ${commentId} updated`)
-							// Refresh comments
+							// Refresh the comments to update the UI
 							fetchComments()
 						})
 						.catch(error => {
+							// Log any errors that occur during the API request
 							console.error('Error updating comment:', error)
 						})
 				})
 
 				// Add event listener to the cancel button
 				commentDiv.querySelector('.cancel-edit').addEventListener('click', function () {
+					// Restore the original text content of the comment
 					commentTextElement.innerHTML = originalText
 				})
 			}
