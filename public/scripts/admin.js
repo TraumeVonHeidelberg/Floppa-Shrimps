@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (window && window.process && window.process.type === 'renderer') {
 			return `http://localhost:3000/${image}`
 		}
-		return `/img/uploads/${image}`
+		return `${image}`
 	}
 
 	/**
@@ -558,7 +558,7 @@ document.addEventListener('DOMContentLoaded', function () {
 								confirmButtonText: 'OK',
 							})
 							// Update the image source to display the new image
-							imageElement.src = `/img/uploads/${data.image}`
+							imageElement.src = getImagePath(`img/uploads/${data.image}`)
 						})
 						.catch(error => {
 							console.error('Error:', error) // Log any errors to the console
