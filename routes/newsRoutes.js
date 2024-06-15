@@ -62,27 +62,40 @@ router.post('/news', authenticateToken, upload.single('image'), async (req, res)
 })
 
 // Endpoint for adding comments
-router.post('/news/:id/comments', authenticateToken, async (req, res) => {
-	const { text } = req.body
-	const userId = req.user.userId
+router.get('/news/:id/comments', authenticateToken, async (req, res) => {
 	const newsId = req.params.id
+	const userId = req.user ? req.user.userId : null
+	const userRole = req.user ? req.user.role : null
 
-	console.log(`Received comment: ${text} for newsId: ${newsId} from userId: ${userId}`)
+	console.log(`Fetching comments for newsId: ${newsId}`)
+	if (userId) {
+		console.log(`Request made by user: ${userId} with role: ${userRole}`)
+	} else {
+		console.log('Request made by an unauthenticated user')
+	}
 
 	try {
-		// Create the comment entry
-		const comment = await Comment.create({
-			text,
-			userId,
-			newsId,
+		const comments = await Comment.findAll({
+			where: { newsId },
+			include: [{ model: User, as: 'author', attributes: ['firstName', 'lastName', 'username', 'profilePicture'] }],
 		})
 
-		console.log(`Comment added: ${comment.text} for newsId: ${comment.newsId} from userId: ${comment.userId}`)
+		console.log(`Fetched comments: ${comments.length} comments found`)
 
-		res.status(201).json(comment)
+		const commentsWithPermissions = comments.map(comment => {
+			const commentJson = comment.toJSON()
+			commentJson.canDelete = comment.userId === userId || userRole === 'admin'
+			commentJson.canEdit = comment.userId === userId
+			console.log(
+				`Comment ID: ${comment.id}, User ID: ${comment.userId}, canDelete: ${commentJson.canDelete}, canEdit: ${commentJson.canEdit}`
+			)
+			return commentJson
+		})
+
+		res.status(200).json(commentsWithPermissions)
 	} catch (error) {
-		console.error('Error adding comment:', error)
-		res.status(500).json({ message: 'Error adding comment' })
+		console.error('Error fetching comments:', error)
+		res.status(500).json({ message: 'Error fetching comments' })
 	}
 })
 
