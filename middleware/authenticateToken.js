@@ -1,60 +1,39 @@
-//jsonwebtoken is used to verify and decode JWT tokens
 const jwt = require('jsonwebtoken')
+require('dotenv').config()
 const User = require('../models/user')
 
-//dotenv is used to get environment variables from .env file
-require('dotenv').config()
+function authenticateToken(req, res, next) {
+	const authHeader = req.headers['authorization']
+	const token = authHeader && authHeader.split(' ')[1]
 
-// This function is a middleware that verifies the JWT token in the request's
-// authorization header. If the token is valid, it sets the user's ID and role
-// in the request object and calls the next middleware or route handler.
-// If the token is invalid or not provided, it sends an appropriate response.
+	if (token == null) {
+		console.log('No token provided, continuing as unauthenticated user')
+		return next()
+	}
 
-async function authenticateToken(req, res, next) {
-  // Extract the token from the authorization header
-  const authHeader = req.headers['authorization']
-  const token = authHeader && authHeader.split(' ')[1]
+	jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
+		if (err) {
+			console.log('Token verification failed:', err.message)
+			return next()
+		}
 
-  // If no token is provided, return a 401 Unauthorized response
-  if (token == null) {
-    console.log('No token provided')
-    return res.sendStatus(401)
-  }
+		try {
+			const dbUser = await User.findByPk(user.userId)
+			if (!dbUser) {
+				return next()
+			}
 
-  // Verify the token using the secret key
-  jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
-    // If verification fails, return a 403 Forbidden response
-    if (err) {
-      console.log('Token verification failed:', err.message)
-      return res.sendStatus(403)
-    }
-
-    try {
-      // Find the user with the provided ID
-      const userInfo = await User.findByPk(user.userId, {
-        attributes: ['id', 'role'], // Retrieve the user's ID and role
-      })
-
-      // If the user is not found, return a 404 Not Found response
-      if (!userInfo) {
-        console.log('User not found')
-        return res.sendStatus(404)
-      }
-
-      // Set the user's ID and role in the request object
-      req.user = {
-        userId: userInfo.id,
-        role: userInfo.role,
-      }
-      console.log('Token verified, user ID:', userInfo.id, 'role:', userInfo.role)
-      // Call the next middleware or route handler
-      next()
-    } catch (error) {
-      // If there's an error fetching the user, return a 500 Internal Server Error response
-      console.error('Error fetching user:', error)
-      res.sendStatus(500)
-    }
-  })
+			req.user = {
+				userId: dbUser.id,
+				role: dbUser.role,
+			}
+			console.log('Token verified, user ID:', user.userId, 'role:', dbUser.role)
+			next()
+		} catch (err) {
+			console.log('Error fetching user:', err.message)
+			return next()
+		}
+	})
 }
 
 module.exports = authenticateToken

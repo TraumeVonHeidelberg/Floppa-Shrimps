@@ -85,11 +85,15 @@ router.post('/news/:id/comments', authenticateToken, async (req, res) => {
 // Endpoint do pobierania komentarzy
 router.get('/news/:id/comments', authenticateToken, async (req, res) => {
 	const newsId = req.params.id
-	const userId = req.user.userId
-	const userRole = req.user.role
+	const userId = req.user ? req.user.userId : null
+	const userRole = req.user ? req.user.role : null
 
 	console.log(`Fetching comments for newsId: ${newsId}`)
-	console.log(`Request made by user: ${userId} with role: ${userRole}`)
+	if (userId) {
+		console.log(`Request made by user: ${userId} with role: ${userRole}`)
+	} else {
+		console.log('Request made by an unauthenticated user')
+	}
 
 	try {
 		const comments = await Comment.findAll({
@@ -99,7 +103,7 @@ router.get('/news/:id/comments', authenticateToken, async (req, res) => {
 
 		console.log(`Fetched comments: ${comments.length} comments found`)
 
-		const commentsWithCanDelete = comments.map(comment => {
+		const commentsWithPermissions = comments.map(comment => {
 			const commentJson = comment.toJSON()
 			commentJson.canDelete = comment.userId === userId || userRole === 'admin'
 			commentJson.canEdit = comment.userId === userId
@@ -109,7 +113,7 @@ router.get('/news/:id/comments', authenticateToken, async (req, res) => {
 			return commentJson
 		})
 
-		res.status(200).json(commentsWithCanDelete)
+		res.status(200).json(commentsWithPermissions)
 	} catch (error) {
 		console.error('Error fetching comments:', error)
 		res.status(500).json({ message: 'Error fetching comments' })
