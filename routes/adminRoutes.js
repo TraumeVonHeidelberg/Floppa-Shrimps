@@ -222,6 +222,28 @@ router.put('/admin/news/:id', authenticateToken, async (req, res) => {
 	}
 })
 
+// Endpoint for uploading an image for a news entry
+router.post('/admin/news/:id/image', authenticateToken, upload.single('image'), async (req, res) => {
+	try {
+		// Find the news entry by ID
+		const news = await News.findByPk(req.params.id)
+		if (!news) {
+			return res.status(404).json({ message: 'News not found' })
+		}
+
+		// Update the image field
+		if (req.file) {
+			news.image = req.file.filename
+			await news.save()
+		}
+
+		res.status(200).json({ image: news.image })
+	} catch (error) {
+		console.error('Error updating news image:', error)
+		res.status(500).json({ message: error.message })
+	}
+})
+
 // Endpoint to delete an item (menu, testimonial, news, or reservation)
 router.delete('/admin/:type/:id', authenticateToken, async (req, res) => {
 	const { type, id } = req.params // Getting the item type and ID from the request parameters
