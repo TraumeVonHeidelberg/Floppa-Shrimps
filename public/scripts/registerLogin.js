@@ -84,11 +84,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		const email = document.getElementById('email').value
 		const password = document.getElementById('password').value
 
-		console.log('First Name:', firstName)
-		console.log('Last Name:', lastName)
-		console.log('Email:', email)
-		console.log('Password:', password)
-
 		if (!firstName || !lastName || !email || !password) {
 			Swal.fire({
 				title: 'Uwaga!',

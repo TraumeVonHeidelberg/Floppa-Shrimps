@@ -215,9 +215,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			reservationData = { ...reservationData, firstName, lastName, email }
 		}
 
-		console.log('Token:', token)
-		console.log('Reservation data before sending:', reservationData)
-
 		fetch(`${API_URL}/reservations`, {
 			method: 'POST',
 			headers: {

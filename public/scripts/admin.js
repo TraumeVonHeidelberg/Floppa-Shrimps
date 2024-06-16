@@ -1454,8 +1454,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				return response.json()
 			})
 			.then(reservations => {
-				// Log the reservations array to the console
-				console.log('Reservations:', reservations)
 
 				// Get the reservations list element from the page
 				const reservationsList = document.getElementById('reservations-list')

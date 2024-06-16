@@ -116,7 +116,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			fetch(`http://localhost:3000/api/news/${newsId}/previous`)
 				.then(response => response.json())
 				.then(previousData => {
-					console.log('Fetched previous news:', previousData)
 					const previousPostContainer = document.getElementById('previous-post-container')
 					if (previousData && previousData.message !== 'No previous news found') {
 						document.getElementById('previous-post-title').textContent = previousData.title
@@ -136,7 +135,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			fetch(`http://localhost:3000/api/news/${newsId}/next`)
 				.then(response => response.json())
 				.then(nextData => {
-					console.log('Fetched next news:', nextData)
 					const nextPostContainer = document.getElementById('next-post-container')
 					if (nextData && nextData.message !== 'No next news found') {
 						document.getElementById('next-post-title').textContent = nextData.title
@@ -156,7 +154,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			fetch(`http://localhost:3000/api/news/latest/5`)
 				.then(response => response.json())
 				.then(latestData => {
-					console.log('Fetched latest news:', latestData)
 					const latestPostsContainer = document.getElementById('latest-posts')
 					latestData.forEach(item => {
 						const postLink = document.createElement('a')
@@ -168,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				.catch(error => {
 					console.error('Error fetching latest news:', error)
 				})
-		
+
 			// Function to fetch comments from the API and display them in the comment section
 			function fetchComments() {
 				// Check if the user is authenticated, and set the appropriate headers for the API request
@@ -189,8 +186,6 @@ document.addEventListener('DOMContentLoaded', function () {
 						return response.json()
 					})
 					.then(comments => {
-						// Log the fetched comments to the console
-						console.log('Fetched comments:', comments)
 						// Get the comment section element from the DOM
 						const commentSection = document.querySelector('.comment-section')
 						// Clear the comment section
@@ -207,26 +202,26 @@ document.addEventListener('DOMContentLoaded', function () {
 									comment => `
                                 <div class="comment" data-id="${comment.id}">
                                     <img src="./img/uploads/${
-																				comment.author.profilePicture || 'avatar-example.png'
-																			}" alt="Avatar użytkownika" class="user-avatar">
+																			comment.author.profilePicture || 'avatar-example.png'
+																		}" alt="Avatar użytkownika" class="user-avatar">
                                     <div class="comment-text">
                                         <p><strong>${
-																						comment.author.username ||
-																						comment.author.firstName + ' ' + comment.author.lastName
-																					}</strong></p>
+																					comment.author.username ||
+																					comment.author.firstName + ' ' + comment.author.lastName
+																				}</strong></p>
                                         <p class="comment-date">${new Date(comment.createdAt).toLocaleString()}</p>
                                         <p class="main-comment-text">${comment.text}</p>
                                     </div>
                                     ${
-																				comment.canEdit
-																					? `<i class="fa-solid fa-pen edit-comment" data-id="${comment.id}"></i>`
-																					: ''
-																			}
+																			comment.canEdit
+																				? `<i class="fa-solid fa-pen edit-comment" data-id="${comment.id}"></i>`
+																				: ''
+																		}
                                     ${
-																				comment.canDelete
-																					? `<i class="fa-solid fa-x delete-comment" data-id="${comment.id}"></i>`
-																					: ''
-																			}
+																			comment.canDelete
+																				? `<i class="fa-solid fa-x delete-comment" data-id="${comment.id}"></i>`
+																				: ''
+																		}
                                 </div>
                             `
 								)
