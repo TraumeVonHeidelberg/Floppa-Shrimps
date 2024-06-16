@@ -58,14 +58,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	// Helper function to get the correct image path
 	function getImagePath(image) {
-		let imagePath;
+		let imagePath
 		if (window && window.process && window.process.type === 'renderer') {
-			imagePath = `http://localhost:3000/${image}`;
+			imagePath = `http://localhost:3000/${image}`
 		} else {
-			imagePath = `${image}`;
+			imagePath = `${image}`
 		}
-		console.log(`Generated image path: ${imagePath}`); // Log the generated image path
-		return imagePath;
+		console.log(`Generated image path: ${imagePath}`) // Log the generated image path
+		return imagePath
 	}
 
 	/**
@@ -562,7 +562,12 @@ document.addEventListener('DOMContentLoaded', function () {
 								confirmButtonText: 'OK',
 							})
 							// Update the image source to display the new image
-							const imagePath = getImagePath(data.image) // Użycie funkcji getImagePath
+							let imagePath
+							if (window && window.process && window.process.type === 'renderer') {
+								imagePath = `http://localhost:3000/img/uploads/${data.image}`
+							} else {
+								imagePath = `/img/uploads/${data.image}`
+							}
 							console.log(`Updated image path: ${imagePath}`) // Log the updated image path
 							imageElement.src = imagePath
 						})
