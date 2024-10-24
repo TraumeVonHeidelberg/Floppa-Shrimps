@@ -1,0 +1,703 @@
+/* Ogólne klasy */
+
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.information-header {
+	margin-bottom: 1.6rem;
+	text-decoration: underline;
+	font-size: 1.8rem;
+	color: #274eba;
+}
+
+.section-header {
+	color: #274eba;
+	text-align: center;
+	font-size: 5.2rem;
+	font-family: 'Playfair Display', serif;
+	margin-bottom: 4.8rem;
+}
+
+.section-header-left {
+	text-align: left;
+}
+
+.section-preheader-margin {
+	margin-bottom: 0.8rem;
+}
+
+.section-header-small {
+	font-size: 4.4rem;
+}
+
+.common-text {
+	font-size: 1.6rem;
+	line-height: 3.2rem;
+}
+
+ul {
+	list-style: none;
+}
+
+button {
+	cursor: pointer;
+}
+
+.main-btn {
+	padding: 1.6rem 3.2rem;
+	font-weight: 700;
+	letter-spacing: 0.2rem;
+	text-transform: uppercase;
+	color: #eb2a3c;
+	background: none;
+	border: 0.3rem solid #eb2a3c;
+	transition: background-color 0.3s, color 0.3s;
+}
+
+.main-btn:hover {
+	color: white;
+	background-color: #eb2a3c;
+}
+
+.text-center {
+	text-align: center;
+}
+
+.hidden {
+	display: none !important;
+}
+
+a {
+	text-decoration: none;
+	color: #1f3571;
+	cursor: pointer;
+}
+
+/* Modal Window */
+
+.modal {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 20;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+	display: flex;
+	flex-direction: column;
+	z-index: 50;
+	gap: 2.4rem;
+	padding: 2.4rem;
+	width: 44rem;
+	min-height: 40rem;
+	max-height: 50rem;
+	background-color: white;
+	border-radius: 1.2rem;
+}
+
+.modal-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1.6rem;
+}
+
+.modal-item i {
+	font-size: 2.4rem;
+	transition: 0.3s color;
+}
+
+.modal-item i:hover {
+	color: #356bff;
+}
+
+.login-header {
+	font-weight: 800;
+}
+
+input {
+	padding: 1.2rem;
+}
+
+.create-account-btn {
+	padding: 1.6rem 3.2rem;
+	background-color: #274eba;
+	color: white;
+	border: none;
+	border-radius: 1.2rem;
+	margin-bottom: 2.4rem;
+	transition: background-color 0.3s;
+}
+
+.create-account-btn:hover {
+	background-color: #356bff;
+}
+
+.login-text {
+	font-size: 1.4rem;
+}
+
+.login-text span {
+	font-weight: 800;
+	color: #274eba;
+	cursor: pointer;
+}
+
+.close-login {
+	cursor: pointer;
+}
+/* ------------------------------------------------------------------------------ */
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background-color: #f6f3eb;
+	font-family: 'Raleway', 'sans-serif';
+	color: #1f3571;
+}
+
+html {
+	font-size: 62.5%;
+	text-underline-offset: 0.5rem;
+	scroll-behavior: smooth;
+}
+
+section {
+	margin-bottom: 4.8rem;
+}
+
+.main-header {
+	height: 75vh;
+}
+
+.main-header .container {
+	margin-top: 18rem;
+}
+
+.main-nav {
+	position: fixed;
+	top: 0;
+	z-index: 5;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 1.6rem;
+	width: 100%;
+	font-size: 1.8rem;
+	letter-spacing: 0.2rem;
+	font-weight: 700;
+	background-color: #f6f3eb;
+}
+
+.project-logo-img {
+	/* width: 20rem; */
+	height: 8rem;
+}
+
+.main-nav-list {
+	display: flex;
+	gap: 4.8rem;
+	list-style: none;
+}
+
+.main-nav-list li a {
+	transition: color 0.3s;
+}
+.main-nav-list li a:hover {
+	color: #eb2a3c;
+}
+
+.nav-group {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 4.8rem;
+}
+
+.nav-group img {
+	width: 6.4rem;
+	height: 6.4rem;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+/* Login list */
+
+.user-options {
+	position: absolute;
+	top: 0.6rem;
+	right: 9.6rem;
+	width: 100%;
+	height: 100%;
+	background-color: #f6f3eb;
+	user-select: none;
+}
+
+.user-options ul {
+	padding: 1.6rem 0;
+	display: flex;
+	justify-content: right;
+	align-items: center;
+	gap: 3.2rem;
+}
+
+/* ------------------------------- */
+
+.header-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	margin: 4.8rem;
+}
+
+.header-text {
+	margin-bottom: 4.8rem;
+	line-height: 7.2rem;
+	font-weight: 700;
+	font-size: 6.2rem;
+	font-family: 'Playfair Display', serif;
+	color: #264ebb;
+}
+
+.site-description {
+	margin-bottom: 3.2rem;
+	font-size: 2.4rem;
+	font-style: italic;
+	line-height: 4rem;
+}
+
+.information {
+	line-height: 3.2rem;
+	margin-bottom: 2.4rem;
+	font-size: 2rem;
+}
+
+/* Dishes Section */
+
+.dishes-examples {
+	position: relative;
+}
+
+.dishes-container {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	grid-template-rows: repeat(2, 1fr);
+}
+
+.dishes-examples::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.1);
+}
+
+.dishes-examples img {
+	width: 100%;
+	height: 100%;
+}
+
+.about-us-grid {
+	display: grid;
+	gap: 8rem;
+	grid-template-columns: repeat(2, 1fr);
+}
+
+.history-card {
+	margin-bottom: 4.8rem;
+}
+
+/* MENU SECTION */
+
+.menu {
+	margin-bottom: 8rem;
+}
+
+.menu-grid-container {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 2.4rem;
+}
+
+.product-card {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 4.8rem;
+}
+
+.product-name {
+	font-size: 2rem;
+	font-weight: 600;
+	font-family: 'Playfair Display', serif;
+	color: #274eba;
+	margin-bottom: 0.8rem;
+}
+
+.product-with {
+	font-style: italic;
+	font-size: 1.4rem;
+	margin-bottom: 2.4rem;
+}
+
+.product-price {
+	font-size: 1.6rem;
+	font-weight: 700;
+	color: #eb2a3c;
+}
+
+/* ------------------------------------------------------------------------------------------ */
+
+.special-offer-section {
+	position: relative;
+	height: 80vh;
+	background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../img/ryby-oferta.jpg');
+	background-size: cover;
+	background-position: center;
+	background-attachment: fixed;
+}
+
+.offer-box {
+	position: absolute;
+	top: -4.8rem;
+	left: 50%;
+	transform: translate(-50%, 0);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	max-width: 42rem;
+	height: 80vh;
+	/* padding: 2.4rem; */
+	background-color: #274eba;
+}
+
+.special-offer-preheader,
+.special-offer-header,
+.special-offer-text {
+	color: white;
+}
+
+.special-offer-header {
+	font-size: 5.6rem;
+	font-weight: 800;
+}
+
+/* TEAM */
+
+.team-grid {
+	display: grid;
+	grid-template-columns: 1.5fr 1fr 1fr;
+	gap: 3.2rem;
+}
+
+.team-img {
+	max-width: 90%;
+	margin-bottom: 2.4rem;
+}
+
+.team-preheader {
+	margin-bottom: 0.8rem;
+}
+
+.third-team-column {
+	margin-top: 4.8rem;
+}
+
+/* ---------------------------------------------------------------------- */
+
+/*Clients' Testimonials */
+
+.client-testimonials {
+	margin-top: 12.8rem;
+	margin-bottom: 12.8rem;
+}
+
+.client-testimonials i {
+	display: block;
+	text-align: center;
+	font-size: 8.6rem;
+	color: #eb2a3c;
+}
+
+.testimonial {
+	display: flex;
+	flex-direction: column;
+	margin: 0 auto;
+	width: 80rem;
+	margin-bottom: 1.6rem;
+	transition: 2s;
+}
+
+.testimonial-text {
+	font-size: 3rem;
+	font-style: italic;
+	font-weight: 500;
+	font-family: 'Playfair Display', 'sans-serif';
+	text-align: center;
+	line-height: 4.8rem;
+	color: #274eba;
+	margin-bottom: 2.4rem;
+}
+.testimonial-author {
+	font-size: 1.6rem;
+	font-weight: 600;
+	text-align: center;
+	color: #eb2a3c;
+	margin-bottom: 0.8rem;
+}
+.testimonial-company {
+	font-size: 1.6rem;
+	text-align: center;
+}
+
+.testimonial-nav {
+	display: flex;
+	justify-content: center;
+}
+
+.testimonial-nav span {
+	height: 1rem;
+	width: 1rem;
+	background-color: #ddd;
+	border-radius: 50%;
+	display: inline-block;
+	margin: 0 0.5rem;
+	cursor: pointer;
+}
+
+.testimonial-nav .active-bullet {
+	background-color: #274eba; /* Ten sam kolor co tekst opinii */
+}
+
+.change {
+	transform: translate(-100%);
+}
+
+.change2 {
+	transform: translate(100%);
+}
+
+/* ----------------------------------------------------------- */
+/* Rezerwacja */
+
+.reservation-text {
+	margin-bottom: 4.8rem;
+}
+
+.reservations-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	gap: 2.4rem;
+	margin-bottom: 2.4rem;
+}
+
+.reservation-field {
+	display: flex;
+	flex-direction: column;
+}
+
+.input-label {
+	font-size: 1.6rem;
+	margin-bottom: 0.4rem;
+}
+
+.form-input {
+	height: 4.8rem;
+}
+
+.reservation-textarea {
+	max-width: 100%;
+	min-height: 15rem;
+	max-height: 20rem;
+	margin-bottom: 2.4rem;
+}
+
+.form-input,
+.reservation-textarea {
+	font-size: 1.6rem;
+	font-family: 'Raleway', 'sans-serif';
+	background: none;
+	border: 0.2rem solid #274eba;
+	padding: 1.2rem;
+}
+
+.reservation-button {
+	padding: 1.2rem 2.4rem;
+	width: 100%;
+	color: white;
+	background-color: black;
+}
+
+/* ------------------------------------------------------ */
+/* Nowości */
+
+.news-grid-container {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	justify-content: center;
+	gap: 3.2rem;
+}
+
+.news-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.news-category {
+	font-size: 1.8rem;
+	font-style: italic;
+	color: #eb2a3c;
+	margin-bottom: 1.6rem;
+}
+
+.news-title {
+	font-size: 2.4rem;
+	font-family: 'Playfair display', 'serif';
+	color: #274eba;
+	text-transform: capitalize;
+	margin-bottom: 1.6rem;
+}
+
+.news-img {
+	width: 100%;
+	height: 25.6rem;
+}
+
+.news-footer {
+	display: flex;
+	align-items: center;
+	gap: 1.2rem;
+	font-size: 1.2rem;
+	margin-bottom: 2.4rem;
+}
+
+.user-avatar {
+	width: 3.2rem;
+	height: 3.2rem;
+	border-radius: 50%;
+}
+
+.news-author {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	color: #eb2a3c;
+}
+
+.news-text {
+	padding: 1.2rem;
+}
+
+.news-card a {
+	margin-top: auto;
+}
+
+/* ---------------------------------------------------------------------- */
+/* FOOTER */
+
+footer {
+	color: white;
+	background-color: #274eba;
+}
+
+.main-footer-grid {
+	display: grid;
+	grid-template-rows: 2fr 1fr 0.5fr 0.2fr;
+}
+
+.first-footer-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 6.4rem;
+	margin-bottom: 1.6rem;
+}
+
+.footer-header {
+	font-size: 6.2rem;
+	text-transform: uppercase;
+	text-align: left;
+	color: white;
+	max-width: 40%;
+}
+
+.second-footer-item {
+	display: flex;
+	justify-content: center;
+	gap: 7.4rem;
+	text-align: center;
+	margin-bottom: 4.4rem;
+}
+
+.footer-card-header {
+	text-transform: uppercase;
+	font-size: 2.4rem;
+	font-family: 'Playfair Display', 'serif';
+	margin-bottom: 1.6rem;
+}
+
+.third-footer-item {
+	display: flex;
+	justify-content: center;
+	gap: 2.4rem;
+}
+
+.footer-btn {
+	width: 4.5rem;
+	height: 4.5rem;
+	background: none;
+	font-size: 1.6rem;
+	color: white;
+	border: 0.3rem solid white;
+	border-radius: 50%;
+	cursor: pointer;
+	transition: color 0.3s, border 0.3s;
+}
+
+.footer-btn:hover {
+	color: #eb2a3c;
+	border: 0.3rem solid #eb2a3c;
+}
+
+.fourth-footer-item {
+	display: flex;
+	justify-content: center;
+	font-size: 1.4rem;
+}
+/* ----------------------------------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+	.menu-grid-container,.news-grid-container{
+		grid-template-columns: repeat(2, 1fr);
+	}
+	.dishes-container {
+		grid-template-columns: repeat(2, 1fr);
+		grid-template-rows: repeat(4, 1fr);
+	}
+}
+
+@media (max-width: 576px) {
+	.menu-grid-container,.news-grid-container {
+		grid-template-columns: repeat(1, 1fr);
+	}
+	.dishes-container {
+		grid-template-columns: repeat(1, 1fr);
+		grid-template-rows: repeat(8, 1fr);
+	}
+}

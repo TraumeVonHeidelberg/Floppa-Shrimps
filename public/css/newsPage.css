@@ -1,0 +1,222 @@
+.news-nav {
+	background-color: transparent;
+	transition: background-color 0.3s;
+}
+
+.nav-color {
+	background-color: #f6f3eb;
+}
+
+.main-news-header {
+	position: relative;
+	height: 70vh;
+	background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../img/news/new dish full.jpg');
+	background-size: cover;
+	background-position: center;
+	margin-bottom: 8rem;
+}
+
+.news-header-text {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	color: white;
+}
+
+.news-preheader {
+	font-size: 2.4rem;
+	font-style: italic;
+	font-weight: 400;
+	margin-bottom: 1.6rem;
+}
+
+.news-header {
+	font-family: 'Playfair Display', 'serif';
+	font-size: 6.2rem;
+	text-align: center;
+	text-transform: uppercase;
+	margin-bottom: 1.6rem;
+}
+
+.main-news-footer {
+	gap: 0.8rem;
+}
+
+.avatar-name {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.mark-letter {
+	float: left;
+	font-size: 5.2rem;
+	font-weight: bold;
+}
+
+/* ------------------------------------------ */
+
+.news-main {
+	width: 130rem;
+	margin: 0 auto;
+}
+
+.main-news-grid {
+	display: grid;
+	grid-template-columns: 4fr 1fr;
+	gap: 4.8rem;
+}
+
+article {
+	display: flex;
+	flex-direction: column;
+	gap: 2.4rem;
+}
+
+.section-header {
+	margin: 0;
+}
+
+.change-post {
+	display: flex;
+	justify-content: space-between;
+}
+
+.comment-content {
+	position: relative;
+}
+
+textarea,
+input {
+	font-family: 'Raleway';
+}
+
+textarea {
+	margin-bottom: 2.4rem;
+	padding: 2.4rem;
+	width: 100%;
+	min-height: 20rem;
+	max-height: 25rem;
+	font-size: 2rem;
+}
+
+.comment-content i {
+	position: absolute;
+	bottom: 3.2rem;
+	right: 20px;
+	font-size: 3.6rem;
+	transition: 0.3s color;
+	cursor: pointer;
+}
+.last-article-text {
+	margin-bottom: 3.2rem;
+}
+
+.change-post {
+	line-height: 1.5;
+}
+
+.call-to-action-sign {
+	font-size: 2rem;
+	font-weight: 700;
+	color: #274eba;
+}
+
+.change-post-title {
+	font-size: 1.8rem;
+	font-weight: 600;
+	transition: 0.3s color;
+	cursor: pointer;
+}
+
+.change-post-title:hover,
+.comment-content i:hover {
+	color: #eb2a3c;
+}
+
+aside {
+	display: flex;
+	flex-direction: column;
+	gap: 2.4rem;
+}
+
+.aside-item {
+	display: flex;
+	flex-direction: column;
+	gap: 1.2rem;
+}
+
+.search-bar {
+	margin-bottom: 2.4rem;
+}
+
+.search-bar-sign {
+	margin-bottom: 0.8rem;
+	font-size: 1.8rem;
+	font-weight: 800;
+}
+
+.main-search-bar {
+	display: flex;
+	gap: 1.2rem;
+}
+
+.search-btn {
+	padding: 1.2rem 2.4rem;
+	font-weight: 600;
+}
+
+.aside-item a {
+	font-size: 1.6rem;
+	font-weight: 500;
+	color: #274eba;
+	transition: 0.3s color;
+}
+
+.aside-item a:hover {
+	color: #eb2a3c;
+}
+
+/* Komenatrza */
+
+.comment {
+	display: flex;
+	gap: 3.2rem;
+	margin-bottom: 3.2rem;
+}
+
+.comment img {
+	width: 6.4rem;
+	height: 6.4rem;
+}
+
+.comment-text {
+	display: flex;
+	flex-direction: column;
+	gap: 0.8rem;
+}
+
+.comment p strong {
+	font-size: 2rem;
+	color: #274eba;
+}
+
+.main-comment-text {
+	font-size: 1.6rem;
+}
+
+.comment i {
+	align-self: center;
+	font-size: 2rem;
+	cursor: pointer;
+}
+
+.main-comment-text button {
+	padding: 1.2rem 2.4rem;
+	background-color: black;
+	color: white;
+}

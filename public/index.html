@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Jakub Brudnicki">
+    <meta name="viewport" content="width=\, initial-scale=1.0">
+    <title>Floppa Shrimps & Cement</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+    <header class="main-header">
+        <nav class="main-nav">
+            <a href="#">
+                <img src="./img/logo-full.svg" alt="Logo projektu, Floppa w łódce łowiąca krewetki"
+                    class="project-logo-img">
+            </a>
+
+            <ul class="main-nav-list">
+                <li><a href="#">Home</a></li>
+                <li><a href="#about-us">O Nas</a></li>
+                <li><a href="#menu">Menu</a></li>
+                <li><a href="#team-section">Team</a></li>
+                <li><a href="#news">Nowości</a></li>
+                <li><a href="#page-footer">Kontakt</a></li>
+            </ul>
+
+
+            <div class="nav-group">
+                <a href="#reservation" class="section-link">
+                    <button class="main-btn">
+                        Rezerwuj Teraz
+                    </button>
+                </a>
+                <!-- <i id="login-icon" class="fa-solid fa-user"></i> -->
+                <img src="./img/avatar-big.jpg" alt="User avatar" id="login-icon">
+                <div id="user-options" class="user-options hidden">
+                    <ul>
+                        <li><a href="profile.html">Profil</a></li>
+                        <li><a href="#" id="logout-btn">Wyloguj</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Domyslnie ukryte modal window do logowania -->
+            <div id="modal" class="modal">
+                <div class="modal-content" id="modal-content">
+                    <!-- Zawartosc okna do logowania jest wstawiana dynamicznie przez js -->
+                </div>
+            </div>
+
+        </nav>
+
+        <div class="container">
+            <div class="header-grid">
+                <div class="grid-item">
+                    <h1 class="header-text">Floppa Shirmps & Cement</h1>
+                    <a href="#menu" class="section-link">
+                        <button class="main-btn">
+                            Sprawdź Menu
+                        </button>
+                    </a>
+
+                </div>
+                <div class="grid-item">
+                    <img src="./img/Lineart-full.png" alt="Lineart Floppy z krewetką">
+                </div>
+
+                <div class="grid-item">
+                    <p class="site-description">Floppa Shrimps & Cement to restauracja z wieloletnimi tradycjami
+                        oferująca najwyższej
+                        jakości owoce morza.
+                    </p>
+
+                    <div class="open-times-information">
+                        <p class="information-header">Godziny otwarcia: </p>
+                        <div class="information">
+                            <p>Poniedziałek - Piątek: 08:00 - 22:00</p>
+                            <p>Sobota - Niedziela: 12:00 - 00:00</p>
+                        </div>
+                    </div>
+                    <div class="reservations-information">
+                        <p class="information-header">Rezerwacje: </p>
+                        <div class="information">
+                            <p>E-Mail: shrimpsandcement@gmail.com</p>
+                            <p>Telefon: +48 881 925 560</p>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+
+    </header>
+
+    <main>
+        <section class="dishes-examples">
+            <div class="dishes-container">
+                <img src="./img/section-1.jpg" alt="Przyklad potrawy, talerz z krewetkami">
+                <img src="./img/section-2.jpg" alt="Smażenie krewetek">
+                <img src="./img/section-3.jpg" alt="Krewetki podane z rybą">
+                <img src="./img/section-4.jpg" alt="Wykwintne danie z owocami morza">
+                <img src="./img/section-5.jpg" alt="Ryba z cytryną">
+                <img src="./img/section-6.jpg" alt="Pieczone krewetki">
+                <img src="./img/section-7.jpg" alt="Przykład dana z ośmiornicą">
+                <img src="./img/section-8.jpg" alt="Krewetka pieczona na ogniu">
+            </div>
+        </section>
+
+
+        <section class="about-us-section" id="about-us">
+            <div class="container">
+                <div class="about-us-grid">
+                    <div class="history-grid-item">
+                        <div class="history-card">
+                            <p class="information-header">2010</p>
+                            <p class="common-text">Restauracja Floppa Shrimps & Cement otwiera swoje drzwi
+                                dla pierwszych klientów. Znajdująca się w malowniczym nadmorskim miasteczku restauracja
+                                szybko zyskała popularność dzięki swojej specjalizacji w świeżych owocach morza i
+                                unikalnych przepisach inspirowanych lokalnymi tradycjami rybackimi.</p>
+                        </div>
+                        <div class="history-card">
+                            <p class="information-header">2015</p>
+                            <p class="common-text">Restauracja rozszerza swoje menu o ekskluzywne menu
+                                degustacyjne, które pozwalało gościom na spróbowanie szerokiej gamy wykwintnych dań z
+                                owoców morza, w tym krewetek, ostryg, homarów i wielu innych. Menu degustacyjne okazało
+                                się ogromnym sukcesem, przyciągając koneserów kulinarnych z całego kraju.</p>
+                        </div>
+                        <div class="history-card">
+                            <p class="information-header">2023</p>
+                            <p class="common-text">Restauracja przechodzi gruntowną modernizację, aby sprostać rosnącym
+                                oczekiwaniom swoich klientów. Zwiększono powierzchnię lokalu, dodano nowoczesne wnętrza
+                                oraz otwartą kuchnię, gdzie goście mogą podziwiać proces przygotowywania dań. Ponadto,
+                                wprowadzono nowe pozycje w menu, łączące tradycyjne smaki z nowoczesnymi technikami
+                                kulinarnymi.</p>
+                        </div>
+                    </div>
+                    <div class="history-grid-item">
+                        <p class="information-header section-preheader-margin">Historia</p>
+                        <h2 class="section-header section-header-left">Tradycja Naszej Rodziny</h2>
+                        <p class="common-text">Restauracja Floppa Shrimps & Cement została założona przez parę, którą
+                            połączyła pasja do rybołówstwa i kulinariów. Jan Fortner,
+                            doświadczony rybak, wraz ze swoją narzeczoną Marią, utalentowana kucharką, stworzyli
+                            miejsce, gdzie
+                            serwowane są świeże owoce morza przygotowywane według tradycyjnych przepisów. Restauracja,
+                            mimo modernizacji w 2023 roku, nadal zachowuje ciepłą, rodzinną atmosferę, przyciągając
+                            klientów z całego świata swoją jakością i autentycznością.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="menu" id="menu">
+            <div class="container">
+                <p class="information-header text-center">
+                    Nasze menu
+                </p>
+                <h2 class="section-header">Odkryj Smaki Oceanu</h2>
+                <div class="menu-grid-container">
+                    <!-- Dynamiczne pozycje menu będą tutaj wstawiane przez JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <section class="special-offer-section">
+            <div class="offer-box">
+                <p class="information-header special-offer-preheader">Oferta Specjalna</p>
+                <h2 class="section-header special-offer-header">Wszystkie pozycje 50% taniej</h2>
+                <p class="common-text special-offer-text">*od poniedziałku do piątku: 12.00 - 15:00</p>
+            </div>
+        </section>
+
+
+        <section class="team-section" id="team-section">
+            <div class="container">
+                <div class="team-grid">
+                    <div class="team-grid-item">
+                        <p class="information-header section-preheader-margin">Nasz Team</p>
+                        <h2 class="section-header section-header-left">Poznaj Naszą Rodzinę</h2>
+                        <p class="common-text">
+                            Restauracja Floppa Shrimps & Cement to nie tylko wyjątkowe miejsce, ale przede wszystkim
+                            zespół wspaniałych ludzi, którzy każdego dnia wkładają serce i duszę w swoją pracę.
+                            Poznajcie naszych pracowników, którzy dbają o to, aby każda wizyta w naszej restauracji była
+                            niezapomnianym doświadczeniem.
+                        </p>
+                    </div>
+                    <div class="team-grid-item">
+                        <div class="team-card">
+                            <img src="./img/personel/1.jpg" alt="Old man with a beard" class="team-img">
+                            <p class="information-header team-preheader">Założyciel</p>
+                            <p class="section-header section-header-left section-header-small">Jan Fortner</p>
+                        </div>
+                        <div class="team-card">
+
+                            <img src="./img/personel/3.jpg" alt="Man with glasses" class="team-img">
+                            <p class="information-header team-preheader">Kucharz</p>
+                            <p class="section-header section-header-left section-header-small">Andrzej Piernik</p>
+                        </div>
+                    </div>
+
+                    <div class="team-grid-item third-team-column">
+                        <div class="team-card">
+                            <img src="./img/personel/2.jpg" alt="Confident woman" class="team-img">
+                            <p class="information-header team-preheader">Założycielka</p>
+                            <p class="section-header section-header-left section-header-small">Maria Fortner</p>
+                        </div>
+                        <div class="team-card">
+                            <img src="./img/personel/4.jpg" alt="CJ" class="team-img">
+                            <p class="information-header team-preheader">Kucharz</p>
+                            <p class="section-header section-header-left section-header-small">Carl Johnson</p>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </section>
+
+
+        <section class="client-testimonials">
+            <i class="fa-solid fa-quote-right"></i>
+            <div class="testimonials">
+                <!--Wszystkie testimonials wstawiane sa przez serwer -->
+            </div>
+            <div class="testimonial-nav"></div>
+
+        </section>
+
+        <section class="reservation-section" id="reservation">
+            <div class="container">
+                <p class="information-header text-center">Zarezerwuj Stolik</p>
+                <h2 class="section-header">Dokonaj Rezerwacji</h2>
+                <p class="common-text text-center reservation-text">
+                    Rezerwacji można dokonać online w każdym momencie bądź dzwoniąc na nr +48 881 925 560 w godzinach
+                    otwarcia.
+                </p>
+
+                <form class="form-inputs" id="reservation-form">
+                    <div class="reservations-grid">
+                        <div class="reservation-field">
+                            <label for="reservation-date" class="input-label">Data*</label>
+                            <input type="date" class="form-input" id="reservation-date" required>
+                        </div>
+                        <div class="reservation-field">
+                            <label for="time" class="input-label">Godzina*</label>
+                            <select id="time" name="time" class="form-input" required></select>
+                        </div>
+                        <div class="reservation-field">
+                            <label for="seats" class="input-label">Miejsca*</label>
+                            <select id="seats" class="form-input" required></select>
+                        </div>
+                        <div class="reservation-field hidden" id="firstNameField">
+                            <label for="firstName" class="input-label">Imie*</label>
+                            <input type="text" class="form-input" id="firstName">
+                        </div>
+                        <div class="reservation-field hidden" id="lastNameField">
+                            <label for="lastName" class="input-label">Nazwisko*</label>
+                            <input type="text" class="form-input" id="lastName">
+                        </div>
+                        <div class="reservation-field hidden" id="emailField">
+                            <label for="email" class="input-label">Email*</label>
+                            <input type="email" class="form-input" id="email">
+                        </div>
+                    </div>
+                    <div class="reservation-field">
+                        <label for="additionalInfo" class="input-label">Dodatkowe Informacje</label>
+                        <textarea id="additionalInfo" class="reservation-textarea"></textarea>
+                    </div>
+                    <button type="submit" class="reservation-button">Zarezerwuj</button>
+                </form>
+            </div>
+        </section>
+
+
+        <section class="news-section" id="news">
+            <div class="container">
+                <p class="information-header text-center">Najnowsze zmiany</p>
+                <h2 class="section-header">Co Ostatnio Dokonaliśmy</h2>
+
+                <div class="news-grid-container" id="news-grid-container">
+                    <!-- Content dodawany jest tu dynamicznie z bazy danych -->
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+
+    <footer id="page-footer">
+        <div class="container">
+            <div class="main-footer-grid">
+                <div class="footer-grid-item first-footer-item">
+                    <h2 class="section-header footer-header">Razem z nami nowy zacznij dziś łów</h2>
+                    <a href="#reservation" class="section-link"><button class="main-btn">Zarezerwuj Teraz</button></a>
+                </div>
+                <div class="footer-grid-item second-footer-item">
+                    <div class="footer-card">
+                        <h3 class="footer-card-header">Adres:</h3>
+                        <p class="common-text footer-card-text">Floppa Shrimps & Cement</p>
+                        <p class="common-text footer-card-text">Hauptstraße 123
+                            69117 Heidelberg
+                            Niemcy</p>
+                    </div>
+                    <div class="footer-card">
+                        <h3 class="footer-card-header">Rezerwacje:</h3>
+                        <p class="common-text footer-card-text">+48 881 925 560</p>
+                        <p class="common-text footer-card-text">shrimpsandcement@gmail.com</p>
+                    </div>
+                    <div class="footer-card">
+                        <h3 class="footer-card-header">Godziny Otwarcia:</h3>
+                        <p class="common-text footer-card-text">Poniedziałek - Piątek: 08:00 - 22:00</p>
+                        <p class="common-text footer-card-text">Sobota - Niedziela: 12:00 - 00:00</p>
+                    </div>
+                </div>
+                <div class="footer-grid-item third-footer-item">
+                    <a href="https://www.facebook.com/seafoodstationrestaurant/?locale=pl_PL" target="#blank"
+                        rel="noopener"><button class="footer-btn"><i class="fa-brands fa-facebook-f"></i></button></a>
+                    <a href="https://twitter.com/TheSeafood" target="#blank" rel="noopener"><button
+                            class="footer-btn"><i class="fa-brands fa-x-twitter"></i></button></a>
+                    <a href="https://www.instagram.com/seafoodstationrestaurant/?hl=pl" target="#blank"
+                        rel="noopener"><button class="footer-btn"><i class="fa-brands fa-instagram"></i></button></a>
+                    <a href="https://www.tiktok.com/channel/seafood" target="#blank" rel="noopener"><button
+                            class="footer-btn"><i class="fa-brands fa-tiktok"></i></button></a>
+                    <a href="https://www.whatsapp.com/?lang=pl_PL" target="#blank" rel="noopener"><button
+                            class="footer-btn"><i class="fa-brands fa-whatsapp"></i></button></a>
+                </div>
+                <div class="footer-grid-item fourth-footer-item">
+                    <p class="small-text"><span id="current-year"></span> &copy Floppa Shrimps & Cement</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="./scripts/scroll.js"></script>
+    <script src="./scripts/getCurrentYear.js"></script>
+    <script src="./scripts/getMenuContent.js"></script>
+    <script src="./scripts/getTestimonialContent.js"></script>
+    <script src="./scripts/registerLogin.js"></script>
+    <script src="./scripts/reservation.js"></script>
+    <script src="./scripts/getNewsContent.js"></script>
+    <script src="https://kit.fontawesome.com/3b7d7d2b37.js" crossorigin="anonymous"></script>
+</body>
+
+</html>

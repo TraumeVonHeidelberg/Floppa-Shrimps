@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="./css/adminPanel.css">
+</head>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html"><img src="./img/logo-full.svg" alt="Logo Floppa Shrimps & Cement"></a>
+    </nav>
+
+    <div class="main-panel">
+        <aside>
+            <button id="user-profile-btn"><i class="fa-solid fa-user"></i>Mój Profil</button>
+            <button id="add-elements-btn"><i class="fa-solid fa-circle-plus"></i>Dodaj elementy</button>
+            <button id="list-elements-btn"><i class="fa-solid fa-list"></i>Wylistuj Elementy</button>
+            <button id="reservations-btn"><i class="fa-solid fa-address-book"></i>Rezerwacje</button>
+        </aside>
+        <article id="main-content">
+            <!-- Dynamiczna zawartosc zgodna z wybraną opcja -->
+        </article>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="./scripts/admin.js"></script>
+    <script src="https://kit.fontawesome.com/3b7d7d2b37.js" crossorigin="anonymous"></script>
+</body>
+
+</html>

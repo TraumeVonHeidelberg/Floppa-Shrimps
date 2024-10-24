@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Jakub Brudnicki">
+    <meta name="viewport" content="width=\, initial-scale=1.0">
+    <title>Floppa Shrimps & Cement</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/newsPage.css">
+</head>
+
+<body>
+    <header class="main-news-header">
+        <nav class="main-nav news-nav">
+            <a href="index.html">
+                <img src="./img/logo-full.svg" alt="Logo projektu, Floppa w łódce łowiąca krewetki"
+                    class="project-logo-img">
+            </a>
+
+            <ul class="main-nav-list">
+                <li><a href="index.html#">Home</a></li>
+                <li><a href="index.html#about-us">O Nas</a></li>
+                <li><a href="index.html#menu">Menu</a></li>
+                <li><a href="index.html#team-section">Team</a></li>
+                <li><a href="index.html#news">Nowości</a></li>
+                <li><a href="index.html#page-footer">Kontakt</a></li>
+            </ul>
+
+            <div class="nav-group">
+                <a href="#reservation" class="section-link">
+                    <button class="main-btn">Rezerwuj Teraz</button>
+                </a>
+                <img src="./img/avatar-big.jpg" alt="User avatar" id="login-icon">
+                <div id="user-options" class="user-options hidden">
+                    <ul>
+                        <li><a href="profile.html">Profil</a></li>
+                        <li><a href="#" id="logout-btn">Wyloguj</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="modal" class="modal">
+                <div class="modal-content" id="modal-content"></div>
+            </div>
+        </nav>
+
+        <!-- Zawartosc jest tu dodawana dynamicznie -->
+        <div class="news-header-text">
+            <p class="news-preheader" id="news-category"></p>
+            <h2 class="news-header" id="news-title"></h2>
+            <p class="news-footer main-news-footer" id="news-footer">
+                <span class="avatar-name"><img src="./img/avatar-example.png" alt="Avatar użytkownika"
+                        class="user-avatar" id="news-author-avatar"></span>
+            </p>
+        </div>
+    </header>
+
+    <main class="news-main">
+        <div class="main-news-grid" id="news-content">
+            <article>
+                <!-- Zawartosc article jest wypelniana dynamicznie -->
+            </article>
+            <!-- <aside>
+                dodawane dynamicznie
+            </aside> -->
+        </div>
+    </main>
+
+    <footer id="page-footer">
+        <div class="container">
+            <div class="main-footer-grid">
+                <div class="footer-grid-item first-footer-item">
+                    <h2 class="section-header footer-header">Razem z nami nowy zacznij dziś łów</h2>
+                    <a href="index.html#reservation" class="section-link"><button class="main-btn">Zarezerwuj
+                            Teraz</button></a>
+                </div>
+                <div class="footer-grid-item second-footer-item">
+                    <div class="footer-card">
+                        <h3 class="footer-card-header">Adres:</h3>
+                        <p class="common-text footer-card-text">Floppa Shrimps & Cement</p>
+                        <p class="common-text footer-card-text">Hauptstraße 123 69117 Heidelberg Niemcy</p>
+                    </div>
+                    <div class="footer-card">
+                        <h3 class="footer-card-header">Rezerwacje:</h3>
+                        <p class="common-text footer-card-text">+48 881 925 560</p>
+                        <p class="common-text footer-card-text">shrimpsandcement@gmail.com</p>
+                    </div>
+                    <div class="footer-card">
+                        <h3 class="footer-card-header">Godziny Otwarcia:</h3>
+                        <p class="common-text footer-card-text">Poniedziałek - Piątek: 08:00 - 22:00</p>
+                        <p class="common-text footer-card-text">Sobota - Niedziela: 12:00 - 00:00</p>
+                    </div>
+                </div>
+                <div class="footer-grid-item third-footer-item">
+                    <a href="https://www.facebook.com/seafoodstationrestaurant/?locale=pl_PL" target="#blank"
+                        rel="noopener"><button class="footer-btn"><i class="fa-brands fa-facebook-f"></i></button></a>
+                    <a href="https://twitter.com/TheSeafood" target="#blank" rel="noopener"><button
+                            class="footer-btn"><i class="fa-brands fa-x-twitter"></i></button></a>
+                    <a href="https://www.instagram.com/seafoodstationrestaurant/?hl=pl" target="#blank"
+                        rel="noopener"><button class="footer-btn"><i class="fa-brands fa-instagram"></i></button></a>
+                    <a href="https://www.tiktok.com/channel/seafood" target="#blank" rel="noopener"><button
+                            class="footer-btn"><i class="fa-brands fa-tiktok"></i></button></a>
+                    <a href="https://www.whatsapp.com/?lang=pl_PL" target="#blank" rel="noopener"><button
+                            class="footer-btn"><i class="fa-brands fa-whatsapp"></i></button></a>
+                </div>
+                <div class="footer-grid-item fourth-footer-item">
+                    <p class="small-text"><span id="current-year"></span> &copy Floppa Shrimps & Cement</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="./scripts/giveNavColor.js"></script>
+    <script src="./scripts/getCurrentYear.js"></script>
+    <script src="./scripts/registerLogin.js"></script>
+    <script src="https://kit.fontawesome.com/3b7d7d2b37.js" crossorigin="anonymous"></script>
+    <script src="./scripts/fullNews.js"></script>
+</body>
+
+</html>
